@@ -1,6 +1,8 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
+import type { MathQuestion, Quiz } from '../domain/quiz'
+import { QUIZ_BONUS_COOKIES } from '../domain/raceGame'
 import { RaceScreen } from './RaceScreen'
 
 /**
@@ -11,10 +13,18 @@ import { RaceScreen } from './RaceScreen'
 const cookiesDownTheMiddle = () => 0.5
 const hazardsInTheLeftLane = () => 0.1
 
-function renderRace(random = cookiesDownTheMiddle, bestScore = 0) {
+const question: MathQuestion = {
+  prompt: '2x + 6x =',
+  options: ['8x', '8', '8y'],
+  correctIndex: 0,
+  explanation: 'Same things go together: 2x + 6x = 8x',
+}
+const brainBreakAfterTwoSeconds = (): Quiz => ({ nextDelay: () => 2, ask: () => question })
+
+function renderRace(random = cookiesDownTheMiddle, bestScore = 0, createQuiz?: () => Quiz) {
   const bestScores = new InMemoryBestScoreStore(bestScore)
   const onExit = vi.fn()
-  const { container } = render(<RaceScreen random={random} bestScores={bestScores} onExit={onExit} />)
+  const { container } = render(<RaceScreen random={random} bestScores={bestScores} createQuiz={createQuiz} onExit={onExit} />)
   const carLeft = () => Number.parseFloat((container.querySelector('.race-car') as HTMLElement).style.left)
   return { bestScores, onExit, carLeft }
 }
@@ -163,5 +173,105 @@ describe('RaceScreen', () => {
 
     expect(screen.getByRole('button', { name: 'Steer left' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Steer right' })).toBeInTheDocument()
+  })
+})
+
+describe('brain breaks', () => {
+  const score = () => Number(screen.getByRole('status').textContent?.replace('Score: ', ''))
+  const questionDialog = () => screen.getByRole('dialog', { name: 'Maths question' })
+
+  function askedQuestion() {
+    const race = renderRace(cookiesDownTheMiddle, 0, brainBreakAfterTwoSeconds)
+    driveFor(3.3 + 2.5)
+    return race
+  }
+
+  it('does not ask anything in a race without a quiz', () => {
+    renderRace()
+
+    driveFor(20)
+
+    expect(screen.queryByRole('dialog', { name: 'Maths question' })).not.toBeInTheDocument()
+  })
+
+  it('pops up a question with the sum and three answers to pick from', () => {
+    askedQuestion()
+
+    const dialog = questionDialog()
+    expect(within(dialog).getByText('2x + 6x =')).toBeInTheDocument()
+    expect(within(dialog).getAllByRole('button').map((button) => button.textContent)).toEqual(['8x', '8', '8y'])
+  })
+
+  it('stops the race while the question is showing', () => {
+    askedQuestion()
+    const before = screen.getByRole('progressbar').getAttribute('aria-valuenow')
+
+    driveFor(5)
+
+    expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe(before)
+    expect(questionDialog()).toBeInTheDocument()
+  })
+
+  it('does not open the pause menu on top of a question', () => {
+    askedQuestion()
+
+    press('Escape')
+
+    expect(screen.queryByRole('dialog', { name: 'Paused' })).not.toBeInTheDocument()
+  })
+
+  it('rewards the right answer first time with bonus cookies and explains why', () => {
+    askedQuestion()
+    const before = score()
+
+    fireEvent.click(within(questionDialog()).getByRole('button', { name: '8x' }))
+
+    expect(screen.queryByRole('dialog', { name: 'Maths question' })).not.toBeInTheDocument()
+    expect(score()).toBe(before + QUIZ_BONUS_COOKIES)
+    expect(screen.getByText(/Same things go together: 2x \+ 6x = 8x/)).toBeInTheDocument()
+  })
+
+  it('is kind about a wrong answer: it greys out, a hint appears, and the question stays', () => {
+    askedQuestion()
+    const before = score()
+
+    fireEvent.click(within(questionDialog()).getByRole('button', { name: '8' }))
+
+    expect(within(questionDialog()).getByRole('button', { name: '8' })).toBeDisabled()
+    expect(within(questionDialog()).getByText(/only the same things go together/i)).toBeInTheDocument()
+    expect(score()).toBe(before)
+  })
+
+  it('moves on after the right answer even following a slip, but gives no bonus', () => {
+    askedQuestion()
+    const before = score()
+    fireEvent.click(within(questionDialog()).getByRole('button', { name: '8y' }))
+
+    fireEvent.click(within(questionDialog()).getByRole('button', { name: '8x' }))
+
+    expect(screen.queryByRole('dialog', { name: 'Maths question' })).not.toBeInTheDocument()
+    expect(score()).toBe(before)
+  })
+
+  it('lets a keyboard player pick with 1, 2 and 3', () => {
+    askedQuestion()
+    const before = score()
+
+    press('1')
+
+    expect(screen.queryByRole('dialog', { name: 'Maths question' })).not.toBeInTheDocument()
+    expect(score()).toBe(before + QUIZ_BONUS_COOKIES)
+  })
+
+  it('races on afterwards, and asks again later', () => {
+    askedQuestion()
+    press('1')
+    const before = screen.getByRole('progressbar').getAttribute('aria-valuenow')
+
+    driveFor(1)
+    expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).not.toBe(before)
+    driveFor(4)
+
+    expect(questionDialog()).toBeInTheDocument()
   })
 })

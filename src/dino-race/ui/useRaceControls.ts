@@ -5,6 +5,8 @@ interface Controls {
   hold(direction: SteerDirection): void
   release(direction: SteerDirection): void
   togglePause(): void
+  /** Picks answer number `optionIndex` (0-based) on a question. */
+  choose(optionIndex: number): void
 }
 
 const DIRECTION_KEYS: Record<string, SteerDirection> = {
@@ -15,6 +17,7 @@ const DIRECTION_KEYS: Record<string, SteerDirection> = {
   d: 'right',
   D: 'right',
 }
+const ANSWER_KEYS = ['1', '2', '3']
 const PAUSE_KEYS = new Set(['Escape', ' ', 'p', 'P'])
 
 export function useRaceControls(controls: Controls): void {
@@ -29,6 +32,8 @@ export function useRaceControls(controls: Controls): void {
       if (direction) {
         event.preventDefault()
         latest.current.hold(direction)
+      } else if (ANSWER_KEYS.includes(event.key)) {
+        latest.current.choose(ANSWER_KEYS.indexOf(event.key))
       } else if (PAUSE_KEYS.has(event.key) && !event.repeat && !isActivatingButton(event)) {
         event.preventDefault()
         latest.current.togglePause()

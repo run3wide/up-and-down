@@ -6,7 +6,7 @@ import { InMemoryBestScoreStore } from './shared/InMemoryBestScoreStore'
 const bestScores = () => ({
   'up-and-down': new InMemoryBestScoreStore(),
   'lemon-volcano': new InMemoryBestScoreStore(),
-  'turbo-race': new InMemoryBestScoreStore(),
+  'dino-race': new InMemoryBestScoreStore(),
 })
 
 const silentSound = { unlock: () => {}, play: () => {} }
@@ -45,8 +45,8 @@ describe('App', () => {
     expect(screen.getByLabelText('8 lemons left')).toBeInTheDocument()
   })
 
-  it('opens Turbo Race straight away from its own address', () => {
-    renderApp('/turbo-race')
+  it('opens Dino Race straight away from its own address', () => {
+    renderApp('/dino-race')
 
     expect(screen.getByRole('progressbar', { name: 'Race progress' })).toBeInTheDocument()
   })

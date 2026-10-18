@@ -18,13 +18,20 @@ const SPACING = 32
 const SPACING_VARIATION = 18
 const FINISH_RUN_IN = 40
 const COOKIE_GAP = 6
+/** Every few obstacles the road opens out, which is when the race stops for a brain-break question. */
+const PATTERNS_BETWEEN_BREATHERS = 3
+const BREATHER_LENGTH = 120
 
 type Random = () => number
 
 /** Builds the whole race up front, so a race is fully decided by the random source it is given. */
 export function buildCourse(random: Random): CourseItem[] {
   const items: Omit<CourseItem, 'id'>[] = []
+  let patterns = 0
   for (let at = COURSE_START_CLEAR; at < FINISH_DISTANCE - FINISH_RUN_IN; at += SPACING + random() * SPACING_VARIATION) {
+    if (patterns > 0 && patterns % PATTERNS_BETWEEN_BREATHERS === 0) at += BREATHER_LENGTH
+    if (at >= FINISH_DISTANCE - FINISH_RUN_IN) break
+    patterns += 1
     const roll = random()
     if (roll < 0.4) items.push(obstacle(random, at, between(random, ITEM_MIN_X, ITEM_MAX_X)))
     else if (roll < 0.75) items.push(...cookieTrio(random, at))

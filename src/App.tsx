@@ -1,6 +1,7 @@
 import type { SoundPlayer } from './lemon-volcano/application/SoundPlayer'
 import { VolcanoScreen } from './lemon-volcano/ui/VolcanoScreen'
-import { RaceScreen } from './turbo-race/ui/RaceScreen'
+import { mathQuiz } from './dino-race/domain/mathQuestions'
+import { RaceScreen } from './dino-race/ui/RaceScreen'
 import { useRoute } from './routing/useRoute'
 import type { BestScoreStore } from './shared/bestScore'
 import { SplashScreen } from './splash/SplashScreen'
@@ -26,8 +27,8 @@ export function App({ random, bestScores, sound, basePath }: AppProps) {
       return <GameScreen random={random} bestScores={bestScores['up-and-down']} onExit={backToGames} />
     case 'lemon-volcano':
       return <VolcanoScreen random={random} bestScores={bestScores['lemon-volcano']} sound={sound} onExit={backToGames} />
-    case 'turbo-race':
-      return <RaceScreen random={random} bestScores={bestScores['turbo-race']} onExit={backToGames} />
+    case 'dino-race':
+      return <RaceScreen random={random} bestScores={bestScores['dino-race']} createQuiz={() => mathQuiz(random)} onExit={backToGames} />
     case null:
       return <SplashScreen onPick={navigate} />
   }

@@ -1,11 +1,13 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { CourseItem } from './course'
 import { FINISH_DISTANCE } from './course'
+import type { MathQuestion, Quiz } from './quiz'
 import {
   COUNTDOWN_SECONDS,
   INVULNERABLE_SECONDS,
   MAX_LIVES,
   MAX_SPEED,
+  QUIZ_BONUS_COOKIES,
   RaceGame,
   START_SPEED,
   STEER_UNITS_PER_SECOND,
@@ -261,5 +263,136 @@ describe('pausing', () => {
     game.togglePause()
 
     expect(game.snapshot().paused).toBe(false)
+  })
+})
+
+describe('brain breaks', () => {
+  const question: MathQuestion = { prompt: '2x + 6x =', options: ['8x', '8', '8y'], correctIndex: 0, explanation: 'Same things go together' }
+  const quizEvery = (seconds: number): Quiz => ({ nextDelay: () => seconds, ask: () => question })
+
+  function racingWithQuiz(quiz: Quiz, course: CourseItem[] = []): RaceGame {
+    const game = new RaceGame(course, quiz)
+    game.tick(COUNTDOWN_SECONDS + FRAME)
+    return game
+  }
+
+  const driveUntilAsked = (game: RaceGame) => driveUntil(game, () => game.snapshot().phase !== 'racing')
+
+  it('never asks anything without a quiz', () => {
+    const game = racing()
+
+    driveUntilAsked(game)
+
+    expect(game.snapshot().phase).toBe('finished')
+    expect(game.snapshot().question).toBeNull()
+  })
+
+  it('stops the race to ask a question once it is due', () => {
+    const game = racingWithQuiz(quizEvery(5))
+
+    driveUntilAsked(game)
+
+    expect(game.snapshot().phase).toBe('asking')
+    expect(game.snapshot().question).toEqual(question)
+    expect(game.snapshot().distance).toBeGreaterThan(100)
+  })
+
+  it('freezes the car, the steering and the pause button while a question is up', () => {
+    const game = racingWithQuiz(quizEvery(5))
+    driveUntilAsked(game)
+    const frozen = game.snapshot()
+
+    game.tick(2)
+    game.steer('left', 1)
+    game.placeCar(30)
+    game.togglePause()
+
+    expect(game.snapshot()).toEqual(frozen)
+  })
+
+  it('waits for a clear road, so a question never lands on top of an obstacle', () => {
+    const game = racingWithQuiz(quizEvery(5), [cone(1, 260, 70)])
+    game.placeCar(30)
+
+    driveUntilAsked(game)
+
+    expect(game.snapshot().distance).toBeGreaterThan(260)
+    expect(game.snapshot().lives).toBe(MAX_LIVES)
+  })
+
+  it('keeps well away from the finish line', () => {
+    const game = racingWithQuiz(quizEvery(33.5))
+
+    driveUntilAsked(game)
+
+    expect(game.snapshot().phase).toBe('finished')
+    expect(game.snapshot().question).toBeNull()
+  })
+
+  it('numbers the questions from one, so they can get harder', () => {
+    const ask = vi.fn((_questionNumber: number) => question)
+    const game = racingWithQuiz({ nextDelay: () => 3, ask })
+
+    driveUntilAsked(game)
+    game.answer(0)
+    driveUntilAsked(game)
+
+    expect(ask.mock.calls.map(([number]) => number)).toEqual([1, 2])
+  })
+
+  describe('answering', () => {
+    function asked(): RaceGame {
+      const game = racingWithQuiz(quizEvery(5))
+      driveUntilAsked(game)
+      return game
+    }
+
+    it('rewards a right answer first time with bonus cookies, and the race carries on', () => {
+      const game = asked()
+
+      const events = game.answer(0)
+
+      expect(events).toEqual([{ type: 'answeredCorrectly', firstTry: true }])
+      expect(game.snapshot()).toMatchObject({ phase: 'racing', question: null, cookies: QUIZ_BONUS_COOKIES })
+    })
+
+    it('is gentle with a wrong answer: no penalty, the question stays, and that pick is remembered', () => {
+      const game = asked()
+
+      const events = game.answer(1)
+
+      expect(events).toEqual([{ type: 'answeredWrong' }])
+      expect(game.snapshot()).toMatchObject({ phase: 'asking', lives: MAX_LIVES, cookies: 0, wrongPicks: [1] })
+    })
+
+    it('still moves on once the right answer is found, but with no bonus after a slip', () => {
+      const game = asked()
+      game.answer(1)
+      game.answer(2)
+
+      const events = game.answer(0)
+
+      expect(events).toEqual([{ type: 'answeredCorrectly', firstTry: false }])
+      expect(game.snapshot()).toMatchObject({ phase: 'racing', cookies: 0 })
+    })
+
+    it('asks again after another wait', () => {
+      const game = asked()
+      game.answer(0)
+      expect(game.snapshot().phase).toBe('racing')
+
+      driveUntilAsked(game)
+
+      expect(game.snapshot().phase).toBe('asking')
+    })
+
+    it('ignores an answer when nothing has been asked, or one that is not an option', () => {
+      const racingGame = racing()
+      expect(racingGame.answer(0)).toEqual([])
+
+      const game = asked()
+      expect(game.answer(7)).toEqual([])
+      expect(game.snapshot().phase).toBe('asking')
+    })
   })
 })

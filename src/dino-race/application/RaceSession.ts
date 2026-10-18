@@ -26,6 +26,10 @@ export class RaceSession {
     this.game.placeCar(x)
   }
 
+  answer(optionIndex: number): RaceEvent[] {
+    return this.game.answer(optionIndex)
+  }
+
   togglePause(): void {
     this.game.togglePause()
   }

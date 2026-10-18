@@ -5,7 +5,9 @@ import { GameOverOverlay, PausedOverlay } from '../../shared/Overlays'
 import { useAnimationFrame } from '../../shared/useAnimationFrame'
 import { RaceSession } from '../application/RaceSession'
 import { FINISH_DISTANCE, buildCourse } from '../domain/course'
-import { MAX_LIVES, RaceGame, type RaceEvent, type SteerDirection } from '../domain/raceGame'
+import type { Quiz } from '../domain/quiz'
+import { MAX_LIVES, QUIZ_BONUS_COOKIES, RaceGame, type RaceEvent, type SteerDirection } from '../domain/raceGame'
+import { QuestionDialog } from './QuestionDialog'
 import { Track } from './Track'
 import { useRaceControls } from './useRaceControls'
 import '../../shared/hud.css'
@@ -15,22 +17,33 @@ import './race.css'
 interface RaceScreenProps {
   random: () => number
   bestScores: BestScoreStore
+  /** Makes this race's brain-break quiz; leave out for a race with no questions. */
+  createQuiz?: () => Quiz | null
   onExit: () => void
 }
 
 const CRASH_MILLISECONDS = 700
 const GO_DISTANCE = 25
+const PRAISE_MILLISECONDS = 4500
 
-export function RaceScreen({ random, bestScores, onExit }: RaceScreenProps) {
-  const [session] = useState(() => new RaceSession(new RaceGame(buildCourse(random))))
+export function RaceScreen({ random, bestScores, createQuiz, onExit }: RaceScreenProps) {
+  const [session] = useState(() => new RaceSession(new RaceGame(buildCourse(random), createQuiz?.() ?? null)))
   const [snapshot, setSnapshot] = useState(() => session.snapshot())
   const [result, setResult] = useState<BestScoreResult | null>(null)
   const [crashed, setCrashed] = useState(false)
   const [cookiePop, setCookiePop] = useState(0)
+  const [praise, setPraise] = useState<string | null>(null)
   const crashTimer = useRef<number | undefined>(undefined)
+  const praiseTimer = useRef<number | undefined>(undefined)
   const stage = useRef<HTMLDivElement>(null)
 
-  useEffect(() => () => clearTimeout(crashTimer.current), [])
+  useEffect(
+    () => () => {
+      clearTimeout(crashTimer.current)
+      clearTimeout(praiseTimer.current)
+    },
+    [],
+  )
 
   const refresh = useCallback(() => setSnapshot(session.snapshot()), [session])
 
@@ -51,6 +64,20 @@ export function RaceScreen({ random, bestScores, onExit }: RaceScreenProps) {
     [bestScores, session],
   )
 
+  const choose = useCallback(
+    (optionIndex: number) => {
+      const explanation = session.snapshot().question?.explanation ?? ''
+      const right = session.answer(optionIndex).find((event) => event.type === 'answeredCorrectly')
+      if (right) {
+        clearTimeout(praiseTimer.current)
+        setPraise(right.firstTry ? `Brilliant! +${QUIZ_BONUS_COOKIES} 🍪  ${explanation}` : `You got it! ${explanation}`)
+        praiseTimer.current = window.setTimeout(() => setPraise(null), PRAISE_MILLISECONDS)
+      }
+      refresh()
+    },
+    [session, refresh],
+  )
+
   useAnimationFrame((elapsed) => {
     react(session.advance(elapsed))
     refresh()
@@ -65,6 +92,7 @@ export function RaceScreen({ random, bestScores, onExit }: RaceScreenProps) {
     hold: (direction) => session.hold(direction),
     release: (direction) => session.release(direction),
     togglePause,
+    choose,
   })
 
   const dragTo = (event: React.PointerEvent) => {
@@ -107,7 +135,15 @@ export function RaceScreen({ random, bestScores, onExit }: RaceScreenProps) {
         <div className="race__progress-fill" style={{ width: `${progress * 100}%` }} />
       </div>
       <p className="race__hint" aria-hidden="true">← → steer</p>
+      {praise && (
+        <p className="race__praise" aria-live="polite">
+          {praise}
+        </p>
+      )}
       <TouchControls hold={(direction) => session.hold(direction)} release={(direction) => session.release(direction)} />
+      {snapshot.phase === 'asking' && snapshot.question && (
+        <QuestionDialog question={snapshot.question} wrongPicks={snapshot.wrongPicks} onAnswer={choose} />
+      )}
       {snapshot.paused && <PausedOverlay onResume={togglePause} onMainMenu={onExit} />}
       {snapshot.phase === 'finished' && result && (
         <GameOverOverlay title="Race finished!" score={snapshot.cookies} result={result} onBackToGames={onExit} />

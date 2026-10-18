@@ -5,7 +5,7 @@ import { SplashScreen } from './SplashScreen'
 
 const upAndDown = { name: 'Play Up and Down, by Daniel Robson' }
 const lemonVolcano = { name: 'Play Lemon Volcano, by Moses Robson' }
-const turboRace = { name: 'Play Turbo Race, by Daniel Robson' }
+const dinoRace = { name: 'Play Dino Race, by Daniel Robson' }
 
 describe('SplashScreen', () => {
   it('offers both games with their authors', () => {
@@ -14,7 +14,7 @@ describe('SplashScreen', () => {
     expect(screen.getByRole('heading', { name: 'Pick a game' })).toBeInTheDocument()
     expect(screen.getByRole('button', upAndDown)).toHaveTextContent('Daniel Robson')
     expect(screen.getByRole('button', lemonVolcano)).toHaveTextContent('Moses Robson')
-    expect(screen.getByRole('button', turboRace)).toHaveTextContent('Daniel Robson')
+    expect(screen.getByRole('button', dinoRace)).toHaveTextContent('Daniel Robson')
   })
 
   it('focuses the first game so keyboard players can begin straight away', () => {
@@ -26,7 +26,7 @@ describe('SplashScreen', () => {
   it.each([
     ['Up and Down', upAndDown, 'up-and-down'],
     ['Lemon Volcano', lemonVolcano, 'lemon-volcano'],
-    ['Turbo Race', turboRace, 'turbo-race'],
+    ['Dino Race', dinoRace, 'dino-race'],
   ])('starts %s when its card is chosen', async (_title, button, gameId) => {
     const onPick = vi.fn()
     render(<SplashScreen onPick={onPick} />)

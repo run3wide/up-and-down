@@ -127,7 +127,7 @@
   background: linear-gradient(#ffffff, #d9f3ff);
 }
 
-.game-card--turbo-race {
+.game-card--dino-race {
   background: linear-gradient(#ffffff, #ffd9df);
 }
 
@@ -153,7 +153,7 @@
   font-size: clamp(1rem, 2.6vw, 1.3rem);
 }
 
-.game-card__title--turbo {
+.game-card__title--dino {
   color: #ff4f6d;
 }
 

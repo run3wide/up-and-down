@@ -61,4 +61,19 @@ describe('buildCourse', () => {
       expect(widestGap).toBeGreaterThan(20)
     }
   })
+
+  it('leaves regular breathing space with no obstacles, wide enough to stop for a question', () => {
+    const QUESTION_SPACE = 100
+    for (let seed = 1; seed <= 20; seed++) {
+      const obstacleAts = buildCourse(seeded(seed))
+        .filter((item) => item.kind !== 'cookie')
+        .map((item) => item.at)
+
+      for (let from = COURSE_START_CLEAR; from < FINISH_DISTANCE - 500; from += 100) {
+        const window = [from, ...obstacleAts.filter((at) => at > from && at < from + 700), from + 700]
+        const widestGap = Math.max(...window.slice(1).map((at, i) => at - window[i]))
+        expect(widestGap).toBeGreaterThanOrEqual(QUESTION_SPACE)
+      }
+    }
+  })
 })
