@@ -162,6 +162,10 @@
   background: linear-gradient(#ffffff, #ffd9e6);
 }
 
+.game-card--brick-builder {
+  background: linear-gradient(#ffffff, #ffd9c2);
+}
+
 .game-card--lemon-volcano {
   background: linear-gradient(#ffffff, #fff3b8);
 }
@@ -210,6 +214,10 @@
 
 .game-card__title--colouring {
   color: #d6336c;
+}
+
+.game-card__title--brick-builder {
+  color: #d9480f;
 }
 
 .game-card__title--match {

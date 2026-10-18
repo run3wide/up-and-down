@@ -14,6 +14,7 @@ describe('game paths', () => {
     ['/spelling-bee', '/', 'spelling-bee'],
     ['/dino-dig', '/', 'dino-dig'],
     ['/colouring', '/', 'colouring'],
+    ['/brick-builder', '/', 'brick-builder'],
     ['/lemon-volcano/', '/', 'lemon-volcano'],
     ['/up-and-down/', '/up-and-down/', null],
     ['/up-and-down/lemon-volcano', '/up-and-down/', 'lemon-volcano'],
@@ -34,7 +35,7 @@ describe('game paths', () => {
   })
 
   it('round-trips', () => {
-    for (const game of ['up-and-down', 'lemon-volcano', 'dino-race', 'little-chef', 'match-up', 'cookie-maze', 'tic-tac-toe', 'spelling-bee', 'dino-dig', 'colouring'] as const) {
+    for (const game of ['up-and-down', 'lemon-volcano', 'dino-race', 'little-chef', 'match-up', 'cookie-maze', 'tic-tac-toe', 'spelling-bee', 'dino-dig', 'colouring', 'brick-builder'] as const) {
       expect(gameAtPath(pathFor(game, '/x/'), '/x/')).toBe(game)
     }
   })
