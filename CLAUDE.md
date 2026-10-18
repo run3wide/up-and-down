@@ -10,12 +10,14 @@ Browser game for kids (React + TypeScript + Vite, tests with Vitest). The build 
 
 ## Structure
 
-- `src/game/domain/` — pure, framework-free rules: `ball` physics, `catching` verdicts, `difficulty` ramp, and the `Game` aggregate (score, lives, pause). Randomness is injected (`Random`); no clock or DOM in here. World is 100 units wide, y is height above the ground.
-- `src/game/application/` — `GameSession` (held keys → movement, frame-time clamp) and the `BestScoreStore` port.
-- `src/game/infrastructure/` — `BestScoreStore` adapters (localStorage, in-memory).
-- `src/game/ui/` — React adapter: `GameScreen`, HUD, overlays, rAF loop and keyboard hooks. The loop feeds time deltas into the session.
-- `src/splash/` — splash screen and logo. `src/art/` — shared inline-SVG art (dino, ball, stegosaurus).
-- `src/main.tsx` is the composition root (`Math.random`, localStorage store).
+Two games, each its own bounded context, picked from the splash screen. After a round each returns to the splash (`onExit`).
+
+- `src/up-and-down/` — Daniel's game. `domain/` is pure and framework-free: `ball` physics, `catching` verdicts, `difficulty` ramp, and the `Game` aggregate (score, lives, pause). `application/GameSession` turns held keys into movement and clamps frame time. `ui/` is the React adapter.
+- `src/robot-hoops/` — Moses's game. `domain/shot` (fixed-power projectile; `hoopAt` places each hoop where a real shot lands so it's always scoreable), `domain/hoopsGame` (`HoopsGame` aggregate: aim, shoot, 8 shots per round), `application/HoopsSession`, `ui/` (SVG court drawn in world units).
+- `src/shared/` — best-score port + adapters (`LocalStorageBestScoreStore(key)`, in-memory), `useAnimationFrame`, shared overlays/HUD/touch-control CSS.
+- `src/splash/` — game picker, Up and Down logo. `src/art/` — shared inline-SVG art.
+- `src/App.tsx` switches between splash and games; `src/main.tsx` is the composition root (`Math.random`, one localStorage key per game).
+- Domain code is deterministic: randomness is injected, no clock or DOM.
 
 ## Conventions
 

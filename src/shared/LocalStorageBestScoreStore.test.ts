@@ -5,19 +5,19 @@ describe('LocalStorageBestScoreStore', () => {
   beforeEach(() => localStorage.clear())
 
   it('remembers the best score between visits', () => {
-    new LocalStorageBestScoreStore().save(12)
+    new LocalStorageBestScoreStore('best').save(12)
 
-    expect(new LocalStorageBestScoreStore().load()).toBe(12)
+    expect(new LocalStorageBestScoreStore('best').load()).toBe(12)
   })
 
   it('starts at zero', () => {
-    expect(new LocalStorageBestScoreStore().load()).toBe(0)
+    expect(new LocalStorageBestScoreStore('best').load()).toBe(0)
   })
 
   it('ignores junk left in storage', () => {
-    localStorage.setItem('up-and-down:best-score', 'banana')
+    localStorage.setItem('best', 'banana')
 
-    expect(new LocalStorageBestScoreStore().load()).toBe(0)
+    expect(new LocalStorageBestScoreStore('best').load()).toBe(0)
   })
 
   it('carries on when storage is unavailable, such as in a private window', () => {
@@ -27,7 +27,7 @@ describe('LocalStorageBestScoreStore', () => {
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw new Error('blocked')
     })
-    const store = new LocalStorageBestScoreStore()
+    const store = new LocalStorageBestScoreStore('best')
 
     expect(store.load()).toBe(0)
     expect(() => store.save(3)).not.toThrow()

@@ -13,9 +13,9 @@ function Word({ text, direction }: { text: string; direction: 'up' | 'down' }) {
   )
 }
 
-export function Logo() {
+export function Logo({ as: Heading = 'h1' }: { as?: 'h1' | 'span' }) {
   return (
-    <h1 className="logo" aria-label="Up and Down">
+    <Heading className="logo" aria-label={Heading === 'h1' ? 'Up and Down' : undefined} aria-hidden={Heading === 'span' || undefined}>
       <span className="logo__peek" aria-hidden="true">
         <Dino mood="cheer" />
       </span>
@@ -24,6 +24,6 @@ export function Logo() {
         <Ball />
       </span>
       <Word text="Down" direction="down" />
-    </h1>
+    </Heading>
   )
 }

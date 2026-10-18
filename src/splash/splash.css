@@ -17,13 +17,13 @@
   text-align: center;
 }
 
-.splash__byline {
+.splash__title {
   margin: 0;
-  font-size: clamp(1.1rem, 3.5vw, 1.8rem);
-  color: var(--ink);
-  background: #ffffffb3;
-  padding: 0.2em 0.9em;
-  border-radius: 999px;
+  font-size: clamp(2.2rem, 7vw, 4rem);
+  color: #fff;
+  -webkit-text-stroke: 0.06em var(--ink);
+  paint-order: stroke fill;
+  text-shadow: 0 0.07em 0 #0004, 0 0.14em 0.2em #0003;
 }
 
 /* Logo */
@@ -89,32 +89,69 @@
   height: auto;
 }
 
-/* Start button */
-.start-button {
-  margin-top: clamp(0.5rem, 3vh, 2rem);
-  min-width: 11rem;
-  min-height: 5rem;
-  padding: 0.3em 1.6em;
-  font-size: clamp(2rem, 7vw, 3.2rem);
-  color: #fff;
-  -webkit-text-stroke: 0.04em #0a5c2a;
-  paint-order: stroke fill;
-  background: linear-gradient(#7cf08a, #25b04a);
-  border: 0.12em solid #0a5c2a;
-  border-radius: 999px;
-  box-shadow: 0 0.12em 0 #0a5c2a, 0 0.35em 0.6em #0004;
+/* Game cards */
+.game-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(0.75rem, 3vw, 2rem);
+}
+
+.game-card {
+  display: grid;
+  justify-items: center;
+  align-content: end;
+  gap: 0.4rem;
+  width: clamp(14rem, 38vw, 22rem);
+  min-height: clamp(13rem, 34vh, 17rem);
+  padding: 1rem 1rem 1.25rem;
+  color: var(--ink);
+  background: #fff;
+  border: 0.3rem solid #fff;
+  border-radius: 2rem;
+  box-shadow: 0 0.4rem 0 #0002, 0 1rem 1.5rem #0003;
   cursor: pointer;
   transition: transform 0.12s, box-shadow 0.12s;
-  animation: pulse 2s ease-in-out infinite;
 }
 
-.start-button:hover {
-  transform: translateY(-3px) scale(1.05);
+.game-card:hover {
+  transform: translateY(-4px) scale(1.03);
 }
 
-.start-button:active {
-  transform: translateY(0.1em) scale(0.98);
-  box-shadow: 0 0.03em 0 #0a5c2a, 0 0.1em 0.3em #0004;
+.game-card:active {
+  transform: translateY(0.2rem) scale(0.98);
+  box-shadow: 0 0.1rem 0 #0002, 0 0.3rem 0.6rem #0003;
+}
+
+.game-card--up-and-down {
+  background: linear-gradient(#ffffff, #d9f3ff);
+}
+
+.game-card--robot-hoops {
+  background: linear-gradient(#ffffff, #ffe7cc);
+}
+
+.game-card .logo {
+  padding-top: clamp(2rem, 7vw, 3.2rem);
+  font-size: clamp(1.8rem, 5.2vw, 3.2rem);
+}
+
+.game-card__title {
+  font-size: clamp(2rem, 5.5vw, 3rem);
+  line-height: 1;
+  color: #ff9a52;
+  -webkit-text-stroke: 0.06em var(--ink);
+  paint-order: stroke fill;
+  text-shadow: 0 0.07em 0 #0004;
+}
+
+.game-card__byline {
+  font-size: clamp(1rem, 2.6vw, 1.3rem);
+}
+
+.robot-icon {
+  width: clamp(5rem, 14vw, 7.5rem);
+  animation: bob 3s ease-in-out infinite;
 }
 
 /* Scene */
@@ -186,7 +223,6 @@
 @keyframes drop { 50% { translate: 0 0.12em; } }
 @keyframes bounce { 50% { translate: 0 -0.5em; } }
 @keyframes bob { 50% { translate: 0 -0.3rem; } }
-@keyframes pulse { 50% { scale: 1.04; } }
 @keyframes drift { to { translate: 160vw 0; } }
 @keyframes sway { 50% { rotate: 4deg; } }
 @keyframes puff {

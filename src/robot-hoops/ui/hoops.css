@@ -1,0 +1,123 @@
+.hoops {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  background: linear-gradient(#ffb36b, #ffe2a8 55%, #fff3d6);
+  overflow: hidden;
+  touch-action: none;
+}
+
+.hoops__stage-area {
+  container-type: size;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.hoops__stage {
+  position: relative;
+  width: min(100cqw, 100cqh);
+  aspect-ratio: 1;
+}
+
+.court {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.hoops__shots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  max-width: 17rem;
+}
+
+.shot-dot {
+  width: clamp(1rem, 3vw, 1.5rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffb066, #e8651a);
+  border: 0.15rem solid #7a2e0a;
+  box-shadow: 0 0.1rem 0.15rem #0003;
+}
+
+.shot-dot--used {
+  background: #ffffff80;
+  border-color: #fff;
+  box-shadow: none;
+}
+
+.hoops__hint {
+  position: absolute;
+  inset: 4.5rem 0 auto 0;
+  margin: 0;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #fff;
+  text-shadow: 0 0.1rem 0.2rem #0006;
+  pointer-events: none;
+}
+
+@media (pointer: coarse) {
+  .hoops__hint {
+    display: none;
+  }
+}
+
+.hoops__cheer {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  margin: 0;
+  translate: -50% 0;
+  font-size: clamp(2rem, 8vw, 4rem);
+  color: #fff;
+  -webkit-text-stroke: 0.06em #e8651a;
+  paint-order: stroke fill;
+  animation: float-up 0.9s ease-out forwards;
+  pointer-events: none;
+}
+
+.shoot-button {
+  width: clamp(7rem, 30vw, 11rem);
+  font-size: 1.8rem;
+  color: #fff;
+  background: linear-gradient(#ff9a52, #e8651a);
+}
+
+.hoop--scored .net {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: swish 0.5s ease-out;
+}
+
+@keyframes swish {
+  30% {
+    transform: scaleY(1.25) scaleX(0.85);
+  }
+  60% {
+    transform: scaleY(0.9) scaleX(1.05);
+  }
+}
+
+@keyframes float-up {
+  from {
+    opacity: 1;
+  }
+  to {
+    translate: -50% -2rem;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,29 +1,27 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { DinoMood } from '../../art/Dino'
-import { recordFinalScore, type BestScoreResult, type BestScoreStore } from '../application/bestScore'
+import { recordFinalScore, type BestScoreResult, type BestScoreStore } from '../../shared/bestScore'
 import { GameSession } from '../application/GameSession'
 import { Game, type Direction, type GameEvent, type Random } from '../domain/game'
 import { WORLD_WIDTH } from '../domain/world'
 import { Hud } from './Hud'
-import { GameOverOverlay, PausedOverlay } from './Overlays'
+import { GameOverOverlay, PausedOverlay } from '../../shared/Overlays'
 import { Playfield, type Burst } from './Playfield'
-import { useAnimationFrame } from './useAnimationFrame'
+import { useAnimationFrame } from '../../shared/useAnimationFrame'
 import { useKeyboardControls } from './useKeyboardControls'
+import '../../shared/hud.css'
+import '../../shared/controls.css'
 import './game.css'
 
 interface GameScreenProps {
   random: Random
   bestScores: BestScoreStore
+  onExit: () => void
 }
 
 const MOOD_SECONDS = 0.6
 
-export function GameScreen(props: GameScreenProps) {
-  const [round, setRound] = useState(0)
-  return <Round key={round} {...props} onPlayAgain={() => setRound(round + 1)} />
-}
-
-function Round({ random, bestScores, onPlayAgain }: GameScreenProps & { onPlayAgain: () => void }) {
+export function GameScreen({ random, bestScores, onExit }: GameScreenProps) {
   const [session] = useState(() => new GameSession(new Game(random)))
   const [snapshot, setSnapshot] = useState(() => session.snapshot())
   const [mood, setMood] = useState<DinoMood>('idle')
@@ -95,7 +93,7 @@ function Round({ random, bestScores, onPlayAgain }: GameScreenProps & { onPlayAg
       <TouchControls hold={(d) => session.hold(d)} release={(d) => session.release(d)} />
       {snapshot.phase === 'paused' && <PausedOverlay onResume={togglePause} />}
       {snapshot.phase === 'over' && result && (
-        <GameOverOverlay score={snapshot.score} result={result} onPlayAgain={onPlayAgain} />
+        <GameOverOverlay score={snapshot.score} result={result} onBackToGames={onExit} />
       )}
     </main>
   )

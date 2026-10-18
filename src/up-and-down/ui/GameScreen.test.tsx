@@ -1,14 +1,15 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { InMemoryBestScoreStore } from '../infrastructure/InMemoryBestScoreStore'
+import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
 import { GameScreen } from './GameScreen'
 
 const middle = () => 0.5
 
 function renderGame(bestScore = 0) {
   const bestScores = new InMemoryBestScoreStore(bestScore)
-  render(<GameScreen random={middle} bestScores={bestScores} />)
-  return { bestScores }
+  const onExit = vi.fn()
+  render(<GameScreen random={middle} bestScores={bestScores} onExit={onExit} />)
+  return { bestScores, onExit }
 }
 
 function playFor(seconds: number) {
@@ -105,15 +106,13 @@ describe('GameScreen', () => {
     expect(bestScores.load()).toBeGreaterThan(0)
   })
 
-  it('starts a fresh game when Play again is pressed', () => {
-    renderGame()
+  it('goes back to the games menu when the round is over and Back to games is pressed', () => {
+    const { onExit } = renderGame()
     loseAllLivesByHidingFromTheBall()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Play again' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Back to games' }))
 
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-    expect(screen.getByRole('status')).toHaveTextContent('Score: 0')
-    expect(screen.getByLabelText('3 lives left')).toBeInTheDocument()
+    expect(onExit).toHaveBeenCalledOnce()
   })
 
   it('has on-screen buttons for touch players', () => {

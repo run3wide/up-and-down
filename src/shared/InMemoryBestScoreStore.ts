@@ -1,4 +1,4 @@
-import type { BestScoreStore } from '../application/bestScore'
+import type { BestScoreStore } from './bestScore'
 
 export class InMemoryBestScoreStore implements BestScoreStore {
   private best: number

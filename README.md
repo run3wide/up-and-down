@@ -1,6 +1,9 @@
-# Up and Down
+# Up and Down (and Robot Hoops)
 
-A gentle browser game for kids, by Daniel Robson. A ball is thrown up and falls back down; move the dinosaur left and right to catch it. Three lives, a score that ramps the difficulty, and a best score saved on the device. No backend, no accounts, no network calls.
+Two gentle browser games for kids, picked from a splash screen. No backend, no accounts, no network calls; best scores stay on the device.
+
+- **Up and Down** (by Daniel Robson): a ball is thrown up and falls back down; move the dinosaur to catch it. Three lives, difficulty ramps with the score.
+- **Robot Hoops** (by Moses Robson): aim the robot left and right, press Space to shoot. Fixed power, eight shots a round.
 
 ## Run it
 
@@ -22,5 +25,5 @@ pnpm build      # type-check + production build into dist/
 
 ## Controls
 
-- Move: ← → or A / D, drag on the playfield, or the on-screen buttons on touch devices
-- Pause: Esc, Space, P, or the pause button
+- Up and Down: move with ← → or A / D, drag on the playfield, or the on-screen buttons on touch devices. Pause with Esc, Space or P.
+- Robot Hoops: aim with ← → or A / D, shoot with Space. Pause with Esc or P. On touch devices use the Aim and Shoot buttons.

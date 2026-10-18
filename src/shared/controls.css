@@ -1,0 +1,31 @@
+/* Touch controls: only where there's no precise pointer. */
+.touch-controls {
+  display: none;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem calc(0.75rem + env(safe-area-inset-bottom));
+  background: var(--grass-dark);
+}
+
+@media (pointer: coarse) {
+  .touch-controls {
+    display: flex;
+  }
+}
+
+.direction-button {
+  width: clamp(5rem, 22vw, 7.5rem);
+  height: clamp(4rem, 14vw, 6rem);
+  font-size: 2.2rem;
+  color: var(--ink);
+  background: #ffffffe6;
+  border: 0;
+  border-radius: 1.5rem;
+  box-shadow: 0 0.3rem 0 #0003;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.direction-button:active {
+  transform: translateY(0.2rem);
+  box-shadow: 0 0.1rem 0 #0003;
+}

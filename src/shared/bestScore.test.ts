@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { InMemoryBestScoreStore } from '../infrastructure/InMemoryBestScoreStore'
+import { InMemoryBestScoreStore } from './InMemoryBestScoreStore'
 import { recordFinalScore } from './bestScore'
 
 describe('recording a final score', () => {

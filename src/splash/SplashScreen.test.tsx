@@ -3,26 +3,33 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { SplashScreen } from './SplashScreen'
 
+const upAndDown = { name: 'Play Up and Down, by Daniel Robson' }
+const robotHoops = { name: 'Play Robot Hoops, by Moses Robson' }
+
 describe('SplashScreen', () => {
-  it('shows the title and the author', () => {
-    render(<SplashScreen onStart={() => {}} />)
+  it('offers both games with their authors', () => {
+    render(<SplashScreen onPick={() => {}} />)
 
-    expect(screen.getByRole('heading', { name: 'Up and Down' })).toBeInTheDocument()
-    expect(screen.getByText('by Daniel Robson')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Pick a game' })).toBeInTheDocument()
+    expect(screen.getByRole('button', upAndDown)).toHaveTextContent('Daniel Robson')
+    expect(screen.getByRole('button', robotHoops)).toHaveTextContent('Moses Robson')
   })
 
-  it('focuses the Start button so keyboard players can begin straight away', () => {
-    render(<SplashScreen onStart={() => {}} />)
+  it('focuses the first game so keyboard players can begin straight away', () => {
+    render(<SplashScreen onPick={() => {}} />)
 
-    expect(screen.getByRole('button', { name: 'Start' })).toHaveFocus()
+    expect(screen.getByRole('button', upAndDown)).toHaveFocus()
   })
 
-  it('starts the game when Start is clicked', async () => {
-    const onStart = vi.fn()
-    render(<SplashScreen onStart={onStart} />)
+  it.each([
+    ['Up and Down', upAndDown, 'up-and-down'],
+    ['Robot Hoops', robotHoops, 'robot-hoops'],
+  ])('starts %s when its card is chosen', async (_title, button, gameId) => {
+    const onPick = vi.fn()
+    render(<SplashScreen onPick={onPick} />)
 
-    await userEvent.click(screen.getByRole('button', { name: 'Start' }))
+    await userEvent.click(screen.getByRole('button', button))
 
-    expect(onStart).toHaveBeenCalledOnce()
+    expect(onPick).toHaveBeenCalledExactlyOnceWith(gameId)
   })
 })
