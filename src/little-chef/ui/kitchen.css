@@ -1,0 +1,136 @@
+.kitchen {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto auto auto 1fr;
+  justify-items: center;
+  gap: 0.6rem;
+  padding: 4.5rem 1rem 1rem;
+  overflow-y: auto;
+  background: repeating-conic-gradient(#fff7e0 0 25%, #ffe9b8 0 50%) 0 0 / 5rem 5rem;
+}
+
+.kitchen__order {
+  display: grid;
+  justify-items: center;
+  padding: 0.5rem 2.5rem 0.75rem;
+  background: #fff;
+  border: 0.25rem solid #ff9f1c;
+  border-radius: 1.5rem;
+  box-shadow: 0 0.3rem 0 #0002;
+}
+
+.kitchen__order-label {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #c2410c;
+}
+
+.kitchen__dish-name {
+  margin: 0;
+  font-size: clamp(2rem, 7vw, 3.2rem);
+  line-height: 1.1;
+  animation: pop-in 0.3s ease-out;
+}
+
+.kitchen__dish-emoji {
+  font-size: clamp(2.5rem, 9vw, 4rem);
+  line-height: 1;
+}
+
+.kitchen__plate {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  gap: 0.4rem;
+  width: clamp(11rem, 40vw, 15rem);
+  min-height: clamp(7rem, 20vh, 9rem);
+  padding: 0.75rem;
+  background: radial-gradient(#fff 60%, #e3e8f0 62%);
+  border-radius: 999px;
+  box-shadow: 0 0.4rem 0 #0003;
+}
+
+.kitchen__in-dish {
+  font-size: clamp(2rem, 6vw, 2.8rem);
+  line-height: 1;
+  animation: pop-in 0.3s ease-out;
+}
+
+.kitchen__empty-spot {
+  width: clamp(2rem, 6vw, 2.8rem);
+  aspect-ratio: 1;
+  border: 0.2rem dashed #9aa5bd;
+  border-radius: 50%;
+}
+
+.kitchen__message {
+  min-height: 2.8rem;
+  margin: 0;
+  font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+  text-align: center;
+}
+
+.kitchen__shelf {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6rem, 7.5rem));
+  justify-content: center;
+  align-content: start;
+  gap: 0.6rem;
+  width: min(100%, 30rem);
+}
+
+.ingredient {
+  display: grid;
+  justify-items: center;
+  gap: 0.15rem;
+  min-height: 5.5rem;
+  padding: 0.4rem;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  background: #fff;
+  border: 0.2rem solid #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 0.25rem 0 #0002;
+  cursor: pointer;
+}
+
+.ingredient:not(:disabled):active {
+  transform: translateY(0.15rem);
+  box-shadow: 0 0.1rem 0 #0002;
+}
+
+.ingredient__emoji {
+  font-size: 2.4rem;
+  line-height: 1.1;
+}
+
+.ingredient:disabled {
+  cursor: default;
+}
+
+.ingredient--added {
+  opacity: 0.35;
+  background: #c8f5d0;
+}
+
+.ingredient--rejected {
+  opacity: 0.45;
+  animation: ingredient-wobble 0.4s ease-in-out;
+}
+
+@keyframes ingredient-wobble {
+  25% { rotate: -6deg; }
+  75% { rotate: 6deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -7,6 +7,7 @@ const bestScores = () => ({
   'up-and-down': new InMemoryBestScoreStore(),
   'lemon-volcano': new InMemoryBestScoreStore(),
   'dino-race': new InMemoryBestScoreStore(),
+  'little-chef': new InMemoryBestScoreStore(),
 })
 
 const silentSound = { unlock: () => {}, play: () => {} }
@@ -49,6 +50,12 @@ describe('App', () => {
     renderApp('/dino-race')
 
     expect(screen.getByRole('progressbar', { name: 'Race progress' })).toBeInTheDocument()
+  })
+
+  it('opens Little Chef straight away from its own address', () => {
+    renderApp('/little-chef')
+
+    expect(screen.getByRole('group', { name: 'Ingredients' })).toBeInTheDocument()
   })
 
   it('opens the other game from its address, under a base path', () => {

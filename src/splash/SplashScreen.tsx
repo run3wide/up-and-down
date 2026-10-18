@@ -30,6 +30,11 @@ export function SplashScreen({ onPick }: { onPick: (game: GameId) => void }) {
             <span className="game-card__title game-card__title--dino" aria-hidden="true">Dino Race</span>
             <span className="game-card__byline">by Daniel</span>
           </button>
+          <button className="game-card game-card--little-chef" aria-label="Play Little Chef, by Vanessa" onClick={() => onPick('little-chef')}>
+            <span className="chef-icon" aria-hidden="true">🍕</span>
+            <span className="game-card__title game-card__title--chef" aria-hidden="true">Little Chef</span>
+            <span className="game-card__byline">by Vanessa</span>
+          </button>
         </div>
       </div>
     </main>

@@ -131,6 +131,10 @@
   background: linear-gradient(#ffffff, #ffd9df);
 }
 
+.game-card--little-chef {
+  background: linear-gradient(#ffffff, #ffe2b8);
+}
+
 .game-card--lemon-volcano {
   background: linear-gradient(#ffffff, #fff3b8);
 }
@@ -155,6 +159,16 @@
 
 .game-card__title--dino {
   color: #ff4f6d;
+}
+
+.game-card__title--chef {
+  color: #ff8a1f;
+}
+
+.chef-icon {
+  font-size: clamp(3.5rem, 10vw, 5.5rem);
+  line-height: 1;
+  animation: bob 3s ease-in-out infinite;
 }
 
 .race-car-icon {
