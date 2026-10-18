@@ -109,7 +109,7 @@ describe('MazeScreen', () => {
     expect(onExit).toHaveBeenCalledOnce()
   })
 
-  it('roars when the last cookie is eaten, and not before', () => {
+  it('does the victory roar when the last cookie is eaten, and not before', () => {
     const { sound } = renderMaze(['S...'])
 
     press('ArrowRight')
@@ -117,7 +117,7 @@ describe('MazeScreen', () => {
     expect(sound.play).not.toHaveBeenCalled()
     press('ArrowRight')
 
-    expect(sound.play).toHaveBeenCalledExactlyOnceWith('roar')
+    expect(sound.play).toHaveBeenCalledExactlyOnceWith('victoryRoar')
   })
 
   it('is silent while sound is muted', () => {

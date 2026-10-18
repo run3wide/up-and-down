@@ -45,7 +45,7 @@ export function MazeScreen({ maze, bestScores, sound, timeLimit, onExit }: MazeS
       const won = events.some((event) => event.type === 'won')
       const outOfTries = events.some((event) => event.type === 'timeUp' && event.livesLeft === 0)
       if (won || outOfTries) setResult(recordFinalScore(bestScores, session.snapshot().score))
-      if (won && !muted) sound.play('roar')
+      if (won && !muted) sound.play('victoryRoar')
     },
     [bestScores, session, sound, muted],
   )

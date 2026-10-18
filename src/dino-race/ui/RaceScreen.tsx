@@ -54,7 +54,8 @@ export function RaceScreen({ random, bestScores, sound, createQuiz, onExit }: Ra
   const react = useCallback(
     (events: RaceEvent[]) => {
       for (const event of events) {
-        if ((event.type === 'started' || event.type === 'finished') && !muted) sound.play('roar')
+        if (event.type === 'started' && !muted) sound.play('roar')
+        if (event.type === 'finished' && !muted) sound.play('victoryRoar')
         if (event.type === 'cookieCollected') setCookiePop((pops) => pops + 1)
         if (event.type === 'crashed') {
           clearTimeout(crashTimer.current)

@@ -124,7 +124,7 @@ describe('RaceScreen', () => {
     expect(Number(screen.getByRole('progressbar').getAttribute('aria-valuenow'))).toBeGreaterThan(before)
   })
 
-  it('roars as the race starts and again at the finish line', () => {
+  it('roars as the race starts and does the victory roar at the finish line', () => {
     const { sound } = renderRace()
 
     driveFor(2.5)
@@ -133,6 +133,7 @@ describe('RaceScreen', () => {
     expect(sound.play).toHaveBeenCalledExactlyOnceWith('roar')
 
     driveFor(90)
+    expect(sound.play).toHaveBeenLastCalledWith('victoryRoar')
     expect(sound.play).toHaveBeenCalledTimes(2)
   })
 
