@@ -28,9 +28,9 @@ describe('child safety and privacy', () => {
     expect(calls).toEqual([])
   })
 
-  it('stores nothing but best scores, on the device', () => {
+  it('stores nothing but best scores and the Dino Dig museum, on the device', () => {
     const storage = shippedFiles(['.ts', '.tsx'])
-      .filter(({ path }) => !path.endsWith('LocalStorageBestScoreStore.ts'))
+      .filter(({ path }) => !path.endsWith('LocalStorageBestScoreStore.ts') && !path.endsWith('LocalStorageCollectionStore.ts'))
       .flatMap(({ path, text }) => (text.match(/localStorage|sessionStorage|indexedDB|document\.cookie/g) ?? []).map((use) => `${path}: ${use}`))
 
     expect(storage).toEqual([])
