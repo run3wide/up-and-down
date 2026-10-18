@@ -6,6 +6,7 @@ import { mathQuiz } from './dino-race/domain/mathQuestions'
 import { RaceScreen } from './dino-race/ui/RaceScreen'
 import { KitchenScreen } from './little-chef/ui/KitchenScreen'
 import { MatchScreen } from './match-up/ui/MatchScreen'
+import { SpellingScreen } from './spelling-bee/ui/SpellingScreen'
 import { TicTacToeScreen } from './tic-tac-toe/ui/TicTacToeScreen'
 import { useRoute } from './routing/useRoute'
 import type { BestScoreStore } from './shared/bestScore'
@@ -42,6 +43,8 @@ export function App({ random, bestScores, sound, basePath }: AppProps) {
       return <MazeScreen levels={MAZE_LEVELS} bestScores={bestScores['cookie-maze']} sound={sound} onExit={backToGames} />
     case 'tic-tac-toe':
       return <TicTacToeScreen random={random} bestScores={bestScores['tic-tac-toe']} sound={sound} onExit={backToGames} />
+    case 'spelling-bee':
+      return <SpellingScreen random={random} bestScores={bestScores['spelling-bee']} onExit={backToGames} />
     case null:
       return <SplashScreen onPick={navigate} />
   }

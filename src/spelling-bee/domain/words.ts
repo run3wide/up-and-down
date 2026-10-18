@@ -1,0 +1,45 @@
+export interface Word {
+  readonly spelling: string
+  readonly emoji: string
+}
+
+/** Each word is something a picture can show, so a child can see what to spell. */
+export const WORDS: readonly Word[] = [
+  { spelling: 'CAT', emoji: '🐱' },
+  { spelling: 'DOG', emoji: '🐶' },
+  { spelling: 'PIG', emoji: '🐷' },
+  { spelling: 'COW', emoji: '🐮' },
+  { spelling: 'BEE', emoji: '🐝' },
+  { spelling: 'HEN', emoji: '🐔' },
+  { spelling: 'FOX', emoji: '🦊' },
+  { spelling: 'EGG', emoji: '🥚' },
+  { spelling: 'PIE', emoji: '🥧' },
+  { spelling: 'SUN', emoji: '☀️' },
+  { spelling: 'BUS', emoji: '🚌' },
+  { spelling: 'CAR', emoji: '🚗' },
+  { spelling: 'HAT', emoji: '🎩' },
+  { spelling: 'FISH', emoji: '🐟' },
+  { spelling: 'DUCK', emoji: '🦆' },
+  { spelling: 'FROG', emoji: '🐸' },
+  { spelling: 'BEAR', emoji: '🐻' },
+  { spelling: 'LION', emoji: '🦁' },
+  { spelling: 'DINO', emoji: '🦖' },
+  { spelling: 'BIRD', emoji: '🐦' },
+  { spelling: 'CAKE', emoji: '🍰' },
+  { spelling: 'MILK', emoji: '🥛' },
+  { spelling: 'CORN', emoji: '🌽' },
+  { spelling: 'PEAR', emoji: '🍐' },
+  { spelling: 'STAR', emoji: '⭐' },
+  { spelling: 'MOON', emoji: '🌙' },
+  { spelling: 'TREE', emoji: '🌳' },
+  { spelling: 'APPLE', emoji: '🍎' },
+  { spelling: 'PIZZA', emoji: '🍕' },
+  { spelling: 'MOUSE', emoji: '🐭' },
+  { spelling: 'TIGER', emoji: '🐯' },
+  { spelling: 'ZEBRA', emoji: '🦓' },
+  { spelling: 'GRAPE', emoji: '🍇' },
+  { spelling: 'BREAD', emoji: '🍞' },
+  { spelling: 'LEMON', emoji: '🍋' },
+  { spelling: 'HORSE', emoji: '🐴' },
+  { spelling: 'SHEEP', emoji: '🐑' },
+]

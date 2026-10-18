@@ -11,6 +11,7 @@ const bestScores = () => ({
   'match-up': new InMemoryBestScoreStore(),
   'cookie-maze': new InMemoryBestScoreStore(),
   'tic-tac-toe': new InMemoryBestScoreStore(),
+  'spelling-bee': new InMemoryBestScoreStore(),
 })
 
 const silentSound = { unlock: () => {}, play: () => {} }
@@ -77,6 +78,12 @@ describe('App', () => {
     renderApp('/tic-tac-toe')
 
     expect(screen.getByRole('group', { name: 'Board' })).toBeInTheDocument()
+  })
+
+  it('opens Spelling Bee straight away from its own address', () => {
+    renderApp('/spelling-bee')
+
+    expect(screen.getByRole('group', { name: 'Alphabet' })).toBeInTheDocument()
   })
 
   it('opens the other game from its address, under a base path', () => {

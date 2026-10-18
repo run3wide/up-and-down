@@ -1,0 +1,124 @@
+.speller {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto auto auto 1fr;
+  justify-items: center;
+  align-content: start;
+  gap: 0.6rem;
+  padding: 4.5rem 1rem 1rem;
+  overflow-y: auto;
+  background: repeating-conic-gradient(#e8f4ff 0 25%, #d4ebff 0 50%) 0 0 / 5rem 5rem;
+}
+
+.speller__picture {
+  padding: 0.3rem 1.6rem;
+  font-size: clamp(4rem, 16vw, 7rem);
+  line-height: 1.15;
+  background: #fff;
+  border: 0.25rem solid #4c9be8;
+  border-radius: 2rem;
+  box-shadow: 0 0.3rem 0 #0002;
+  animation: pop-in 0.3s ease-out;
+}
+
+.speller__word {
+  display: flex;
+  justify-content: center;
+  gap: clamp(0.4rem, 2vw, 0.8rem);
+}
+
+.speller__blank {
+  position: relative;
+  width: clamp(3.4rem, 14vw, 5rem);
+  aspect-ratio: 4 / 5;
+  padding: 0;
+  font: inherit;
+  font-size: clamp(2.2rem, 9vw, 3.4rem);
+  color: var(--ink);
+  background: #ffffffaa;
+  border: 0;
+  border-bottom: 0.4rem solid var(--ink);
+  border-radius: 0.6rem 0.6rem 0 0;
+  cursor: pointer;
+}
+
+.speller__blank--filled {
+  background: #c8f5d0;
+  animation: pop-in 0.3s ease-out;
+}
+
+.speller__blank--nuh-uh {
+  animation: nuh-uh 0.5s ease-in-out;
+}
+
+.speller__rejected {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #e5484d;
+  animation: nuh-uh-fade 0.6s ease-in forwards;
+}
+
+.speller__message {
+  min-height: 2.8rem;
+  margin: 0;
+  font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+  text-align: center;
+}
+
+.speller__alphabet {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(3.2rem, 3.8rem));
+  justify-content: center;
+  align-content: start;
+  gap: 0.4rem;
+  width: min(100%, 34rem);
+}
+
+.speller__letter {
+  min-height: 3.4rem;
+  font: inherit;
+  font-size: 1.7rem;
+  color: var(--ink);
+  background: #fff;
+  border: 0.2rem solid #fff;
+  border-radius: 0.9rem;
+  box-shadow: 0 0.25rem 0 #0002;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.speller__letter:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.speller__letter--selected {
+  background: #ffe27a;
+  border-color: #ff9f1c;
+  transform: translateY(-0.2rem);
+}
+
+.speller__ghost {
+  position: fixed;
+  z-index: 10;
+  translate: -50% -50%;
+  font-size: 3rem;
+  color: var(--ink);
+  pointer-events: none;
+  text-shadow: 0 0.1em 0.2em #0004;
+}
+
+@keyframes nuh-uh {
+  15% { translate: -0.5rem 0; }
+  45% { translate: 0.5rem 0; }
+  75% { translate: -0.3rem 0; }
+}
+
+@keyframes nuh-uh-fade {
+  0%, 60% { opacity: 1; }
+  100% { opacity: 0; }
+}

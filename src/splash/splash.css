@@ -147,6 +147,10 @@
   background: linear-gradient(#ffffff, #dfe8ff);
 }
 
+.game-card--spelling-bee {
+  background: linear-gradient(#ffffff, #d9f0ff);
+}
+
 .game-card--lemon-volcano {
   background: linear-gradient(#ffffff, #fff3b8);
 }
@@ -183,6 +187,10 @@
 
 .game-card__title--tic-tac-toe {
   color: #2f7de1;
+}
+
+.game-card__title--spelling-bee {
+  color: #1fa67a;
 }
 
 .game-card__title--match {
