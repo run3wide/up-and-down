@@ -9,7 +9,10 @@ const fruits: Kind = { id: 'fruit', plural: 'fruits', items: [item('Apple'), ite
 const animals: Kind = { id: 'animal', plural: 'animals', items: [item('Cat'), item('Dog'), item('Cow')] }
 const numbers: Kind = { id: 'number', plural: 'numbers', items: [item('One'), item('Two'), item('Three')] }
 const colours: Kind = { id: 'colour', plural: 'colours', items: [item('Red'), item('Blue'), item('Green')] }
-const small = [fruits, animals, numbers]
+const small = [fruits, animals, numbers, colours]
+
+const manyKinds = (count: number): Kind[] =>
+  Array.from({ length: count }, (_, k) => ({ id: `kind${k}`, plural: `kind${k}s`, items: ['a', 'b', 'c'].map((letter) => item(`${letter}${k}`)) }))
 
 const anyOrder = () => 0
 
@@ -57,8 +60,8 @@ describe('MatchGame', () => {
     const game = new MatchGame(small, anyOrder)
 
     const snapshot = game.snapshot()
-    expect(snapshot).toMatchObject({ phase: 'playing', lives: MAX_LIVES, boardsCleared: 0, pairsTotal: 3, pairsFound: 0 })
-    expect(snapshot.cards).toHaveLength(6)
+    expect(snapshot).toMatchObject({ phase: 'playing', lives: MAX_LIVES, boardsCleared: 0, pairsTotal: 4, pairsFound: 0 })
+    expect(snapshot.cards).toHaveLength(8)
     expect(snapshot.cards.every((card) => card.state === 'down')).toBe(true)
   })
 
@@ -105,7 +108,7 @@ describe('MatchGame', () => {
     expect(events).toEqual([
       { type: 'cardFlipped', card: a },
       { type: 'cardFlipped', card: b },
-      expect.objectContaining({ type: 'pairFound', kind: expect.stringMatching(/^(fruits|animals|numbers)$/) }),
+      expect.objectContaining({ type: 'pairFound', kind: expect.stringMatching(/^(fruits|animals|numbers|colours)$/) }),
     ])
     const snapshot = game.snapshot()
     expect(snapshot.cards[a].state).toBe('matched')
@@ -155,7 +158,7 @@ describe('MatchGame', () => {
     const game = new MatchGame(small, anyOrder)
     clearBoard(game)
 
-    expect(game.snapshot()).toMatchObject({ phase: 'cleared', boardsCleared: 1, pairsFound: 3 })
+    expect(game.snapshot()).toMatchObject({ phase: 'cleared', boardsCleared: 1, pairsFound: 4 })
   })
 
   it('announces a cleared board right after the last pair', () => {
@@ -180,21 +183,35 @@ describe('MatchGame', () => {
     expect(game.snapshot().lives).toBe(MAX_LIVES)
   })
 
-  it('deals a fresh face-down board with one more pair each time, up to every kind', () => {
-    const four = [fruits, animals, numbers, colours]
-    const game = new MatchGame(four, anyOrder)
-    expect(game.snapshot().pairsTotal).toBe(3)
+  it('deals boards that are always full rows of four cards, growing to a 4x4 square', () => {
+    const kinds = manyKinds(8)
+    const game = new MatchGame(kinds, anyOrder)
+    const sizes: number[] = []
 
-    clearBoard(game, four)
+    for (let board = 0; board < 5; board++) {
+      sizes.push(game.snapshot().cards.length)
+      clearBoard(game, kinds)
+      game.nextBoard()
+    }
+
+    expect(sizes).toEqual([8, 12, 16, 16, 16])
+  })
+
+  it('deals a fresh face-down board after a cleared one', () => {
+    const game = new MatchGame(small, anyOrder)
+    clearBoard(game)
     game.nextBoard()
 
     const snapshot = game.snapshot()
-    expect(snapshot).toMatchObject({ phase: 'playing', pairsTotal: 4, pairsFound: 0, boardsCleared: 1 })
-    expect(snapshot.cards).toHaveLength(8)
+    expect(snapshot).toMatchObject({ phase: 'playing', pairsFound: 0, boardsCleared: 1 })
     expect(snapshot.cards.every((card) => card.state === 'down')).toBe(true)
+  })
 
-    clearBoard(game, four)
+  it('never deals more pairs than there are kinds', () => {
+    const game = new MatchGame(small, anyOrder)
+    clearBoard(game)
     game.nextBoard()
+
     expect(game.snapshot().pairsTotal).toBe(4)
   })
 
@@ -218,7 +235,7 @@ describe('MatchGame', () => {
   })
 
   it('plays with the real kinds: each has enough different things to fill a board', () => {
-    expect(KINDS.length).toBeGreaterThanOrEqual(6)
+    expect(KINDS.length).toBeGreaterThanOrEqual(8)
     for (const kind of KINDS) expect(kind.items.length).toBeGreaterThanOrEqual(4)
     const names = KINDS.flatMap((kind) => kind.items.map((it) => it.name))
     expect(new Set(names).size).toBe(names.length)

@@ -26,11 +26,10 @@
 
 .match__cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(6rem, 7.5rem));
-  justify-content: center;
+  grid-template-columns: repeat(4, 1fr);
   align-content: start;
   gap: 0.7rem;
-  width: min(100%, 34rem);
+  width: min(100%, 30rem);
 }
 
 .match-card {
@@ -38,8 +37,9 @@
   justify-items: center;
   align-content: center;
   gap: 0.1rem;
-  min-height: 6.5rem;
-  padding: 0.4rem;
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 0.25rem;
   font: inherit;
   font-size: 1rem;
   color: var(--ink);

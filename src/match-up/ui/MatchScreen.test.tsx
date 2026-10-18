@@ -68,8 +68,8 @@ describe('MatchScreen', () => {
     renderMatch()
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/alike/i)
-    expect(cards().getAllByRole('button')).toHaveLength(6)
-    expect(cards().getAllByRole('button', { name: /^Hidden card/ })).toHaveLength(6)
+    expect(cards().getAllByRole('button')).toHaveLength(8)
+    expect(cards().getAllByRole('button', { name: /^Hidden card/ })).toHaveLength(8)
     expect(screen.getByRole('status')).toHaveTextContent('Score: 0')
     expect(screen.getByRole('img', { name: '5 lives left' })).toBeInTheDocument()
   })
@@ -115,7 +115,7 @@ describe('MatchScreen', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(/great/i)
     expect(screen.getByRole('status')).toHaveTextContent('Score: 1')
     fireEvent.click(screen.getByRole('button', { name: 'Next board' }))
-    expect(cards().getAllByRole('button', { name: /^Hidden card/ })).toHaveLength(8)
+    expect(cards().getAllByRole('button', { name: /^Hidden card/ })).toHaveLength(12)
     expect(screen.queryByRole('button', { name: 'Next board' })).not.toBeInTheDocument()
   })
 

@@ -19,4 +19,6 @@ export const KINDS: readonly Kind[] = [
   { id: 'vehicle', plural: 'vehicles', items: [item('Car', '🚗'), item('Bus', '🚌'), item('Train', '🚂'), item('Boat', '⛵'), item('Plane', '✈️')] },
   { id: 'shape', plural: 'shapes', items: [item('Circle', '⚪'), item('Square', '🟦'), item('Triangle', '🔺'), item('Diamond', '🔶'), item('Star', '⭐')] },
   { id: 'weather', plural: 'weather', items: [item('Sun', '☀️'), item('Rain', '🌧️'), item('Snow', '❄️'), item('Rainbow', '🌈'), item('Cloud', '☁️')] },
+  { id: 'toy', plural: 'toys', items: [item('Ball', '⚽'), item('Teddy', '🧸'), item('Kite', '🪁'), item('Balloon', '🎈'), item('Drum', '🥁')] },
+  { id: 'clothes', plural: 'clothes', items: [item('Shirt', '👕'), item('Trousers', '👖'), item('Socks', '🧦'), item('Hat', '🧢'), item('Dress', '👗')] },
 ]

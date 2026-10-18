@@ -2,8 +2,8 @@ import type { Item, Kind } from './kinds'
 
 export const MAX_LIVES = 5
 
-const FIRST_BOARD_PAIRS = 3
-const MOST_PAIRS = 6
+/** Every count makes whole rows of four cards, so each board is a tidy rectangle that ends as a 4x4 square. */
+const PAIRS_PER_BOARD = [4, 6, 8]
 
 export type Phase = 'playing' | 'cleared' | 'over'
 export type CardState = 'down' | 'up' | 'matched'
@@ -102,7 +102,7 @@ export class MatchGame {
     this.cleared = false
     this.up = []
     this.matched = new Set()
-    const pairs = Math.min(FIRST_BOARD_PAIRS + this.boardsCleared, MOST_PAIRS, this.kinds.length)
+    const pairs = Math.min(PAIRS_PER_BOARD[Math.min(this.boardsCleared, PAIRS_PER_BOARD.length - 1)], this.kinds.length)
     const cards = this.shuffled(this.kinds)
       .slice(0, pairs)
       .flatMap((kind) => this.shuffled(kind.items).slice(0, 2).map((item) => ({ ...item, kind })))
