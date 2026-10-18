@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest'
 import { App } from './App'
 import { InMemoryGalleryStore } from './colouring/infrastructure/InMemoryGalleryStore'
+import { InMemorySketchStore } from './colouring/infrastructure/InMemorySketchStore'
 import { InMemoryCollectionStore } from './dino-dig/infrastructure/InMemoryCollectionStore'
 import { InMemoryBestScoreStore } from './shared/InMemoryBestScoreStore'
 import type { SoundPlayer } from './shared/sound/SoundPlayer'
@@ -46,7 +47,7 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame', 'performance', 'setTimeout', 'clearTimeout'] })
   window.history.replaceState(null, '', '/')
   sound = { unlock: vi.fn<SoundPlayer['unlock']>(), play: vi.fn<SoundPlayer['play']>() }
-  render(<App random={() => 0.5} bestScores={bestScores()} sound={sound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} basePath="/" />)
+  render(<App random={() => 0.5} bestScores={bestScores()} sound={sound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} colouringSketches={new InMemorySketchStore()} basePath="/" />)
 })
 
 afterEach(() => {
