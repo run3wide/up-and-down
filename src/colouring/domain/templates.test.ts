@@ -9,6 +9,15 @@ describe('colouring templates', () => {
     expect(new Set(TEMPLATES.map(({ id }) => id)).size).toBe(TEMPLATES.length)
   })
 
+  it.each(['car', 'truck', 'bus', 'garbage-truck', 'hippo', 'elephant', 'tiger', 'snake', 'hamburger',
+    'mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune',
+    'space-shuttle', 'ufo', 'astronaut', 'satellite', 'big-rocket'])(
+    'has a %s to colour',
+    (id) => {
+      expect(TEMPLATES.map((template) => template.id)).toContain(id)
+    },
+  )
+
   describe.each(TEMPLATES.map((template) => [template.name, template] as const))('%s', (_name, template) => {
     it(`has at least ${MIN_PARTS} parts to colour, so there is plenty to be creative with`, () => {
       expect(template.regions.length).toBeGreaterThanOrEqual(MIN_PARTS)
