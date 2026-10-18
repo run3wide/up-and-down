@@ -1,0 +1,43 @@
+:root {
+  --sky-top: #5ec8ff;
+  --sky-bottom: #c9f0ff;
+  --grass: #5fcf6b;
+  --grass-dark: #3fae5a;
+  --ink: #1d2b53;
+  --font-display: 'Arial Rounded MT Bold', 'Nunito', ui-rounded, 'Avenir Next Rounded', system-ui, sans-serif;
+  font-family: var(--font-display);
+  color: var(--ink);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+button {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 4px solid #1d2b53;
+  outline-offset: 3px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
