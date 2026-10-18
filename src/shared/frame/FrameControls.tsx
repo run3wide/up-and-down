@@ -18,10 +18,11 @@ export function FrameControls({ sound, pause }: FrameControlsProps) {
   if (!frame) throw new Error('FrameControls must be rendered inside a GameFrame')
 
   const { paused, onPause } = pause ?? {}
+  const { leaving } = frame
+  // Cancelling the leave card leaves the game paused, showing its own Resume.
   useEffect(() => {
-    if (frame.leaving && paused === false) onPause?.()
-    // Only when the leave card opens: cancelling it leaves the game paused, with its own Resume.
-  }, [frame.leaving])
+    if (leaving && paused === false) onPause?.()
+  }, [leaving, paused, onPause])
 
   if (!frame.controlsSlot) return null
   return createPortal(
