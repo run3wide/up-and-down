@@ -1,16 +1,20 @@
+import type { SoundEffect } from '../../shared/sound/SoundPlayer'
+
 export interface Word {
   readonly spelling: string
   readonly emoji: string
+  /** What the animal says when its word is spelled; things that don't make a noise have none. */
+  readonly sound?: SoundEffect
 }
 
 /** Each word is something a picture can show, so a child can see what to spell. */
 export const WORDS: readonly Word[] = [
-  { spelling: 'CAT', emoji: '🐱' },
-  { spelling: 'DOG', emoji: '🐶' },
-  { spelling: 'PIG', emoji: '🐷' },
-  { spelling: 'COW', emoji: '🐮' },
-  { spelling: 'BEE', emoji: '🐝' },
-  { spelling: 'HEN', emoji: '🐔' },
+  { spelling: 'CAT', emoji: '🐱', sound: 'meow' },
+  { spelling: 'DOG', emoji: '🐶', sound: 'woof' },
+  { spelling: 'PIG', emoji: '🐷', sound: 'oink' },
+  { spelling: 'COW', emoji: '🐮', sound: 'moo' },
+  { spelling: 'BEE', emoji: '🐝', sound: 'buzz' },
+  { spelling: 'HEN', emoji: '🐔', sound: 'cluck' },
   { spelling: 'FOX', emoji: '🦊' },
   { spelling: 'EGG', emoji: '🥚' },
   { spelling: 'PIE', emoji: '🥧' },
@@ -19,12 +23,12 @@ export const WORDS: readonly Word[] = [
   { spelling: 'CAR', emoji: '🚗' },
   { spelling: 'HAT', emoji: '🎩' },
   { spelling: 'FISH', emoji: '🐟' },
-  { spelling: 'DUCK', emoji: '🦆' },
-  { spelling: 'FROG', emoji: '🐸' },
-  { spelling: 'BEAR', emoji: '🐻' },
-  { spelling: 'LION', emoji: '🦁' },
-  { spelling: 'DINO', emoji: '🦖' },
-  { spelling: 'BIRD', emoji: '🐦' },
+  { spelling: 'DUCK', emoji: '🦆', sound: 'quack' },
+  { spelling: 'FROG', emoji: '🐸', sound: 'ribbit' },
+  { spelling: 'BEAR', emoji: '🐻', sound: 'growl' },
+  { spelling: 'LION', emoji: '🦁', sound: 'growl' },
+  { spelling: 'DINO', emoji: '🦖', sound: 'roar' },
+  { spelling: 'BIRD', emoji: '🐦', sound: 'tweet' },
   { spelling: 'CAKE', emoji: '🍰' },
   { spelling: 'MILK', emoji: '🥛' },
   { spelling: 'CORN', emoji: '🌽' },
@@ -34,12 +38,12 @@ export const WORDS: readonly Word[] = [
   { spelling: 'TREE', emoji: '🌳' },
   { spelling: 'APPLE', emoji: '🍎' },
   { spelling: 'PIZZA', emoji: '🍕' },
-  { spelling: 'MOUSE', emoji: '🐭' },
-  { spelling: 'TIGER', emoji: '🐯' },
+  { spelling: 'MOUSE', emoji: '🐭', sound: 'squeak' },
+  { spelling: 'TIGER', emoji: '🐯', sound: 'growl' },
   { spelling: 'ZEBRA', emoji: '🦓' },
   { spelling: 'GRAPE', emoji: '🍇' },
   { spelling: 'BREAD', emoji: '🍞' },
   { spelling: 'LEMON', emoji: '🍋' },
-  { spelling: 'HORSE', emoji: '🐴' },
-  { spelling: 'SHEEP', emoji: '🐑' },
+  { spelling: 'HORSE', emoji: '🐴', sound: 'neigh' },
+  { spelling: 'SHEEP', emoji: '🐑', sound: 'baa' },
 ]

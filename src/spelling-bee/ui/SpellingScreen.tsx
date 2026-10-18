@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { recordFinalScore, type BestScoreStore } from '../../shared/bestScore'
 import { PausedOverlay } from '../../shared/Overlays'
+import { SoundToggle } from '../../shared/SoundToggle'
+import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { SpellingGame, type SpellingEvent } from '../domain/spellingGame'
 import { WORDS } from '../domain/words'
 import '../../shared/hud.css'
@@ -13,6 +15,7 @@ const NUH_UH_MS = 600
 interface SpellingScreenProps {
   random: () => number
   bestScores: BestScoreStore
+  sound: SoundPlayer
   onExit: () => void
 }
 
@@ -30,7 +33,7 @@ interface Drag {
   moved: boolean
 }
 
-export function SpellingScreen({ random, bestScores, onExit }: SpellingScreenProps) {
+export function SpellingScreen({ random, bestScores, sound, onExit }: SpellingScreenProps) {
   const [game] = useState(() => new SpellingGame(WORDS, random))
   const [snapshot, setSnapshot] = useState(() => game.snapshot())
   const [best, setBest] = useState(() => bestScores.load())
@@ -39,6 +42,7 @@ export function SpellingScreen({ random, bestScores, onExit }: SpellingScreenPro
   const [rejection, setRejection] = useState<Rejection | null>(null)
   const [dragGhost, setDragGhost] = useState<{ letter: string; x: number; y: number } | null>(null)
   const [paused, setPaused] = useState(false)
+  const [muted, setMuted] = useState(false)
   const drag = useRef<Drag | null>(null)
   const justDragged = useRef(false)
 
@@ -53,19 +57,21 @@ export function SpellingScreen({ random, bestScores, onExit }: SpellingScreenPro
         if (event.type === 'wordSpelled') {
           setMessage(`You spelled ${event.word}! ${event.emoji}`)
           setBest(recordFinalScore(bestScores, game.snapshot().wordsSpelled).best)
+          if (event.sound && !muted) sound.play(event.sound)
         }
       }
     },
-    [bestScores, game],
+    [bestScores, game, sound, muted],
   )
 
   const place = useCallback(
     (letter: string, position: number) => {
+      sound.unlock()
       react(game.place(letter, position))
       setSnapshot(game.snapshot())
       setSelected(null)
     },
-    [game, react],
+    [game, react, sound],
   )
 
   useEffect(() => {
@@ -140,9 +146,12 @@ export function SpellingScreen({ random, bestScores, onExit }: SpellingScreenPro
         <p className="hud__score" role="status">
           Score: {snapshot.wordsSpelled}
         </p>
-        <button className="hud__pause" onClick={() => setPaused(true)} aria-label="Pause">
-          <span aria-hidden="true">❚❚</span>
-        </button>
+        <div className="hud__actions">
+          <SoundToggle muted={muted} onToggle={() => setMuted(!muted)} />
+          <button className="hud__pause" onClick={() => setPaused(true)} aria-label="Pause">
+            <span aria-hidden="true">❚❚</span>
+          </button>
+        </div>
       </header>
       <div key={snapshot.emoji + snapshot.wordsSpelled} className="speller__picture" role="img" aria-label="Picture to spell">
         {snapshot.emoji}

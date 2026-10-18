@@ -44,7 +44,7 @@ export function App({ random, bestScores, sound, basePath }: AppProps) {
     case 'tic-tac-toe':
       return <TicTacToeScreen random={random} bestScores={bestScores['tic-tac-toe']} sound={sound} onExit={backToGames} />
     case 'spelling-bee':
-      return <SpellingScreen random={random} bestScores={bestScores['spelling-bee']} onExit={backToGames} />
+      return <SpellingScreen random={random} bestScores={bestScores['spelling-bee']} sound={sound} onExit={backToGames} />
     case null:
       return <SplashScreen onPick={navigate} />
   }

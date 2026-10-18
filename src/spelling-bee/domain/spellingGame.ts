@@ -1,3 +1,4 @@
+import type { SoundEffect } from '../../shared/sound/SoundPlayer'
 import type { Word } from './words'
 
 export type Phase = 'spelling' | 'spelled'
@@ -5,7 +6,7 @@ export type Phase = 'spelling' | 'spelled'
 export type SpellingEvent =
   | { type: 'letterPlaced'; letter: string; position: number }
   | { type: 'wrongLetter'; letter: string; position: number }
-  | { type: 'wordSpelled'; word: string; emoji: string }
+  | { type: 'wordSpelled'; word: string; emoji: string; sound: SoundEffect | undefined }
 
 export interface SpellingSnapshot {
   readonly phase: Phase
@@ -38,7 +39,7 @@ export class SpellingGame {
     const events: SpellingEvent[] = [{ type: 'letterPlaced', letter, position }]
     if (this.isSpelled()) {
       this.wordsSpelled += 1
-      events.push({ type: 'wordSpelled', word: this.word.spelling, emoji: this.word.emoji })
+      events.push({ type: 'wordSpelled', word: this.word.spelling, emoji: this.word.emoji, sound: this.word.sound })
     }
     return events
   }

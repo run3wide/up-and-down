@@ -1,3 +1,4 @@
+import { isAnimalCall, scheduleAnimalCall } from './animalCalls'
 import { scheduleEruption } from './eruptionSound'
 import type { SoundEffect, SoundPlayer } from './SoundPlayer'
 import roarClip from './trexRoar.wav?inline'
@@ -10,7 +11,7 @@ const CLIPS: Partial<Record<SoundEffect, string>> = { roar: roarClip, victoryRoa
 const PLAYBACK_RATE: Partial<Record<SoundEffect, number>> = { winner: 0.7 }
 
 /**
- * Plays sounds with Web Audio. The eruption is synthesised; the dino roars and the "Winner!" are small CC0 clips (see CREDITS.md)
+ * Plays sounds with Web Audio. The eruption and the animal calls are synthesised; the dino roars and the "Winner!" are small CC0 clips (see CREDITS.md)
  * bundled into the app as data URLs, so the game still makes no network calls.
  */
 export class WebAudioSoundPlayer implements SoundPlayer {
@@ -28,6 +29,7 @@ export class WebAudioSoundPlayer implements SoundPlayer {
     const context = this.ensureContext()
     if (!context || !this.output || context.state !== 'running') return
     if (effect === 'eruption') scheduleEruption(context, this.output)
+    else if (isAnimalCall(effect)) scheduleAnimalCall(context, this.output, effect)
     else void this.playClip(context, this.output, effect)
   }
 

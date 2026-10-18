@@ -10,8 +10,9 @@ const alwaysFirstWord = () => 0
 function renderSpelling(bestScore = 0) {
   const bestScores = new InMemoryBestScoreStore(bestScore)
   const onExit = vi.fn()
-  render(<SpellingScreen random={alwaysFirstWord} bestScores={bestScores} onExit={onExit} />)
-  return { bestScores, onExit }
+  const sound = { unlock: vi.fn(), play: vi.fn() }
+  render(<SpellingScreen random={alwaysFirstWord} bestScores={bestScores} sound={sound} onExit={onExit} />)
+  return { bestScores, onExit, sound }
 }
 
 const alphabet = () => within(screen.getByRole('group', { name: 'Alphabet' }))
@@ -141,6 +142,28 @@ describe('SpellingScreen', () => {
     expect(screen.getByRole('img', { name: /^Picture/ })).not.toHaveTextContent('🐱')
     expect(screen.queryByRole('button', { name: 'Next word' })).not.toBeInTheDocument()
     expect(letter('A')).toBeEnabled()
+  })
+
+  it('makes the animal sound when its word is spelled', () => {
+    const { sound } = renderSpelling()
+
+    tapLetterThenBlank('C', 0)
+    tapLetterThenBlank('A', 1)
+    expect(sound.play).not.toHaveBeenCalled()
+    tapLetterThenBlank('T', 2)
+
+    expect(sound.unlock).toHaveBeenCalled()
+    expect(sound.play).toHaveBeenCalledExactlyOnceWith('meow')
+  })
+
+  it('stays quiet when muted', () => {
+    const { sound } = renderSpelling()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mute sound' }))
+    spellCurrentWord()
+
+    expect(sound.play).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: 'Unmute sound' })).toBeInTheDocument()
   })
 
   it('pauses and goes back to the games', () => {

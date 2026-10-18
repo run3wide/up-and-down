@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { SpellingGame } from './spellingGame'
 import { type Word, WORDS } from './words'
 
-const cat: Word = { spelling: 'CAT', emoji: '🐱' }
+const cat: Word = { spelling: 'CAT', emoji: '🐱', sound: 'meow' }
 const ball: Word = { spelling: 'BALL', emoji: '⚽' }
 const apple: Word = { spelling: 'APPLE', emoji: '🍎' }
 
@@ -67,11 +67,20 @@ describe('SpellingGame', () => {
 
     expect(game.place('T', 2)).toEqual([
       { type: 'letterPlaced', letter: 'T', position: 2 },
-      { type: 'wordSpelled', word: 'CAT', emoji: '🐱' },
+      { type: 'wordSpelled', word: 'CAT', emoji: '🐱', sound: 'meow' },
     ])
 
     expect(game.snapshot()).toEqual({ phase: 'spelled', emoji: '🐱', blanks: ['C', 'A', 'T'], wordsSpelled: 1 })
     expect(game.place('X', 0)).toEqual([])
+  })
+
+  it('has no sound for a word that is not a noisy animal', () => {
+    const game = new SpellingGame([ball], firstWord)
+    game.place('B', 0)
+    game.place('A', 1)
+    game.place('L', 2)
+
+    expect(game.place('L', 3)).toContainEqual({ type: 'wordSpelled', word: 'BALL', emoji: '⚽', sound: undefined })
   })
 
   it('brings the next word with fresh blanks', () => {
