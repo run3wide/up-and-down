@@ -9,6 +9,7 @@ import { MatchScreen } from './match-up/ui/MatchScreen'
 import type { CollectionStore } from './dino-dig/application/CollectionStore'
 import { DigScreen } from './dino-dig/ui/DigScreen'
 import type { GalleryStore } from './colouring/application/GalleryStore'
+import { BuilderScreen } from './brick-builder/ui/BuilderScreen'
 import { ColouringScreen } from './colouring/ui/ColouringScreen'
 import { SpellingScreen } from './spelling-bee/ui/SpellingScreen'
 import { TicTacToeScreen } from './tic-tac-toe/ui/TicTacToeScreen'
@@ -23,7 +24,7 @@ type Random = () => number
 interface AppProps {
   random: Random
   /** Colouring is not scored, so it has no best score. */
-  bestScores: Record<Exclude<GameId, 'colouring'>, BestScoreStore>
+  bestScores: Record<Exclude<GameId, 'colouring' | 'brick-builder'>, BestScoreStore>
   sound: SoundPlayer
   dinoDigCollection: CollectionStore
   colouringGallery: GalleryStore
@@ -60,6 +61,8 @@ export function App({ random, bestScores, sound, dinoDigCollection, colouringGal
       return <DigScreen random={random} bestScores={bestScores['dino-dig']} collection={dinoDigCollection} sound={sound} onExit={backToGames} />
     case 'colouring':
       return <ColouringScreen gallery={colouringGallery} onExit={backToGames} />
+    case 'brick-builder':
+      return <BuilderScreen onExit={backToGames} />
     case null:
       return <SplashScreen onPick={openGame} />
   }

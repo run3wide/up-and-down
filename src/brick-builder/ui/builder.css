@@ -1,0 +1,154 @@
+.brick-builder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem 1.25rem;
+  overflow-y: auto;
+  background: linear-gradient(#bfe6ff, #eaf7ff);
+}
+
+.brick-builder__bar {
+  display: flex;
+  gap: 0.5rem;
+  width: min(100%, 36rem);
+}
+
+.brick-builder__tool {
+  min-height: 3rem;
+  padding: 0.2em 1.1em;
+  font-size: 1.15rem;
+  color: var(--ink);
+  background: #fff;
+  border: 0.12rem solid var(--ink);
+  border-radius: 999px;
+  box-shadow: 0 0.1rem 0 var(--ink);
+  cursor: pointer;
+}
+
+.brick-builder__title {
+  margin: 0;
+  font-size: clamp(1.5rem, 6vw, 2.2rem);
+  text-align: center;
+}
+
+.brick-builder__message {
+  min-height: 1.8rem;
+  margin: 0;
+  font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+  text-align: center;
+}
+
+.brick-builder__plate {
+  position: relative;
+  flex: none;
+  width: min(100%, 36rem);
+  aspect-ratio: 12 / 10;
+  background: #ffffff88;
+  border-radius: 0.75rem 0.75rem 0 0;
+  touch-action: none;
+}
+
+.brick-builder__base {
+  flex: none;
+  width: min(100%, 36rem);
+  height: 1.1rem;
+  margin-top: -0.6rem;
+  background: #43a047;
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.brick-builder__placed {
+  position: absolute;
+  height: 10%;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.brick {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border: 0.12rem solid #0003;
+  border-radius: 0.3rem;
+  box-shadow: inset 0 -0.25rem 0 #0002;
+}
+
+.brick__stud {
+  flex: 1;
+  position: relative;
+}
+
+.brick__stud::before {
+  content: '';
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  top: -0.3rem;
+  height: 0.35rem;
+  border-radius: 0.2rem 0.2rem 0 0;
+  background: #ffffff55;
+  box-shadow: 0 0 0 0.12rem #0003;
+}
+
+.brick-builder__landing {
+  position: absolute;
+  height: 10%;
+  box-sizing: border-box;
+  border: 0.2rem dashed var(--ink);
+  border-radius: 0.3rem;
+  background: #ffffff66;
+  pointer-events: none;
+}
+
+.brick-builder__columns {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+}
+
+.brick-builder__column {
+  padding: 0;
+  background: #ffffff33;
+  border: 0;
+  border-left: 0.1rem dashed #0003;
+  cursor: pointer;
+}
+
+.brick-builder__tray {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: end;
+  gap: 0.6rem;
+  width: min(100%, 36rem);
+}
+
+.brick-builder__choice {
+  height: 3.25rem;
+  padding: 0.6rem 0.5rem 0.2rem;
+  background: #ffffffaa;
+  border: 0.15rem solid transparent;
+  border-radius: 0.6rem;
+  cursor: grab;
+  touch-action: none;
+}
+
+.brick-builder__choice--chosen {
+  border-color: var(--ink);
+  background: #fff;
+}
+
+.brick-builder__ghost {
+  position: fixed;
+  height: 2.2rem;
+  transform: translate(-50%, -50%);
+  opacity: 0.85;
+  pointer-events: none;
+}
