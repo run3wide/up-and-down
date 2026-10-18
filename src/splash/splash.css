@@ -2,14 +2,17 @@
   position: relative;
   height: 100%;
   display: grid;
-  place-items: center;
-  overflow: hidden;
+  align-items: start;
+  justify-items: center;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: linear-gradient(var(--sky-top), var(--sky-bottom) 70%, #fff3c4);
 }
 
 .splash__content {
   position: relative;
   z-index: 2;
+  margin-block: auto;
   display: grid;
   justify-items: center;
   gap: clamp(0.5rem, 2vh, 1.5rem);
@@ -223,7 +226,7 @@
 
 /* Scene */
 .scene {
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: 1;
   pointer-events: none;
