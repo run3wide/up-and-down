@@ -4,7 +4,7 @@ Three gentle browser games for kids, picked from a splash screen. No backend, no
 
 - **Up and Down** (by Daniel): a ball is thrown up and falls back down; move the dinosaur to catch it. Three lives, difficulty ramps with the score.
 - **Dino Race** (by Daniel): steer the car left and right down the road to the finish line, dodge cones and rocks, grab chocolate chip cookies. Three lives. Every few seconds the race pauses for a "brain break": a little sum about adding only like things together (3🍍 + 3🍍 = 6🍍), starting with fruit pictures and moving on to letters.
-- **Cookie Maze**: a T-Rex walks around a maze and keeps going in whichever direction you pick (arrows, WASD or the on-screen buttons), turning at the next gap you ask for. Eat every chocolate chip cookie to win; there are no baddies, and a quick finish earns bonus points.
+- **Cookie Maze** (by Daniel): a T-Rex walks around a maze and keeps going in whichever direction you pick (arrows, WASD or the on-screen buttons), turning at the next gap you ask for. Eat every chocolate chip cookie to win; there are no baddies, and a quick finish earns bonus points.
 - **Lemon Volcano** (by Moses): aim the strawberry left and right, press Space to throw a lemon into the volcano. Fixed power, eight lemons a round.
 
 Each game has its own address: `/up-and-down`, `/lemon-volcano` and `/dino-race` (under `/up-and-down/` on GitHub Pages).

@@ -8,7 +8,7 @@ const lemonVolcano = { name: 'Play Lemon Volcano, by Moses' }
 const dinoRace = { name: 'Play Dino Race, by Daniel' }
 const littleChef = { name: 'Play Little Chef, by Vanessa' }
 const matchUp = { name: 'Play Match Up, by Daniel' }
-const cookieMaze = { name: 'Play Cookie Maze' }
+const cookieMaze = { name: 'Play Cookie Maze, by Daniel' }
 
 describe('SplashScreen', () => {
   it('offers every game with their authors', () => {
@@ -20,6 +20,7 @@ describe('SplashScreen', () => {
     expect(screen.getByRole('button', dinoRace)).toHaveTextContent('Daniel')
     expect(screen.getByRole('button', littleChef)).toHaveTextContent('Vanessa')
     expect(screen.getByRole('button', matchUp)).toHaveTextContent('Daniel')
+    expect(screen.getByRole('button', cookieMaze)).toHaveTextContent('Daniel')
   })
 
   it('focuses the first game so keyboard players can begin straight away', () => {
