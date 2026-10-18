@@ -10,6 +10,7 @@
 
 .lemon-volcano__stage-area {
   container-type: size;
+  overflow: hidden;
   display: flex;
   align-items: flex-end;
   justify-content: center;
