@@ -101,6 +101,33 @@ describe('KitchenGame', () => {
     }
   })
 
+  it('serves every dish once before any dish comes round again', () => {
+    const game = new KitchenGame(RECIPES, Math.random)
+    const served: string[] = []
+
+    for (let round = 0; round < RECIPES.length * 2; round++) {
+      served.push(game.snapshot().dish)
+      cook(game, RECIPES)
+    }
+
+    const dishes = RECIPES.map((recipe) => recipe.dish)
+    expect([...served.slice(0, RECIPES.length)].sort()).toEqual([...dishes].sort())
+    expect([...served.slice(RECIPES.length)].sort()).toEqual([...dishes].sort())
+  })
+
+  it('takes the dishes in a different order each time the random source says so', () => {
+    const order = (random: () => number) => {
+      const game = new KitchenGame(RECIPES, random)
+      return RECIPES.map(() => {
+        const { dish } = game.snapshot()
+        cook(game, RECIPES)
+        return dish
+      })
+    }
+
+    expect(order(firstRecipe)).not.toEqual(order(lastRecipe))
+  })
+
   it('fills the shelf up gradually as more dishes are cooked, up to a limit', () => {
     const game = new KitchenGame(RECIPES, firstRecipe)
     const sizes: number[] = []
@@ -141,6 +168,28 @@ describe('RECIPES', () => {
   it('has savoury and sweet dishes, each with its own ingredients', () => {
     expect(new Set(RECIPES.map((recipe) => recipe.flavour))).toEqual(new Set(['savoury', 'sweet']))
     for (const recipe of RECIPES) expect(recipe.ingredients.length).toBeGreaterThanOrEqual(3)
+  })
+
+  it('has plenty of dishes', () => {
+    expect(RECIPES.length).toBeGreaterThanOrEqual(12)
+    expect(new Set(RECIPES.map((recipe) => recipe.dish)).size).toBe(RECIPES.length)
+  })
+
+  it('draws each ingredient the same way everywhere and never repeats one within a dish', () => {
+    const emojiByName = new Map<string, string>()
+    for (const recipe of RECIPES) {
+      expect(new Set(recipe.ingredients.map((own) => own.name)).size).toBe(recipe.ingredients.length)
+      for (const { name, emoji } of recipe.ingredients) expect(emojiByName.get(name) ?? emoji).toBe(emoji)
+      for (const { name, emoji } of recipe.ingredients) emojiByName.set(name, emoji)
+    }
+  })
+
+  it('keeps savoury and sweet ingredients apart, so the wrong ones on the shelf are never arguable', () => {
+    const namesOf = (flavour: string) =>
+      new Set(RECIPES.filter((recipe) => recipe.flavour === flavour).flatMap((recipe) => recipe.ingredients.map((own) => own.name)))
+    const sweet = namesOf('sweet')
+
+    for (const name of namesOf('savoury')) expect(sweet.has(name)).toBe(false)
   })
 
   it('gives a pizza tomatoes, cheese and pepperoni but never grapes or lettuce', () => {

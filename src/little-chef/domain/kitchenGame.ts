@@ -41,13 +41,14 @@ export class KitchenGame {
   private lives = MAX_LIVES
   private dishesCooked = 0
   private order: Order
+  private deck: Recipe[] = []
   private added = new Set<string>()
   private rejected = new Set<string>()
 
   constructor(recipes: readonly Recipe[], random: () => number) {
     this.recipes = recipes
     this.random = random
-    this.order = this.takeOrder(recipes)
+    this.order = this.takeOrder()
   }
 
   pick(name: string): KitchenEvent[] {
@@ -87,16 +88,28 @@ export class KitchenGame {
   private finishDish(): KitchenEvent {
     const { dish, emoji } = this.order.recipe
     this.dishesCooked += 1
-    this.order = this.takeOrder(this.recipes.filter((recipe) => recipe.dish !== dish))
+    this.order = this.takeOrder()
     return { type: 'dishCooked', dish, emoji }
   }
 
-  private takeOrder(choices: readonly Recipe[]): Order {
-    const options = choices.length > 0 ? choices : this.recipes
-    const recipe = options[Math.floor(this.random() * options.length)]
+  private takeOrder(): Order {
+    const recipe = this.nextRecipe()
     this.added = new Set()
     this.rejected = new Set()
     return { recipe, shelf: this.shuffled([...recipe.ingredients, ...this.wrongIngredientsFor(recipe)]) }
+  }
+
+  /** A shuffled deck, so every dish is served once before any comes round again. */
+  private nextRecipe(): Recipe {
+    if (this.deck.length === 0) this.deck = this.freshDeck()
+    return this.deck.shift()!
+  }
+
+  private freshDeck(): Recipe[] {
+    const deck = this.shuffled(this.recipes)
+    const justCooked = this.order?.recipe
+    if (deck.length > 1 && deck[0] === justCooked) deck.push(deck.shift()!)
+    return deck
   }
 
   private wrongIngredientsFor(recipe: Recipe): Ingredient[] {
@@ -117,8 +130,8 @@ export class KitchenGame {
 
   private shuffled<T>(items: readonly T[]): T[] {
     const result = [...items]
-    for (let i = result.length - 1; i > 0; i--) {
-      const j = Math.floor(this.random() * (i + 1))
+    for (let i = 0; i < result.length - 1; i++) {
+      const j = i + Math.floor(this.random() * (result.length - i))
       ;[result[i], result[j]] = [result[j], result[i]]
     }
     return result
