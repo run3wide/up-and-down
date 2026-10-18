@@ -1,13 +1,14 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { InMemoryGalleryStore } from '../infrastructure/InMemoryGalleryStore'
+import { InMemorySketchStore } from '../infrastructure/InMemorySketchStore'
 import { TEMPLATES } from '../domain/templates'
 import { ColouringScreen } from './ColouringScreen'
 
 const trex = TEMPLATES.find(({ id }) => id === 't-rex')!
 
-function renderScreen(gallery = new InMemoryGalleryStore(), onExit = () => {}) {
-  render(<ColouringScreen gallery={gallery} onExit={onExit} />)
+function renderScreen(gallery = new InMemoryGalleryStore(), onExit = () => {}, sketches = new InMemorySketchStore()) {
+  render(<ColouringScreen gallery={gallery} sketches={sketches} onExit={onExit} />)
   return gallery
 }
 
@@ -129,5 +130,103 @@ describe('ColouringScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Back to games' }))
 
     expect(onExit).toHaveBeenCalledOnce()
+  })
+
+  describe('free drawing', () => {
+    const openPad = (sketches = new InMemorySketchStore()) => {
+      renderScreen(new InMemoryGalleryStore(), () => {}, sketches)
+      fireEvent.click(screen.getByRole('button', { name: /^Free draw/ }))
+      const pad = screen.getByRole('application', { name: /^Drawing pad/ })
+      // jsdom has no layout: say the pad is 200px square at the top left, so one pixel is half a unit.
+      pad.getBoundingClientRect = () => ({ left: 0, top: 0, width: 200, height: 200, right: 200, bottom: 200, x: 0, y: 0, toJSON: () => ({}) })
+      return { pad, sketches }
+    }
+    const drag = (pad: HTMLElement, ...points: [number, number][]) => {
+      const [[startX, startY], ...rest] = points
+      fireEvent.pointerDown(pad, { clientX: startX, clientY: startY, pointerId: 1 })
+      for (const [x, y] of rest) fireEvent.pointerMove(pad, { clientX: x, clientY: y, pointerId: 1 })
+      fireEvent.pointerUp(pad, { clientX: points.at(-1)![0], clientY: points.at(-1)![1], pointerId: 1 })
+    }
+
+    it('offers a blank page on the shelf', () => {
+      renderScreen()
+
+      expect(screen.getByRole('button', { name: 'Free draw, not started' })).toBeInTheDocument()
+    })
+
+    it('opens a pad to draw anything on', () => {
+      openPad()
+
+      expect(screen.getByRole('heading', { name: 'Draw anything you like' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Red' })).toHaveAttribute('aria-pressed', 'true')
+      expect(screen.getByRole('button', { name: 'Medium' })).toHaveAttribute('aria-pressed', 'true')
+    })
+
+    it('draws a line where a finger or mouse is dragged, in the chosen colour and brush', () => {
+      const { pad, sketches } = openPad()
+      chooseColour('Blue')
+      chooseColour('Thick')
+
+      drag(pad, [20, 20], [100, 100], [180, 20])
+
+      expect(sketches.load()).toEqual([{ colour: 'blue', brush: 'thick', points: [[10, 10], [50, 50], [90, 10]] }])
+    })
+
+    it('draws a dot from a tap', () => {
+      const { pad, sketches } = openPad()
+
+      drag(pad, [100, 100])
+
+      expect(sketches.load()).toEqual([{ colour: 'red', brush: 'medium', points: [[50, 50]] }])
+    })
+
+    it('ignores moving over the pad when nothing is pressed', () => {
+      const { pad, sketches } = openPad()
+
+      fireEvent.pointerMove(pad, { clientX: 50, clientY: 50, pointerId: 1 })
+
+      expect(sketches.load()).toEqual([])
+    })
+
+    it('undoes a stroke and clears the page', () => {
+      const { pad, sketches } = openPad()
+      drag(pad, [20, 20], [40, 40])
+      drag(pad, [60, 60], [80, 80])
+
+      fireEvent.click(screen.getByRole('button', { name: 'Undo' }))
+      expect(sketches.load()).toHaveLength(1)
+
+      fireEvent.click(screen.getByRole('button', { name: 'Clear' }))
+      expect(sketches.load()).toEqual([])
+    })
+
+    it('draws from the keyboard: arrow keys draw, space lifts the pen', () => {
+      const { pad, sketches } = openPad()
+
+      for (const key of ['ArrowRight', 'ArrowRight', 'ArrowDown']) fireEvent.keyDown(pad, { key })
+      fireEvent.keyDown(pad, { key: ' ' })
+      fireEvent.keyDown(pad, { key: 'ArrowDown' })
+      fireEvent.keyDown(pad, { key: ' ' })
+
+      expect(sketches.load()).toEqual([
+        { colour: 'red', brush: 'medium', points: [[50, 50], [54, 50], [58, 50], [58, 54]] },
+        { colour: 'red', brush: 'medium', points: [[58, 54], [58, 58]] },
+      ])
+    })
+
+    it('picks up the drawing from last time, and shows it on the shelf', () => {
+      const sketches = new InMemorySketchStore([{ colour: 'green', brush: 'thin', points: [[1, 1], [9, 9]] }])
+      renderScreen(new InMemoryGalleryStore(), () => {}, sketches)
+
+      expect(screen.getByRole('button', { name: 'Free draw, started' })).toBeInTheDocument()
+    })
+
+    it('goes back to the shelf', () => {
+      openPad()
+
+      fireEvent.click(screen.getByRole('button', { name: 'My pictures' }))
+
+      expect(screen.getByRole('group', { name: 'Pictures' })).toBeInTheDocument()
+    })
   })
 })

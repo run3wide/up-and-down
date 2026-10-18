@@ -1,5 +1,10 @@
 import { useState } from 'react'
 import type { GalleryStore } from '../application/GalleryStore'
+import type { SketchStore } from '../application/SketchStore'
+import { Drawing, type DrawingSnapshot, type Stroke } from '../domain/drawing'
+import { Palette } from './Palette'
+import { Sketchpad } from './Sketchpad'
+import { StrokeArt } from './StrokeArt'
 import { COLOURS } from '../domain/colours'
 import { Picture, type Fills, type PictureSnapshot } from '../domain/picture'
 import { TEMPLATES, type Template } from '../domain/templates'
@@ -9,13 +14,17 @@ import './colouring.css'
 
 interface ColouringScreenProps {
   gallery: GalleryStore
+  sketches: SketchStore
   onExit: () => void
 }
 
-export function ColouringScreen({ gallery, onExit }: ColouringScreenProps) {
+export function ColouringScreen({ gallery, sketches, onExit }: ColouringScreenProps) {
   const [saved, setSaved] = useState(() => gallery.load())
+  const [sketch, setSketch] = useState(() => sketches.load())
   const [picture, setPicture] = useState<Picture | null>(null)
   const [snapshot, setSnapshot] = useState<PictureSnapshot | null>(null)
+  const [drawing, setDrawing] = useState<Drawing | null>(null)
+  const [drawingSnapshot, setDrawingSnapshot] = useState<DrawingSnapshot | null>(null)
 
   const open = (template: Template) => {
     const next = new Picture(template, saved[template.id])
@@ -23,13 +32,32 @@ export function ColouringScreen({ gallery, onExit }: ColouringScreenProps) {
     setSnapshot(next.snapshot())
   }
 
-  const showShelf = () => {
-    setSaved(gallery.load())
-    setPicture(null)
-    setSnapshot(null)
+  const openSketchpad = () => {
+    const next = new Drawing(sketch)
+    setDrawing(next)
+    setDrawingSnapshot(next.snapshot())
   }
 
-  if (!picture || !snapshot) return <Shelf saved={saved} onOpen={open} onExit={onExit} />
+  const showShelf = () => {
+    setSaved(gallery.load())
+    setSketch(sketches.load())
+    setPicture(null)
+    setSnapshot(null)
+    setDrawing(null)
+    setDrawingSnapshot(null)
+  }
+
+  if (drawing && drawingSnapshot) {
+    const changeDrawing = (edit: (drawing: Drawing) => void) => {
+      edit(drawing)
+      const next = drawing.snapshot()
+      setDrawingSnapshot(next)
+      sketches.save(next.strokes)
+    }
+    return <Sketchpad snapshot={drawingSnapshot} onChange={changeDrawing} onShelf={showShelf} />
+  }
+
+  if (!picture || !snapshot) return <Shelf saved={saved} sketch={sketch} onOpen={open} onOpenSketchpad={openSketchpad} onExit={onExit} />
 
   const change = (edit: (picture: Picture) => void) => {
     edit(picture)
@@ -41,7 +69,15 @@ export function ColouringScreen({ gallery, onExit }: ColouringScreenProps) {
   return <Easel snapshot={snapshot} onChange={change} onShelf={showShelf} />
 }
 
-function Shelf({ saved, onOpen, onExit }: { saved: Readonly<Record<string, Fills>>; onOpen: (template: Template) => void; onExit: () => void }) {
+interface ShelfProps {
+  saved: Readonly<Record<string, Fills>>
+  sketch: readonly Stroke[]
+  onOpen: (template: Template) => void
+  onOpenSketchpad: () => void
+  onExit: () => void
+}
+
+function Shelf({ saved, sketch, onOpen, onOpenSketchpad, onExit }: ShelfProps) {
   return (
     <main className="colouring">
       <header className="colouring__bar">
@@ -61,6 +97,12 @@ function Shelf({ saved, onOpen, onExit }: { saved: Readonly<Record<string, Fills
             </button>
           )
         })}
+        <button className="colouring__card" aria-label={`Free draw, ${sketch.length === 0 ? 'not started' : 'started'}`} onClick={onOpenSketchpad}>
+          <svg className="colouring__art" viewBox="0 0 100 100" aria-hidden="true">
+            <StrokeArt strokes={sketch} />
+          </svg>
+          <span aria-hidden="true">Free draw</span>
+        </button>
       </div>
     </main>
   )
@@ -97,11 +139,7 @@ function Easel({ snapshot, onChange, onShelf }: EaselProps) {
         {finished ? 'All coloured in! 🎉 Change any part you like.' : ''}
       </p>
       <PictureArt template={template} fills={fills} onPick={(region) => onChange((picture) => picture.fill(region, colour))} />
-      <div className="colouring__palette" role="group" aria-label="Colours">
-        {COLOURS.map(({ id, name, hex }) => (
-          <button key={id} className="colouring__swatch" style={{ background: hex }} aria-label={name} aria-pressed={colour === id} onClick={() => setColour(id)} />
-        ))}
-      </div>
+      <Palette chosen={colour} onChoose={setColour} />
     </main>
   )
 }

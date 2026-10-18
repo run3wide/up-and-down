@@ -116,3 +116,42 @@
   width: 100%;
   box-shadow: none;
 }
+
+.colouring__pad {
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.colouring__stroke {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.colouring__brushes {
+  display: flex;
+  gap: 0.5rem;
+  width: min(100%, 36rem);
+}
+
+.colouring__brush {
+  flex: 1;
+  min-height: 3.25rem;
+  padding: 0.3rem;
+  color: var(--ink);
+  background: #fff;
+  border: 0.15rem solid var(--ink);
+  border-radius: 1rem;
+  box-shadow: 0 0.1rem 0 var(--ink);
+  cursor: pointer;
+}
+
+.colouring__brush svg {
+  height: 100%;
+  fill: currentColor;
+}
+
+.colouring__brush[aria-pressed='true'] {
+  outline: 0.3rem solid var(--ink);
+  outline-offset: 0.15rem;
+}
