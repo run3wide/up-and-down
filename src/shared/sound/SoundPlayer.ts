@@ -1,4 +1,4 @@
-export type AnimalCall = 'moo' | 'meow' | 'woof' | 'oink' | 'buzz' | 'cluck' | 'ribbit' | 'quack' | 'tweet' | 'squeak' | 'neigh' | 'baa' | 'growl'
+export type AnimalCall = 'moo' | 'baa' | 'bleat' | 'meow' | 'woof' | 'oink' | 'neigh' | 'peep' | 'ribbit' | 'buzz'
 
 export type SoundEffect = 'eruption' | 'roar' | 'victoryRoar' | 'winner' | AnimalCall
 

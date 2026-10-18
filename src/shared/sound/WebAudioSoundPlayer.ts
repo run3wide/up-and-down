@@ -1,17 +1,44 @@
-import { isAnimalCall, scheduleAnimalCall } from './animalCalls'
 import { scheduleEruption } from './eruptionSound'
 import type { SoundEffect, SoundPlayer } from './SoundPlayer'
 import roarClip from './trexRoar.wav?inline'
 import victoryRoarClip from './trexVictoryRoar.wav?inline'
 import winnerClip from './winner.ogg?inline'
+import baaClip from './animals/Baa.ogg?inline'
+import bleatClip from './animals/Bleat.ogg?inline'
+import buzzClip from './animals/Buzz.ogg?inline'
+import meowClip from './animals/Meow.ogg?inline'
+import mooClip from './animals/Moo.ogg?inline'
+import peepClip from './animals/Peeps.ogg?inline'
+import ribbitClip from './animals/Ribbit.mp3?inline'
+import squealClip from './animals/Squeal.ogg?inline'
+import whinnyClip from './animals/Whinny.ogg?inline'
+import woofClip from './animals/Bark.ogg?inline'
 
-const CLIPS: Partial<Record<SoundEffect, string>> = { roar: roarClip, victoryRoar: victoryRoarClip, winner: winnerClip }
+const CLIPS: Partial<Record<SoundEffect, string>> = {
+  roar: roarClip,
+  victoryRoar: victoryRoarClip,
+  winner: winnerClip,
+  moo: mooClip,
+  baa: baaClip,
+  bleat: bleatClip,
+  meow: meowClip,
+  woof: woofClip,
+  oink: squealClip,
+  neigh: whinnyClip,
+  peep: peepClip,
+  ribbit: ribbitClip,
+  buzz: buzzClip,
+}
+
+/** A long recording only needs its first moments, which then fade out rather than stop with a click. */
+const PLAY_SECONDS: Partial<Record<SoundEffect, number>> = { buzz: 1.5 }
+const FADE_SECONDS = 0.25
 
 /** Slowed down, the announcer's "Winner!" drops into a big dinosaur voice. */
 const PLAYBACK_RATE: Partial<Record<SoundEffect, number>> = { winner: 0.7 }
 
 /**
- * Plays sounds with Web Audio. The eruption and the animal calls are synthesised; the dino roars and the "Winner!" are small CC0 clips (see CREDITS.md)
+ * Plays sounds with Web Audio. The eruption is synthesised; the dino roars, the "Winner!" and the animal calls are small CC0 or public-domain clips (see CREDITS.md)
  * bundled into the app as data URLs, so the game still makes no network calls.
  */
 export class WebAudioSoundPlayer implements SoundPlayer {
@@ -29,7 +56,6 @@ export class WebAudioSoundPlayer implements SoundPlayer {
     const context = this.ensureContext()
     if (!context || !this.output || context.state !== 'running') return
     if (effect === 'eruption') scheduleEruption(context, this.output)
-    else if (isAnimalCall(effect)) scheduleAnimalCall(context, this.output, effect)
     else void this.playClip(context, this.output, effect)
   }
 
@@ -38,8 +64,17 @@ export class WebAudioSoundPlayer implements SoundPlayer {
       const source = context.createBufferSource()
       source.buffer = await this.clip(context, effect)
       source.playbackRate.value = PLAYBACK_RATE[effect] ?? 1
-      source.connect(output)
-      source.start()
+      const seconds = PLAY_SECONDS[effect]
+      if (seconds === undefined) {
+        source.connect(output)
+        source.start()
+      } else {
+        const fade = context.createGain()
+        fade.gain.setValueAtTime(1, context.currentTime + seconds - FADE_SECONDS)
+        fade.gain.linearRampToValueAtTime(0, context.currentTime + seconds)
+        source.connect(fade).connect(output)
+        source.start(0, 0, seconds)
+      }
     } catch {
       // A clip that won't decode is just a missing sound: the game carries on.
     }
