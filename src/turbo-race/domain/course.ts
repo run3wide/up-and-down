@@ -1,4 +1,4 @@
-export type ItemKind = 'cone' | 'rock' | 'coin'
+export type ItemKind = 'cone' | 'rock' | 'cookie'
 
 export interface CourseItem {
   readonly id: number
@@ -17,7 +17,7 @@ export const ITEM_MAX_X = 72
 const SPACING = 32
 const SPACING_VARIATION = 18
 const FINISH_RUN_IN = 40
-const COIN_GAP = 6
+const COOKIE_GAP = 6
 
 type Random = () => number
 
@@ -27,7 +27,7 @@ export function buildCourse(random: Random): CourseItem[] {
   for (let at = COURSE_START_CLEAR; at < FINISH_DISTANCE - FINISH_RUN_IN; at += SPACING + random() * SPACING_VARIATION) {
     const roll = random()
     if (roll < 0.4) items.push(obstacle(random, at, between(random, ITEM_MIN_X, ITEM_MAX_X)))
-    else if (roll < 0.75) items.push(...coinTrio(random, at))
+    else if (roll < 0.75) items.push(...cookieTrio(random, at))
     else items.push(...obstaclePairWithGap(random, at))
   }
   return items.map((item, id) => ({ ...item, id }))
@@ -41,9 +41,9 @@ function obstacle(random: Random, at: number, x: number): Omit<CourseItem, 'id'>
   return { kind: random() < 0.5 ? 'cone' : 'rock', at, x }
 }
 
-function coinTrio(random: Random, at: number): Omit<CourseItem, 'id'>[] {
+function cookieTrio(random: Random, at: number): Omit<CourseItem, 'id'>[] {
   const x = between(random, ITEM_MIN_X + 2, ITEM_MAX_X - 2)
-  return [0, 1, 2].map((row) => ({ kind: 'coin', at: at + row * COIN_GAP, x }))
+  return [0, 1, 2].map((row) => ({ kind: 'cookie', at: at + row * COOKIE_GAP, x }))
 }
 
 /** Two obstacles with a wide gap between them, so there is always room to drive through. */

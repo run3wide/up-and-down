@@ -39,15 +39,15 @@ describe('buildCourse', () => {
     expect(new Set(course.map((item) => item.id)).size).toBe(course.length)
   })
 
-  it('has both hazards to dodge and coins to collect', () => {
+  it('has both hazards to dodge and cookies to collect', () => {
     const kinds = new Set(buildCourse(seeded(5)).map((item) => item.kind))
 
-    expect(kinds).toContain('coin')
+    expect(kinds).toContain('cookie')
     expect(kinds.has('cone') || kinds.has('rock')).toBe(true)
   })
 
   it('never blocks the whole road: obstacles at the same spot leave a gap to drive through', () => {
-    const course = buildCourse(seeded(11)).filter((item) => item.kind !== 'coin')
+    const course = buildCourse(seeded(11)).filter((item) => item.kind !== 'cookie')
     const rows = new Map<number, typeof course>()
     for (const item of course) {
       const key = Math.round(item.at / 4)

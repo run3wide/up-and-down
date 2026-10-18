@@ -4,14 +4,14 @@ import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
 import { RaceScreen } from './RaceScreen'
 
 /**
- * With every random value at 0.5 the course is nothing but coins down the middle of the road,
+ * With every random value at 0.5 the course is nothing but cookies down the middle of the road,
  * so driving straight collects them all and finishes. With 0.1 every obstacle sits in the left lane,
  * so hugging the left edge crashes into all of them.
  */
-const coinsDownTheMiddle = () => 0.5
+const cookiesDownTheMiddle = () => 0.5
 const hazardsInTheLeftLane = () => 0.1
 
-function renderRace(random = coinsDownTheMiddle, bestScore = 0) {
+function renderRace(random = cookiesDownTheMiddle, bestScore = 0) {
   const bestScores = new InMemoryBestScoreStore(bestScore)
   const onExit = vi.fn()
   const { container } = render(<RaceScreen random={random} bestScores={bestScores} onExit={onExit} />)
@@ -94,7 +94,7 @@ describe('RaceScreen', () => {
     expect(carLeft()).toBeLessThan(50)
   })
 
-  it('collects coins by driving through them', () => {
+  it('collects cookies by driving through them', () => {
     renderRace()
 
     driveFor(8)

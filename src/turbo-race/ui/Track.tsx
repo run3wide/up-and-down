@@ -5,20 +5,20 @@ import type { RaceSnapshot } from '../domain/raceGame'
 import { ItemSprite, Tree } from './RoadSprites'
 
 /** The stage is square, so one world unit is 1% of its width and height. */
-const CAR_WIDTH = 10
-const CAR_HEIGHT = 17.5
+const CAR_WIDTH = 12
+const CAR_HEIGHT = 21
 const CAR_BOTTOM = 6
 const CAR_CENTRE = CAR_BOTTOM + CAR_HEIGHT / 2
 const TREE_SPACING = 26
-const ITEM_SIZE = { cone: 6, rock: 7.5, coin: 5.5 } as const
+const ITEM_SIZE = { cone: 6, rock: 7.5, cookie: 5.5 } as const
 
 interface TrackProps {
   snapshot: RaceSnapshot
   crashed: boolean
-  coinPop: number
+  cookiePop: number
 }
 
-export function Track({ snapshot, crashed, coinPop }: TrackProps) {
+export function Track({ snapshot, crashed, cookiePop }: TrackProps) {
   const { distance, carX, items, invulnerable } = snapshot
   const finishAhead = FINISH_DISTANCE - distance
   return (
@@ -46,8 +46,8 @@ export function Track({ snapshot, crashed, coinPop }: TrackProps) {
         style={{ left: `${carX}%`, bottom: `${CAR_BOTTOM}%`, width: `${CAR_WIDTH}%`, height: `${CAR_HEIGHT}%` }}
       >
         <RaceCar />
-        {coinPop > 0 && (
-          <span key={coinPop} className="coin-pop" aria-hidden="true">
+        {cookiePop > 0 && (
+          <span key={cookiePop} className="cookie-pop" aria-hidden="true">
             +1
           </span>
         )}

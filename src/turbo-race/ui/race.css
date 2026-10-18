@@ -65,9 +65,9 @@
   overflow: visible;
 }
 
-.road-item--coin svg {
-  filter: drop-shadow(0 0 0.8cqw #ffd23f);
-  animation: coin-spin 1.2s ease-in-out infinite;
+.road-item--cookie svg {
+  filter: drop-shadow(0 0.5cqw 0.5cqw #0005);
+  animation: cookie-wobble 1.4s ease-in-out infinite;
 }
 
 .finish-line {
@@ -99,13 +99,13 @@
   animation: spin-out 0.7s ease-out;
 }
 
-.coin-pop {
+.cookie-pop {
   position: absolute;
   inset: -20% 0 auto;
   text-align: center;
   font-size: 4cqw;
-  color: #fff3a8;
-  -webkit-text-stroke: 0.4cqw #7a5a00;
+  color: #ffe2b3;
+  -webkit-text-stroke: 0.4cqw #6b3a12;
   paint-order: stroke fill;
   animation: pop-up 0.7s ease-out forwards;
 }
@@ -165,9 +165,12 @@
   }
 }
 
-@keyframes coin-spin {
-  50% {
-    transform: scaleX(0.35);
+@keyframes cookie-wobble {
+  25% {
+    transform: rotate(-9deg);
+  }
+  75% {
+    transform: rotate(9deg);
   }
 }
 

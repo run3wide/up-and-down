@@ -3,7 +3,7 @@ import type { ItemKind } from '../domain/course'
 export function ItemSprite({ kind }: { kind: ItemKind }) {
   if (kind === 'cone') return <Cone />
   if (kind === 'rock') return <Rock />
-  return <Coin />
+  return <Cookie />
 }
 
 function Cone() {
@@ -25,12 +25,18 @@ function Rock() {
   )
 }
 
-function Coin() {
+function Cookie() {
   return (
     <svg viewBox="0 0 40 40" aria-hidden="true">
-      <circle cx="20" cy="20" r="16" fill="#ffd23f" stroke="#b8860b" strokeWidth="2.4" />
-      <circle cx="20" cy="20" r="10" fill="none" stroke="#f2a900" strokeWidth="2" />
-      <path d="M20 12 L22.4 17.6 L28.4 18 L23.8 21.8 L25.4 27.6 L20 24.4 L14.6 27.6 L16.2 21.8 L11.6 18 L17.6 17.6 Z" fill="#fff3a8" />
+      <circle cx="20" cy="20" r="17" fill="#d99a52" stroke="#9a5f24" strokeWidth="2" />
+      <path d="M8 14 Q12 7 20 6 Q28 7 32 14" stroke="#f0bd7a" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+      <path d="M33 25 A14 14 0 0 1 22 34" stroke="#b9772f" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+      <ellipse cx="14" cy="15" rx="3.4" ry="2.8" fill="#4a2a17" transform="rotate(-20 14 15)" />
+      <ellipse cx="25" cy="13" rx="3" ry="2.4" fill="#4a2a17" transform="rotate(15 25 13)" />
+      <ellipse cx="22" cy="22" rx="3.6" ry="3" fill="#4a2a17" transform="rotate(-10 22 22)" />
+      <ellipse cx="11" cy="25" rx="2.8" ry="2.4" fill="#4a2a17" transform="rotate(25 11 25)" />
+      <ellipse cx="19" cy="30" rx="3" ry="2.4" fill="#4a2a17" transform="rotate(-25 19 30)" />
+      <ellipse cx="30" cy="22" rx="2.2" ry="1.9" fill="#4a2a17" />
     </svg>
   )
 }

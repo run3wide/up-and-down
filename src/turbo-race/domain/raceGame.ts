@@ -18,7 +18,7 @@ const VISIBLE_AHEAD = 100
 
 export type Phase = 'countdown' | 'racing' | 'finished' | 'over'
 export type SteerDirection = 'left' | 'right'
-export type RaceEvent = { type: 'coinCollected' } | { type: 'crashed' } | { type: 'finished' } | { type: 'gameOver' }
+export type RaceEvent = { type: 'cookieCollected' } | { type: 'crashed' } | { type: 'finished' } | { type: 'gameOver' }
 
 export interface VisibleItem {
   readonly id: number
@@ -37,7 +37,7 @@ export interface RaceSnapshot {
   readonly distance: number
   readonly speed: number
   readonly lives: number
-  readonly coins: number
+  readonly cookies: number
   readonly invulnerable: boolean
   readonly items: readonly VisibleItem[]
 }
@@ -52,7 +52,7 @@ export class RaceGame {
   private distance = 0
   private speed = START_SPEED
   private lives = MAX_LIVES
-  private coins = 0
+  private cookies = 0
   private invulnerableLeft = 0
 
   constructor(course: readonly CourseItem[]) {
@@ -68,7 +68,7 @@ export class RaceGame {
       distance: this.distance,
       speed: this.speed,
       lives: this.lives,
-      coins: this.coins,
+      cookies: this.cookies,
       invulnerable: this.invulnerableLeft > 0,
       items: this.visibleItems(),
     }
@@ -124,7 +124,7 @@ export class RaceGame {
     for (const item of this.course) {
       if (this.used.has(item.id) || !this.isTouching(item)) continue
       this.used.add(item.id)
-      events.push(...(item.kind === 'coin' ? this.collectCoin() : this.hitObstacle()))
+      events.push(...(item.kind === 'cookie' ? this.collectCookie() : this.hitObstacle()))
       if (this.phase === 'over') break
     }
     return events
@@ -136,9 +136,9 @@ export class RaceGame {
     )
   }
 
-  private collectCoin(): RaceEvent[] {
-    this.coins += 1
-    return [{ type: 'coinCollected' }]
+  private collectCookie(): RaceEvent[] {
+    this.cookies += 1
+    return [{ type: 'cookieCollected' }]
   }
 
   private hitObstacle(): RaceEvent[] {

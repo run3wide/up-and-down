@@ -26,7 +26,7 @@ export function RaceScreen({ random, bestScores, onExit }: RaceScreenProps) {
   const [snapshot, setSnapshot] = useState(() => session.snapshot())
   const [result, setResult] = useState<BestScoreResult | null>(null)
   const [crashed, setCrashed] = useState(false)
-  const [coinPop, setCoinPop] = useState(0)
+  const [cookiePop, setCookiePop] = useState(0)
   const crashTimer = useRef<number | undefined>(undefined)
   const stage = useRef<HTMLDivElement>(null)
 
@@ -37,14 +37,14 @@ export function RaceScreen({ random, bestScores, onExit }: RaceScreenProps) {
   const react = useCallback(
     (events: RaceEvent[]) => {
       for (const event of events) {
-        if (event.type === 'coinCollected') setCoinPop((pops) => pops + 1)
+        if (event.type === 'cookieCollected') setCookiePop((pops) => pops + 1)
         if (event.type === 'crashed') {
           clearTimeout(crashTimer.current)
           setCrashed(true)
           crashTimer.current = window.setTimeout(() => setCrashed(false), CRASH_MILLISECONDS)
         }
         if (event.type === 'finished' || event.type === 'gameOver') {
-          setResult(recordFinalScore(bestScores, session.snapshot().coins))
+          setResult(recordFinalScore(bestScores, session.snapshot().cookies))
         }
       }
     },
@@ -78,7 +78,7 @@ export function RaceScreen({ random, bestScores, onExit }: RaceScreenProps) {
     <main className="race">
       <div className="race__stage-area">
         <div ref={stage} className="race__stage" onPointerDown={dragTo} onPointerMove={dragTo}>
-          <Track snapshot={snapshot} crashed={crashed} coinPop={coinPop} />
+          <Track snapshot={snapshot} crashed={crashed} cookiePop={cookiePop} />
           {snapshot.phase === 'countdown' && (
             <p key={snapshot.countdown} className="race__call">
               {snapshot.countdown}
@@ -90,7 +90,7 @@ export function RaceScreen({ random, bestScores, onExit }: RaceScreenProps) {
       <header className="hud">
         <Hearts lives={snapshot.lives} max={MAX_LIVES} />
         <p className="hud__score" role="status">
-          Score: {snapshot.coins}
+          Score: {snapshot.cookies}
         </p>
         <button className="hud__pause" onClick={togglePause} aria-label="Pause">
           <span aria-hidden="true">❚❚</span>
@@ -110,9 +110,9 @@ export function RaceScreen({ random, bestScores, onExit }: RaceScreenProps) {
       <TouchControls hold={(direction) => session.hold(direction)} release={(direction) => session.release(direction)} />
       {snapshot.paused && <PausedOverlay onResume={togglePause} onMainMenu={onExit} />}
       {snapshot.phase === 'finished' && result && (
-        <GameOverOverlay title="Race finished!" score={snapshot.coins} result={result} onBackToGames={onExit} />
+        <GameOverOverlay title="Race finished!" score={snapshot.cookies} result={result} onBackToGames={onExit} />
       )}
-      {snapshot.phase === 'over' && result && <GameOverOverlay score={snapshot.coins} result={result} onBackToGames={onExit} />}
+      {snapshot.phase === 'over' && result && <GameOverOverlay score={snapshot.cookies} result={result} onBackToGames={onExit} />}
     </main>
   )
 }

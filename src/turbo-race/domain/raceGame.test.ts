@@ -16,7 +16,7 @@ const FRAME = 1 / 60
 const CENTRE = 50
 
 const cone = (id: number, at: number, x = CENTRE): CourseItem => ({ id, kind: 'cone', at, x })
-const coin = (id: number, at: number, x = CENTRE): CourseItem => ({ id, kind: 'coin', at, x })
+const cookie = (id: number, at: number, x = CENTRE): CourseItem => ({ id, kind: 'cookie', at, x })
 
 function racing(course: CourseItem[] = []): RaceGame {
   const game = new RaceGame(course)
@@ -37,7 +37,7 @@ describe('the start of a race', () => {
       carX: CENTRE,
       distance: 0,
       lives: MAX_LIVES,
-      coins: 0,
+      cookies: 0,
     })
   })
 
@@ -125,30 +125,30 @@ describe('steering', () => {
   })
 })
 
-describe('coins', () => {
-  it('scores a coin driven through', () => {
-    const game = racing([coin(1, 30)])
+describe('cookies', () => {
+  it('scores a cookie driven through', () => {
+    const game = racing([cookie(1, 30)])
 
     const events = driveUntil(game, () => game.snapshot().distance > 40)
 
-    expect(events).toContainEqual({ type: 'coinCollected' })
-    expect(game.snapshot().coins).toBe(1)
+    expect(events).toContainEqual({ type: 'cookieCollected' })
+    expect(game.snapshot().cookies).toBe(1)
   })
 
-  it('misses a coin that is off to the side', () => {
-    const game = racing([coin(1, 30, 30)])
+  it('misses a cookie that is off to the side', () => {
+    const game = racing([cookie(1, 30, 30)])
 
     driveUntil(game, () => game.snapshot().distance > 40)
 
-    expect(game.snapshot().coins).toBe(0)
+    expect(game.snapshot().cookies).toBe(0)
   })
 
-  it('takes a coin only once, and removes it from the road', () => {
-    const game = racing([coin(1, 30)])
+  it('takes a cookie only once, and removes it from the road', () => {
+    const game = racing([cookie(1, 30)])
 
-    driveUntil(game, () => game.snapshot().coins > 0)
+    driveUntil(game, () => game.snapshot().cookies > 0)
 
-    expect(game.snapshot().items.some((item) => item.kind === 'coin')).toBe(false)
+    expect(game.snapshot().items.some((item) => item.kind === 'cookie')).toBe(false)
   })
 })
 
