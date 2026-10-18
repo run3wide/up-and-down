@@ -29,5 +29,31 @@ Two games, each its own bounded context, picked from the splash screen. After a 
 
 - TDD; test the domain without React. UI tests drive the loop with Vitest fake timers (fake `requestAnimationFrame`) and use `fireEvent` — `userEvent` hangs under fake timers.
 - tsconfig has `erasableSyntaxOnly`: no constructor parameter properties or enums.
-- Players are young children: keep effects soft, no scary failure states, respect `prefers-reduced-motion`.
-- No network calls, analytics or data collection.
+- Domain-driven names: code uses the game's own words (lemon, crater, brain break), not generic ones.
+
+## Safe for kids
+
+The players are young children, and some of the builders are too (the games are credited to the kids who designed them).
+
+- Soft by default: gentle sounds and effects, no scary failure states, no flashing or strobing, respect `prefers-reduced-motion`. Losing is "try again", never punishment.
+- Keep sound moderate and never start it before a tap or key press (browsers require this anyway).
+- No ads, links out, chat, user-generated text, accounts, in-app purchases or anything that leads a child off the page.
+- Content stays kind and age-appropriate: no violence, no real-world brands, no scary imagery.
+- Touch and keyboard must both work; targets are big, and text is short and readable.
+- Maths and other learning content stays encouraging: wrong answers get another go, not a penalty.
+
+## Public repo: keep private info out
+
+The repo and the deployed site are public (GitHub Pages), and so is the full git history. Anything committed is visible forever.
+
+- No network calls, analytics, tracking, cookies or third-party scripts, fonts or CDNs. Everything is bundled. The only storage is `localStorage` for best scores, on the device.
+- Never commit secrets, tokens, `.env` files, personal emails, phone numbers, addresses, school names, photos of the kids, or real voices/recordings.
+- Credit kids by **first name only** in anything new (UI, README, tests, docs, commit messages, code comments). No surnames, ages or birthdays, and no locations or schedules.
+- Commit with a no-reply identity, not a personal address or machine hostname (`git config user.email <id>+<user>@users.noreply.github.com`).
+- Keep `prompt.md`, notes and test fixtures free of anything you would not put on the site itself.
+- Before pushing, scan the diff for names, emails and paths: `git diff --cached | grep -inE "@|/Users/|token|secret|key"`.
+- Don't paste real user data, screenshots with personal details, or absolute local paths into the repo.
+
+### Known cleanup
+
+Surnames are gone from the UI, README and `prompt.md`, but old commits still contain them, plus the author name and a hostname-based email. The history is deliberately left alone (rewriting a published repo is destructive and other worktrees and sessions depend on it). Set a no-reply email for new commits and don't reintroduce surnames.

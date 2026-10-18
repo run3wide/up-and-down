@@ -2,9 +2,9 @@
 
 Three gentle browser games for kids, picked from a splash screen. No backend, no accounts, no network calls; best scores stay on the device.
 
-- **Up and Down** (by Daniel Robson): a ball is thrown up and falls back down; move the dinosaur to catch it. Three lives, difficulty ramps with the score.
-- **Dino Race** (by Daniel Robson): steer the car left and right down the road to the finish line, dodge cones and rocks, grab chocolate chip cookies. Three lives. Every few seconds the race pauses for a "brain break": a little sum about adding only like things together (3🍍 + 3🍍 = 6🍍), starting with fruit pictures and moving on to letters.
-- **Lemon Volcano** (by Moses Robson): aim the strawberry left and right, press Space to throw a lemon into the volcano. Fixed power, eight lemons a round.
+- **Up and Down** (by Daniel): a ball is thrown up and falls back down; move the dinosaur to catch it. Three lives, difficulty ramps with the score.
+- **Dino Race** (by Daniel): steer the car left and right down the road to the finish line, dodge cones and rocks, grab chocolate chip cookies. Three lives. Every few seconds the race pauses for a "brain break": a little sum about adding only like things together (3🍍 + 3🍍 = 6🍍), starting with fruit pictures and moving on to letters.
+- **Lemon Volcano** (by Moses): aim the strawberry left and right, press Space to throw a lemon into the volcano. Fixed power, eight lemons a round.
 
 Each game has its own address: `/up-and-down`, `/lemon-volcano` and `/dino-race` (under `/up-and-down/` on GitHub Pages).
 

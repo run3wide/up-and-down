@@ -1,6 +1,6 @@
 # Up and Down — build brief
 
-You are building **Up and Down**, a browser game for kids, made by Daniel Robson (for his siblings). Read this whole file, then get to work. Follow the working agreements in `~/.claude/CLAUDE.md` (TDD, hexagonal/DDD where it earns its keep, small commits, run tests and lint before declaring done).
+You are building **Up and Down**, a browser game for kids, made by Daniel (for his siblings). Read this whole file, then get to work. Follow the working agreements in `~/.claude/CLAUDE.md` (TDD, hexagonal/DDD where it earns its keep, small commits, run tests and lint before declaring done).
 
 ## The game
 
@@ -10,7 +10,7 @@ A ball is thrown up and falls back down. A dinosaur stands at the bottom of the 
 
 ### 1. Splash screen (first thing on load)
 - Big, cool, playful **logo** reading **Up and Down** (custom styled wordmark — chunky rounded letters, "Up" and "Down" visually playing on direction, e.g. Up rising / Down dropping, a ball bouncing between them).
-- Second line, smaller: **by Daniel Robson**
+- Second line, smaller: **by Daniel**
 - Dinosaurs worked into the logo and scene (e.g. a friendly T-Rex peeking over the letters, a little stegosaurus, cartoon volcano / ferns / clouds in the background). Draw them as inline SVG so there are no asset dependencies.
 - A large, obvious **Start** button (big tap target, hover/press animation). Clicking it goes to the game.
 - Looks polished: gradients, soft shadows, subtle animation (floating clouds, bobbing dino, bouncing ball). Respect `prefers-reduced-motion`.
@@ -50,4 +50,4 @@ A ball is thrown up and falls back down. A dinosaur stands at the bottom of the 
 5. Run the app and actually look at it (use the `run` skill / a browser) before saying the splash screen looks good. Report anything you couldn't verify.
 
 ## Definition of done (v1)
-Opening the app shows the splash screen with the logo, "by Daniel Robson" and a Start button; Start begins a playable game where you move a dinosaur to catch a falling ball; game over shows score and lets you play again. Tests and lint pass.
+Opening the app shows the splash screen with the logo, "by Daniel" and a Start button; Start begins a playable game where you move a dinosaur to catch a falling ball; game over shows score and lets you play again. Tests and lint pass.
