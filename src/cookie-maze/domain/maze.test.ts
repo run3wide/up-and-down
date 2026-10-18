@@ -13,6 +13,18 @@ describe('Maze', () => {
     expect(maze.isOpen({ row: 0, column: 0 })).toBe(false)
   })
 
+  it('marks super stars, which are open path with no cookie of their own', () => {
+    const maze = Maze.fromRows(['S.*'])
+
+    expect(maze.starCells).toEqual([{ row: 0, column: 2 }])
+    expect(maze.cookieCells).toEqual([{ row: 0, column: 1 }])
+    expect(maze.isOpen({ row: 0, column: 2 })).toBe(true)
+  })
+
+  it('refuses a star the dino could never reach', () => {
+    expect(() => Maze.fromRows(['S#*'])).toThrow(MazeLayoutError)
+  })
+
   it('treats everything outside the drawing as wall', () => {
     const maze = Maze.fromRows(['S.'])
 

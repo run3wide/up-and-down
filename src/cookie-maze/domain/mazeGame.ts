@@ -4,11 +4,18 @@ import { Maze, key, stepFrom, type Cell, type Direction } from './maze'
 export const TIME_LIMIT_SECONDS = 120
 export const COOKIE_POINTS = 10
 export const MAX_LIVES = 3
+/** A super star eats every cookie within this many cells (a square around it) and gives some time back. */
+export const BLAST_RADIUS = 2
+export const STAR_BONUS_SECONDS = 5
 
 /** `timeUp` waits for another try; `over` is when the last try has gone. */
 export type MazePhase = 'ready' | 'playing' | 'won' | 'timeUp' | 'over'
 
-export type MazeEvent = { type: 'cookieEaten'; cell: Cell } | { type: 'won' } | { type: 'timeUp'; livesLeft: number }
+export type MazeEvent =
+  | { type: 'cookieEaten'; cell: Cell }
+  | { type: 'starCollected'; cell: Cell; cookiesCleared: number }
+  | { type: 'won' }
+  | { type: 'timeUp'; livesLeft: number }
 
 export interface MazeSnapshot {
   readonly phase: MazePhase
@@ -21,6 +28,7 @@ export interface MazeSnapshot {
   readonly cookiesEaten: number
   readonly cookiesLeft: number
   readonly remainingCookies: readonly Cell[]
+  readonly remainingStars: readonly Cell[]
   readonly secondsLeft: number
   readonly lives: number
   readonly score: number
@@ -30,6 +38,7 @@ export class MazeGame {
   private readonly maze: Maze
   private readonly timeLimit: number
   private cookies = new Map<string, Cell>()
+  private stars = new Map<string, Cell>()
   private cell: Cell
   private heading: Direction | null = null
   private phase: MazePhase = 'ready'
@@ -41,7 +50,7 @@ export class MazeGame {
     this.maze = maze
     this.timeLimit = timeLimit
     this.cell = maze.start
-    this.layOutCookies()
+    this.layOut()
   }
 
   /** One step, one cell. Bumping into a wall does nothing, and does not start the clock. */
@@ -52,7 +61,7 @@ export class MazeGame {
     this.phase = 'playing'
     this.cell = next
     this.heading = direction
-    return this.eatCookieHere()
+    return this.stars.delete(key(next)) ? this.setOffStar(next) : this.eatCookieHere()
   }
 
   togglePause(): void {
@@ -66,7 +75,7 @@ export class MazeGame {
     this.cell = this.maze.start
     this.heading = null
     this.elapsed = 0
-    this.layOutCookies()
+    this.layOut()
     this.phase = 'ready'
   }
 
@@ -87,13 +96,15 @@ export class MazeGame {
       cookiesEaten: eaten,
       cookiesLeft: this.cookies.size,
       remainingCookies: [...this.cookies.values()],
+      remainingStars: [...this.stars.values()],
       secondsLeft: this.timeLimit - this.elapsed,
       lives: this.lives,
       score: eaten * COOKIE_POINTS + this.speedBonus(),
     }
   }
 
-  private layOutCookies(): void {
+  private layOut(): void {
+    this.stars = new Map(this.maze.starCells.map((star) => [key(star), star]))
     this.cookies = new Map(this.maze.cookieCells.map((cookie) => [key(cookie), cookie]))
   }
 
@@ -103,7 +114,17 @@ export class MazeGame {
 
   private eatCookieHere(): MazeEvent[] {
     if (!this.cookies.delete(key(this.cell))) return []
-    const eaten: MazeEvent = { type: 'cookieEaten', cell: this.cell }
+    return this.afterEating({ type: 'cookieEaten', cell: this.cell })
+  }
+
+  private setOffStar(star: Cell): MazeEvent[] {
+    const blasted = [...this.cookies.values()].filter((cookie) => isWithin(BLAST_RADIUS, star, cookie))
+    for (const cookie of blasted) this.cookies.delete(key(cookie))
+    this.elapsed = Math.max(0, this.elapsed - STAR_BONUS_SECONDS)
+    return this.afterEating({ type: 'starCollected', cell: star, cookiesCleared: blasted.length })
+  }
+
+  private afterEating(eaten: MazeEvent): MazeEvent[] {
     if (this.cookies.size > 0) return [eaten]
     this.phase = 'won'
     return [eaten, { type: 'won' }]
@@ -115,3 +136,5 @@ export class MazeGame {
     return { type: 'timeUp', livesLeft: this.lives }
   }
 }
+
+const isWithin = (radius: number, a: Cell, b: Cell): boolean => Math.abs(a.row - b.row) <= radius && Math.abs(a.column - b.column) <= radius

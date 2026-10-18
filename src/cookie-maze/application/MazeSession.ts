@@ -1,33 +1,38 @@
 import type { Direction } from '../domain/maze'
-import type { MazeEvent, MazeGame, MazeSnapshot } from '../domain/mazeGame'
+import type { MazeEvent } from '../domain/mazeGame'
+import type { MazeRun, MazeRunSnapshot } from '../domain/mazeRun'
 
 export const MAX_FRAME_SECONDS = 0.25
 
 export class MazeSession {
-  private readonly game: MazeGame
+  private readonly run: MazeRun
 
-  constructor(game: MazeGame) {
-    this.game = game
+  constructor(run: MazeRun) {
+    this.run = run
   }
 
-  snapshot(): MazeSnapshot {
-    return this.game.snapshot()
+  snapshot(): MazeRunSnapshot {
+    return this.run.snapshot()
   }
 
   step(direction: Direction): MazeEvent[] {
-    return this.game.step(direction)
+    return this.run.step(direction)
   }
 
   tryAgain(): void {
-    this.game.tryAgain()
+    this.run.tryAgain()
+  }
+
+  nextMaze(): void {
+    this.run.nextMaze()
   }
 
   togglePause(): void {
-    this.game.togglePause()
+    this.run.togglePause()
   }
 
   /** Frame time is clamped so a hidden tab can't burn the clock. */
   advance(elapsedSeconds: number): MazeEvent[] {
-    return this.game.tick(Math.min(elapsedSeconds, MAX_FRAME_SECONDS))
+    return this.run.tick(Math.min(elapsedSeconds, MAX_FRAME_SECONDS))
   }
 }

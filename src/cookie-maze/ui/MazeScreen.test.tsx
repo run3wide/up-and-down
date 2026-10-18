@@ -3,18 +3,25 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
 import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { Maze } from '../domain/maze'
-import { MAX_LIVES, TIME_LIMIT_SECONDS } from '../domain/mazeGame'
+import { MAX_LIVES, STAR_BONUS_SECONDS } from '../domain/mazeGame'
+import type { MazeLevel } from '../domain/mazeRun'
 import { MazeScreen } from './MazeScreen'
 
-function renderMaze(rows: string[], timeLimit?: number) {
+const CLOCK = 120
+
+function level(rows: string[], timeLimit = CLOCK): MazeLevel {
+  return { maze: Maze.fromRows(rows), timeLimit }
+}
+
+function renderMaze(rows: string[], timeLimit?: number, ...laterMazes: MazeLevel[]) {
   const bestScores = new InMemoryBestScoreStore()
   const onExit = vi.fn()
   const sound = { unlock: vi.fn(), play: vi.fn() } satisfies SoundPlayer
   const { container } = render(
-    <MazeScreen maze={Maze.fromRows(rows)} bestScores={bestScores} sound={sound} timeLimit={timeLimit} onExit={onExit} />,
+    <MazeScreen levels={[level(rows, timeLimit), ...laterMazes]} bestScores={bestScores} sound={sound} onExit={onExit} />,
   )
   const dinoLeft = () => Number.parseFloat((container.querySelector('.maze__dino') as HTMLElement).style.left)
-  return { bestScores, onExit, sound, dinoLeft }
+  return { bestScores, onExit, sound, container, dinoLeft }
 }
 
 function wait(seconds: number) {
@@ -48,7 +55,7 @@ describe('MazeScreen', () => {
     wait(5)
 
     expect(cookiesLeft()).toContain('3')
-    expect(timeLeft()).toContain(String(TIME_LIMIT_SECONDS))
+    expect(timeLeft()).toContain(String(CLOCK))
     expect(screen.getByLabelText(`${MAX_LIVES} lives left`)).toBeInTheDocument()
     expect(dinoLeft()).toBeCloseTo(12.5)
   })
@@ -93,7 +100,7 @@ describe('MazeScreen', () => {
     press('ArrowRight')
     wait(10.5)
 
-    expect(timeLeft()).toContain(String(TIME_LIMIT_SECONDS - 10))
+    expect(timeLeft()).toContain(String(CLOCK - 10))
   })
 
   it('is won when the last cookie is eaten: records the score and goes back to the games', () => {
@@ -102,7 +109,7 @@ describe('MazeScreen', () => {
     press('ArrowRight')
     press('ArrowRight')
 
-    const dialog = screen.getByRole('dialog', { name: 'Every cookie!' })
+    const dialog = screen.getByRole('dialog', { name: 'All mazes cleared!' })
     expect(within(dialog).getByText(/Score: \d+/)).toBeInTheDocument()
     expect(bestScores.load()).toBeGreaterThan(0)
     fireEvent.click(within(dialog).getByRole('button', { name: 'Back to games' }))
@@ -164,6 +171,51 @@ describe('MazeScreen', () => {
     expect(onExit).toHaveBeenCalledOnce()
   })
 
+  it('says which maze it is', () => {
+    renderMaze(['S..'], undefined, level(['S.']))
+
+    expect(screen.getByText('Maze 1 of 2')).toBeInTheDocument()
+  })
+
+  it('shows a super star, and sets off fireworks that clear the cookies around it', () => {
+    const { container } = renderMaze(['S*....'])
+    expect(container.querySelector('.maze__star')).toBeInTheDocument()
+    expect(container.querySelector('.maze__burst')).not.toBeInTheDocument()
+
+    press('ArrowRight')
+
+    expect(container.querySelector('.maze__burst')).toBeInTheDocument()
+    expect(container.querySelector('.maze__star')).not.toBeInTheDocument()
+    expect(cookiesLeft()).toContain('2')
+    expect(screen.getByText(`+${STAR_BONUS_SECONDS}s`)).toBeInTheDocument()
+  })
+
+  it('clears the fireworks away again after a moment', () => {
+    const { container } = renderMaze(['S*.......'])
+    press('ArrowRight')
+
+    wait(2)
+
+    expect(container.querySelector('.maze__burst')).not.toBeInTheDocument()
+  })
+
+  it('moves on to the next maze when one is cleared, then finishes after the last', () => {
+    const { bestScores, onExit } = renderMaze(['S.'], undefined, level(['S.']))
+
+    press('ArrowRight')
+    const cleared = screen.getByRole('dialog', { name: 'Maze cleared!' })
+    expect(bestScores.load()).toBe(0)
+    fireEvent.click(within(cleared).getByRole('button', { name: 'Next maze' }))
+
+    expect(screen.getByText('Maze 2 of 2')).toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    press('ArrowRight')
+    const finished = screen.getByRole('dialog', { name: 'All mazes cleared!' })
+    expect(bestScores.load()).toBeGreaterThan(2 * 10)
+    fireEvent.click(within(finished).getByRole('button', { name: 'Back to games' }))
+    expect(onExit).toHaveBeenCalledOnce()
+  })
+
   it('pauses with Escape, stopping the clock, and carries on when resumed', () => {
     renderMaze(['S...'])
     press('ArrowRight')
@@ -172,7 +224,7 @@ describe('MazeScreen', () => {
     wait(10.5)
     fireEvent.click(screen.getByRole('button', { name: 'Resume' }))
 
-    expect(timeLeft()).toContain(String(TIME_LIMIT_SECONDS))
+    expect(timeLeft()).toContain(String(CLOCK))
   })
 
   it('goes back to the main menu from the pause screen', () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { Maze } from './maze'
-import { COOKIE_POINTS, MAX_LIVES, MazeGame, TIME_LIMIT_SECONDS } from './mazeGame'
+import { BLAST_RADIUS, COOKIE_POINTS, MAX_LIVES, MazeGame, STAR_BONUS_SECONDS, TIME_LIMIT_SECONDS } from './mazeGame'
 
 function gameIn(...rows: string[]) {
   return new MazeGame(Maze.fromRows(rows))
@@ -171,5 +171,85 @@ describe('MazeGame', () => {
     game.togglePause()
     game.step('right')
     expect(game.snapshot().x).toBe(2)
+  })
+
+  describe('super stars', () => {
+    const cookiesAroundAStar = ['S*.....', '.......']
+
+    it('go off like fireworks when stepped on, eating every cookie around them', () => {
+      const game = gameIn(...cookiesAroundAStar)
+
+      const events = game.step('right')
+
+      const cleared = game.snapshot().cookiesEaten
+      expect(events).toContainEqual({ type: 'starCollected', cell: { row: 0, column: 1 }, cookiesCleared: cleared })
+      expect(cleared).toBeGreaterThan(0)
+    })
+
+    it('reach exactly as far as the blast radius, and no further', () => {
+      const game = gameIn('S*' + '.'.repeat(BLAST_RADIUS + 3))
+
+      game.step('right')
+
+      const row = game.snapshot().remainingCookies.map((cookie) => cookie.column)
+      expect(Math.min(...row)).toBe(1 + BLAST_RADIUS + 1)
+    })
+
+    it('add seconds back to the clock', () => {
+      const game = new MazeGame(Maze.fromRows(['S.*.........']), 20)
+      game.step('right')
+      game.tick(8)
+
+      game.step('right')
+
+      expect(game.snapshot().secondsLeft).toBe(12 + STAR_BONUS_SECONDS)
+    })
+
+    it('never add more than the clock started with', () => {
+      const game = new MazeGame(Maze.fromRows(['S.*.........']), 20)
+      game.step('right')
+      game.tick(1)
+
+      game.step('right')
+
+      expect(game.snapshot().secondsLeft).toBe(20)
+    })
+
+    it('can win the maze by clearing the last cookies', () => {
+      const game = gameIn('S*..')
+
+      const events = game.step('right')
+
+      expect(events).toContainEqual({ type: 'won' })
+      expect(game.snapshot()).toMatchObject({ phase: 'won', cookiesLeft: 0, cookiesEaten: 2 })
+    })
+
+    it('count the cleared cookies in the score', () => {
+      const game = gameIn('S*..')
+      game.step('right')
+
+      expect(game.snapshot().score).toBe(2 * COOKIE_POINTS + TIME_LIMIT_SECONDS)
+    })
+
+    it('are used up: a star only goes off once', () => {
+      const game = gameIn('S*.......', '.........')
+      game.step('right')
+
+      game.step('left')
+      const events = game.step('right')
+
+      expect(events).toEqual([])
+      expect(game.snapshot().remainingStars).toEqual([])
+    })
+
+    it('come back, with the cookies, when the maze is tried again', () => {
+      const game = new MazeGame(Maze.fromRows(['S*...........']), 2)
+      game.step('right')
+      game.tick(5)
+
+      game.tryAgain()
+
+      expect(game.snapshot().remainingStars).toEqual([{ row: 0, column: 1 }])
+    })
   })
 })

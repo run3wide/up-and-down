@@ -17,7 +17,8 @@
 
 .maze__board {
   position: relative;
-  width: min(96cqw, calc((100cqh - 4.5rem) * 15 / 13));
+  container-type: inline-size;
+  width: min(96cqw, calc((100cqh - 4.5rem) * var(--columns) / var(--rows)));
   max-height: calc(100cqh - 4.5rem);
 }
 
@@ -34,6 +35,100 @@
   fill: #3f8f58;
   stroke: #2f7346;
   stroke-width: 0.04;
+}
+
+.maze__level {
+  position: absolute;
+  inset: 4rem auto auto 1rem;
+  margin: 0;
+  font-size: 1.1rem;
+  color: #fff;
+  text-shadow: 0 0.1rem 0.2rem #0006;
+  pointer-events: none;
+}
+
+.maze__star {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: star-pulse 1.6s ease-in-out infinite;
+}
+
+.maze__burst {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.maze__burst-ring {
+  position: absolute;
+  width: calc(var(--blast) * 100cqw);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(#fff7c2, #ffd23fcc 45%, #ff8fb180 62%, #ff8fb100 72%);
+  animation: burst-ring 1s ease-out forwards;
+}
+
+.maze__spark {
+  position: absolute;
+  font-size: 6.5cqw;
+  translate: -50% -50%;
+  rotate: var(--angle);
+  animation: spark-fly 1s ease-out forwards;
+}
+
+.maze__burst-bonus {
+  position: absolute;
+  translate: -50% -190%;
+  font-size: 6cqw;
+  color: #fff;
+  -webkit-text-stroke: 0.4cqw var(--ink);
+  paint-order: stroke fill;
+  white-space: nowrap;
+  animation: bonus-rise 1.1s ease-out forwards;
+}
+
+@keyframes star-pulse {
+  50% {
+    transform: scale(1.18) rotate(8deg);
+  }
+}
+
+@keyframes burst-ring {
+  from {
+    transform: scale(0.1);
+    opacity: 1;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes spark-fly {
+  from {
+    transform: translateY(0) scale(0.4);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(-15cqw) scale(1.2);
+    opacity: 0;
+  }
+}
+
+@keyframes bonus-rise {
+  from {
+    margin-top: 0;
+    opacity: 1;
+  }
+
+  to {
+    margin-top: -8cqw;
+    opacity: 0;
+  }
 }
 
 .maze__scores {
@@ -87,6 +182,29 @@
 @media (prefers-reduced-motion: reduce) {
   .maze__dino {
     transition: none;
+  }
+
+  .maze__star,
+  .maze__spark {
+    animation: none;
+  }
+
+  .maze__spark {
+    display: none;
+  }
+
+  .maze__burst-ring {
+    animation-name: burst-fade;
+  }
+
+  .maze__burst-bonus {
+    animation-name: burst-fade;
+  }
+}
+
+@keyframes burst-fade {
+  to {
+    opacity: 0;
   }
 }
 

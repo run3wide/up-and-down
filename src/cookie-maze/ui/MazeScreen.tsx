@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { recordFinalScore, type BestScoreResult, type BestScoreStore } from '../../shared/bestScore'
 import { Hearts } from '../../shared/Hearts'
 import { GameOverOverlay, Overlay, PausedOverlay } from '../../shared/Overlays'
@@ -6,21 +6,23 @@ import { SoundToggle } from '../../shared/SoundToggle'
 import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { useAnimationFrame } from '../../shared/useAnimationFrame'
 import { MazeSession } from '../application/MazeSession'
-import type { Direction, Maze } from '../domain/maze'
-import { MAX_LIVES, MazeGame, type MazeEvent } from '../domain/mazeGame'
-import { MazeBoard } from './MazeBoard'
+import type { Direction } from '../domain/maze'
+import { MAX_LIVES, type MazeEvent } from '../domain/mazeGame'
+import { MazeRun, type MazeLevel } from '../domain/mazeRun'
+import { MazeBoard, type Burst } from './MazeBoard'
 import { useMazeControls } from './useMazeControls'
 import '../../shared/hud.css'
 import './maze.css'
 
 interface MazeScreenProps {
-  maze: Maze
+  /** The mazes to play, in order. */
+  levels: readonly MazeLevel[]
   bestScores: BestScoreStore
   sound: SoundPlayer
-  /** Seconds on the clock for each try; leave out for the usual. */
-  timeLimit?: number
   onExit: () => void
 }
+
+const FIREWORKS_MILLISECONDS = 1100
 
 const ARROWS: readonly { direction: Direction; label: string; arrow: string }[] = [
   { direction: 'up', label: 'Go up', arrow: '▲' },
@@ -29,25 +31,45 @@ const ARROWS: readonly { direction: Direction; label: string; arrow: string }[] 
   { direction: 'down', label: 'Go down', arrow: '▼' },
 ]
 
-export function MazeScreen({ maze, bestScores, sound, timeLimit, onExit }: MazeScreenProps) {
-  const [session] = useState(() => new MazeSession(new MazeGame(maze, timeLimit)))
+export function MazeScreen({ levels, bestScores, sound, onExit }: MazeScreenProps) {
+  const [session] = useState(() => new MazeSession(new MazeRun(levels)))
   const [snapshot, setSnapshot] = useState(() => session.snapshot())
   const [result, setResult] = useState<BestScoreResult | null>(null)
   const [muted, setMuted] = useState(false)
+  const [bursts, setBursts] = useState<readonly Burst[]>([])
+  const burstCount = useRef(0)
+  const burstTimers = useRef(new Set<number>())
   const [facing, setFacing] = useState<'left' | 'right'>('right')
 
   if ((snapshot.heading === 'left' || snapshot.heading === 'right') && snapshot.heading !== facing) setFacing(snapshot.heading)
 
+  useEffect(() => {
+    const timers = burstTimers.current
+    return () => timers.forEach(clearTimeout)
+  }, [])
+
   const refresh = useCallback(() => setSnapshot(session.snapshot()), [session])
+
+  const showFireworks = useCallback((cell: Burst['cell']) => {
+    const id = burstCount.current++
+    setBursts((current) => [...current, { id, cell }])
+    const timer = window.setTimeout(() => {
+      burstTimers.current.delete(timer)
+      setBursts((current) => current.filter((burst) => burst.id !== id))
+    }, FIREWORKS_MILLISECONDS)
+    burstTimers.current.add(timer)
+  }, [])
 
   const react = useCallback(
     (events: MazeEvent[]) => {
+      for (const event of events) if (event.type === 'starCollected') showFireworks(event.cell)
       const won = events.some((event) => event.type === 'won')
       const outOfTries = events.some((event) => event.type === 'timeUp' && event.livesLeft === 0)
-      if (won || outOfTries) setResult(recordFinalScore(bestScores, session.snapshot().score))
+      const { allCleared, runScore } = session.snapshot()
+      if ((won && allCleared) || outOfTries) setResult(recordFinalScore(bestScores, runScore))
       if (won && !muted) sound.play('victoryRoar')
     },
-    [bestScores, session, sound, muted],
+    [bestScores, session, sound, muted, showFireworks],
   )
 
   useAnimationFrame((elapsed) => {
@@ -69,6 +91,11 @@ export function MazeScreen({ maze, bestScores, sound, timeLimit, onExit }: MazeS
     refresh()
   }, [session, refresh])
 
+  const nextMaze = useCallback(() => {
+    session.nextMaze()
+    refresh()
+  }, [session, refresh])
+
   const togglePause = useCallback(() => {
     session.togglePause()
     refresh()
@@ -79,7 +106,7 @@ export function MazeScreen({ maze, bestScores, sound, timeLimit, onExit }: MazeS
   return (
     <main className="maze">
       <div className="maze__board-area">
-        <MazeBoard maze={maze} snapshot={snapshot} facing={facing} />
+        <MazeBoard maze={snapshot.maze} snapshot={snapshot} facing={facing} bursts={bursts} />
       </div>
       <header className="hud">
         <Hearts lives={snapshot.lives} max={MAX_LIVES} />
@@ -98,6 +125,9 @@ export function MazeScreen({ maze, bestScores, sound, timeLimit, onExit }: MazeS
           </button>
         </div>
       </header>
+      <p className="maze__level">
+        Maze {snapshot.mazeNumber} of {snapshot.mazeCount}
+      </p>
       {snapshot.phase === 'ready' && (
         <p className="maze__hint">
           <span className="maze__hint--keys">Press an arrow to step!</span>
@@ -121,10 +151,18 @@ export function MazeScreen({ maze, bestScores, sound, timeLimit, onExit }: MazeS
         </Overlay>
       )}
       {snapshot.phase === 'over' && result && (
-        <GameOverOverlay title="Time's up!" message="Better luck next time! 🍪" score={snapshot.score} result={result} onBackToGames={onExit} />
+        <GameOverOverlay title="Time's up!" message="Better luck next time! 🍪" score={snapshot.runScore} result={result} onBackToGames={onExit} />
       )}
-      {snapshot.phase === 'won' && result && (
-        <GameOverOverlay title="Every cookie!" score={snapshot.score} result={result} onBackToGames={onExit} />
+      {snapshot.phase === 'won' && !snapshot.allCleared && (
+        <Overlay title="Maze cleared!">
+          <p className="overlay__message">Yum! 🍪 Score: {snapshot.runScore}</p>
+          <button className="big-button" autoFocus onClick={nextMaze}>
+            Next maze
+          </button>
+        </Overlay>
+      )}
+      {snapshot.allCleared && result && (
+        <GameOverOverlay title="All mazes cleared!" score={snapshot.runScore} result={result} onBackToGames={onExit} />
       )}
     </main>
   )

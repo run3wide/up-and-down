@@ -25,21 +25,24 @@ export const opposite = (direction: Direction): Direction => OPPOSITES[direction
 
 const WALL = '#'
 const START = 'S'
+const STAR = '*'
 
-/** A drawing of the maze: `#` is wall, `S` is where the dino starts, and every other cell is a path with a cookie on it. */
+/** A drawing of the maze: `#` is wall, `S` is where the dino starts, `*` is a super star, and every other cell is a path with a cookie on it. */
 export class Maze {
   readonly rows: number
   readonly columns: number
   readonly start: Cell
   readonly cookieCells: readonly Cell[]
+  readonly starCells: readonly Cell[]
   private readonly drawing: readonly string[]
 
-  private constructor(drawing: readonly string[], start: Cell, cookieCells: readonly Cell[]) {
+  private constructor(drawing: readonly string[], start: Cell, cookieCells: readonly Cell[], starCells: readonly Cell[]) {
     this.drawing = drawing
     this.rows = drawing.length
     this.columns = drawing[0].length
     this.start = start
     this.cookieCells = cookieCells
+    this.starCells = starCells
   }
 
   static fromRows(drawing: readonly string[]): Maze {
@@ -53,10 +56,12 @@ export class Maze {
     const maze = new Maze(
       drawing,
       starts[0].cell,
-      cells.filter(({ mark }) => mark !== WALL && mark !== START).map(({ cell }) => cell),
+      cells.filter(({ mark }) => mark !== WALL && mark !== START && mark !== STAR).map(({ cell }) => cell),
+      cells.filter(({ mark }) => mark === STAR).map(({ cell }) => cell),
     )
-    if (maze.cookieCells.some((cell) => !maze.reachableFromStart().has(key(cell)))) {
-      throw new MazeLayoutError('Every cookie must be reachable from the start')
+    const reachable = maze.reachableFromStart()
+    if ([...maze.cookieCells, ...maze.starCells].some((cell) => !reachable.has(key(cell)))) {
+      throw new MazeLayoutError('Every cookie and star must be reachable from the start')
     }
     return maze
   }
