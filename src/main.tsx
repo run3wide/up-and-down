@@ -17,6 +17,7 @@ const bestScores = {
   'tic-tac-toe': new LocalStorageBestScoreStore('tic-tac-toe:best-score'),
   'spelling-bee': new LocalStorageBestScoreStore('spelling-bee:best-score'),
   'dino-dig': new LocalStorageBestScoreStore('dino-dig:best-score'),
+  'put-it-in-the-bucket': new LocalStorageBestScoreStore('put-it-in-the-bucket:best-score'),
 }
 
 const dinoDigCollection = new LocalStorageCollectionStore('dino-dig:museum')

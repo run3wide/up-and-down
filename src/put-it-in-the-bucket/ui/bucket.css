@@ -1,0 +1,108 @@
+.bucket-game {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
+  justify-items: center;
+  align-content: start;
+  gap: 0.8rem;
+  padding: 4.5rem 1rem 1rem;
+  overflow-y: auto;
+  background: linear-gradient(#cfeeff, #fff3c9);
+}
+
+.bucket-game__item {
+  padding: 0.3rem 2rem;
+  font: inherit;
+  font-size: clamp(5rem, 22vw, 8rem);
+  line-height: 1.15;
+  background: #fff;
+  border: 0.3rem solid #4c9be8;
+  border-radius: 2rem;
+  box-shadow: 0 0.3rem 0 #0002;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  animation: pop-in 0.3s ease-out;
+}
+
+.bucket-game__item:disabled {
+  opacity: 0.5;
+}
+
+.bucket-game__item--picked {
+  background: #ffe27a;
+  border-color: #ff9f1c;
+}
+
+.bucket-game__item--dragging {
+  opacity: 0.35;
+}
+
+.bucket-game__message {
+  min-height: 2.8rem;
+  margin: 0;
+  font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+  text-align: center;
+}
+
+.bucket-game__buckets {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: start;
+  gap: clamp(0.6rem, 3vw, 1.4rem);
+  width: min(100%, 40rem);
+}
+
+.bucket-game__bucket {
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  width: clamp(6.5rem, 28vw, 10rem);
+  padding: 0.8rem 0.4rem 0.6rem;
+  font: inherit;
+  color: var(--ink);
+  background: #fff;
+  border: 0.3rem solid #8a5a2b;
+  border-radius: 0.6rem 0.6rem 2rem 2rem;
+  box-shadow: 0 0.3rem 0 #0002;
+  cursor: pointer;
+}
+
+.bucket-game__bucket-picture {
+  font-size: clamp(3rem, 12vw, 4.5rem);
+  line-height: 1.1;
+}
+
+.bucket-game__bucket-label {
+  font-size: clamp(1rem, 3.5vw, 1.3rem);
+}
+
+.bucket-game__bucket--cheer {
+  background: #c8f5d0;
+  animation: bucket-cheer 0.6s ease-out;
+}
+
+.bucket-game__bucket--nuh-uh {
+  animation: bucket-nuh-uh 0.5s ease-in-out;
+}
+
+.bucket-game__ghost {
+  position: fixed;
+  z-index: 10;
+  translate: -50% -50%;
+  font-size: 5rem;
+  pointer-events: none;
+  text-shadow: 0 0.1em 0.2em #0004;
+}
+
+@keyframes bucket-cheer {
+  40% { transform: translateY(-0.6rem) scale(1.08); }
+}
+
+@keyframes bucket-nuh-uh {
+  15% { translate: -0.5rem 0; }
+  45% { translate: 0.5rem 0; }
+  75% { translate: -0.3rem 0; }
+}

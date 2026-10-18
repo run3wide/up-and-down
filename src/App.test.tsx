@@ -15,6 +15,7 @@ const bestScores = () => ({
   'tic-tac-toe': new InMemoryBestScoreStore(),
   'spelling-bee': new InMemoryBestScoreStore(),
   'dino-dig': new InMemoryBestScoreStore(),
+  'put-it-in-the-bucket': new InMemoryBestScoreStore(),
 })
 
 const silentSound = { unlock: () => {}, play: () => {} }
@@ -87,6 +88,12 @@ describe('App', () => {
     renderApp('/brick-builder')
 
     expect(screen.getByRole('heading', { name: 'Brick Builder' })).toBeInTheDocument()
+  })
+
+  it('opens Put It In The Bucket straight away from its own address', () => {
+    renderApp('/put-it-in-the-bucket')
+
+    expect(screen.getByRole('group', { name: 'Buckets' })).toBeInTheDocument()
   })
 
   it('opens Dino Dig straight away from its own address', () => {

@@ -9,6 +9,7 @@ import { MatchScreen } from './match-up/ui/MatchScreen'
 import type { CollectionStore } from './dino-dig/application/CollectionStore'
 import { DigScreen } from './dino-dig/ui/DigScreen'
 import type { GalleryStore } from './colouring/application/GalleryStore'
+import { BucketScreen } from './put-it-in-the-bucket/ui/BucketScreen'
 import { BuilderScreen } from './brick-builder/ui/BuilderScreen'
 import { ColouringScreen } from './colouring/ui/ColouringScreen'
 import { SpellingScreen } from './spelling-bee/ui/SpellingScreen'
@@ -61,6 +62,8 @@ export function App({ random, bestScores, sound, dinoDigCollection, colouringGal
       return <DigScreen random={random} bestScores={bestScores['dino-dig']} collection={dinoDigCollection} sound={sound} onExit={backToGames} />
     case 'colouring':
       return <ColouringScreen gallery={colouringGallery} onExit={backToGames} />
+    case 'put-it-in-the-bucket':
+      return <BucketScreen random={random} bestScores={bestScores['put-it-in-the-bucket']} onExit={backToGames} />
     case 'brick-builder':
       return <BuilderScreen onExit={backToGames} />
     case null:
