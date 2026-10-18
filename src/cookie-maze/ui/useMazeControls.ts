@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import type { Direction } from '../domain/maze'
 
 interface Controls {
-  steer(direction: Direction): void
+  step(direction: Direction): void
   togglePause(): void
 }
 
@@ -33,7 +33,7 @@ export function useMazeControls(controls: Controls): void {
       const direction = DIRECTION_KEYS[event.key]
       if (direction) {
         event.preventDefault()
-        latest.current.steer(direction)
+        latest.current.step(direction)
       } else if (PAUSE_KEYS.has(event.key) && !event.repeat && !isActivatingButton(event)) {
         event.preventDefault()
         latest.current.togglePause()

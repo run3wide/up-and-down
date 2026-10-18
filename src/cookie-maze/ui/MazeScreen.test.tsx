@@ -3,21 +3,23 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
 import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { Maze } from '../domain/maze'
-import { CELLS_PER_SECOND } from '../domain/mazeGame'
+import { MAX_LIVES, TIME_LIMIT_SECONDS } from '../domain/mazeGame'
 import { MazeScreen } from './MazeScreen'
 
-function renderMaze(...rows: string[]) {
+function renderMaze(rows: string[], timeLimit?: number) {
   const bestScores = new InMemoryBestScoreStore()
   const onExit = vi.fn()
   const sound = { unlock: vi.fn(), play: vi.fn() } satisfies SoundPlayer
-  const { container } = render(<MazeScreen maze={Maze.fromRows(rows)} bestScores={bestScores} sound={sound} onExit={onExit} />)
+  const { container } = render(
+    <MazeScreen maze={Maze.fromRows(rows)} bestScores={bestScores} sound={sound} timeLimit={timeLimit} onExit={onExit} />,
+  )
   const dinoLeft = () => Number.parseFloat((container.querySelector('.maze__dino') as HTMLElement).style.left)
   return { bestScores, onExit, sound, dinoLeft }
 }
 
-function walkFor(cells: number) {
+function wait(seconds: number) {
   act(() => {
-    vi.advanceTimersByTime((cells / CELLS_PER_SECOND) * 1000)
+    vi.advanceTimersByTime(seconds * 1000)
   })
 }
 
@@ -29,6 +31,7 @@ function press(key: string) {
 }
 
 const cookiesLeft = () => screen.getByRole('status').textContent
+const timeLeft = () => screen.getByRole('timer').textContent
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame', 'performance', 'setTimeout', 'clearTimeout'] })
@@ -39,61 +42,65 @@ afterEach(() => {
 })
 
 describe('MazeScreen', () => {
-  it('waits at the start, counting the cookies still to find', () => {
-    const { dinoLeft } = renderMaze('S...')
+  it('waits at the start, showing the cookies to find, the clock and three lives', () => {
+    const { dinoLeft } = renderMaze(['S...'])
 
-    walkFor(3)
+    wait(5)
 
     expect(cookiesLeft()).toContain('3')
+    expect(timeLeft()).toContain(String(TIME_LIMIT_SECONDS))
+    expect(screen.getByLabelText(`${MAX_LIVES} lives left`)).toBeInTheDocument()
     expect(dinoLeft()).toBeCloseTo(12.5)
   })
 
-  it('keeps walking after the key is let go, eating cookies on the way', () => {
-    const { dinoLeft } = renderMaze('S....')
+  it('moves one cell for each press and stays there', () => {
+    const { dinoLeft } = renderMaze(['S....'])
 
     press('ArrowRight')
-    walkFor(2.2)
+    wait(1)
 
-    expect(dinoLeft()).toBeCloseTo(50, -1)
-    expect(cookiesLeft()).toContain('2')
+    expect(dinoLeft()).toBeCloseTo(30)
+    expect(cookiesLeft()).toContain('3')
   })
 
-  it.each([
-    ['d', 'right'],
-    ['D', 'right'],
-    ['ArrowRight', 'right'],
-  ])('walks right when %s is pressed', (key) => {
-    const { dinoLeft } = renderMaze('S..')
+  it.each(['d', 'D', 'ArrowRight'])('steps right when %s is pressed', (key) => {
+    const { dinoLeft } = renderMaze(['S..'])
 
     press(key)
-    walkFor(1)
 
-    expect(dinoLeft()).toBeGreaterThan(20)
+    expect(dinoLeft()).toBeCloseTo(50)
   })
 
-  it('walks left with A and the left arrow', () => {
-    const { dinoLeft } = renderMaze('..S')
+  it.each(['a', 'ArrowLeft'])('steps left when %s is pressed', (key) => {
+    const { dinoLeft } = renderMaze(['..S'])
 
-    press('a')
-    walkFor(1)
+    press(key)
 
-    expect(dinoLeft()).toBeLessThan(83)
+    expect(dinoLeft()).toBeCloseTo(50)
   })
 
-  it('can be steered with the on-screen arrows', () => {
-    const { dinoLeft } = renderMaze('S..')
+  it('steps with the on-screen arrows', () => {
+    const { dinoLeft } = renderMaze(['S..'])
 
     fireEvent.click(screen.getByRole('button', { name: 'Go right' }))
-    walkFor(1)
 
-    expect(dinoLeft()).toBeGreaterThan(20)
+    expect(dinoLeft()).toBeCloseTo(50)
+  })
+
+  it('counts the clock down once the dino has set off', () => {
+    renderMaze(['S...'])
+
+    press('ArrowRight')
+    wait(10.5)
+
+    expect(timeLeft()).toContain(String(TIME_LIMIT_SECONDS - 10))
   })
 
   it('is won when the last cookie is eaten: records the score and goes back to the games', () => {
-    const { bestScores, onExit } = renderMaze('S..')
+    const { bestScores, onExit } = renderMaze(['S..'])
 
     press('ArrowRight')
-    walkFor(3)
+    press('ArrowRight')
 
     const dialog = screen.getByRole('dialog', { name: 'Every cookie!' })
     expect(within(dialog).getByText(/Score: \d+/)).toBeInTheDocument()
@@ -103,41 +110,73 @@ describe('MazeScreen', () => {
   })
 
   it('roars when the last cookie is eaten, and not before', () => {
-    const { sound } = renderMaze('S...')
+    const { sound } = renderMaze(['S...'])
 
     press('ArrowRight')
-    walkFor(2)
+    press('ArrowRight')
     expect(sound.play).not.toHaveBeenCalled()
-    walkFor(2)
+    press('ArrowRight')
 
     expect(sound.play).toHaveBeenCalledExactlyOnceWith('roar')
   })
 
   it('is silent while sound is muted', () => {
-    const { sound } = renderMaze('S..')
+    const { sound } = renderMaze(['S..'])
 
     fireEvent.click(screen.getByRole('button', { name: 'Mute sound' }))
     press('ArrowRight')
-    walkFor(3)
+    press('ArrowRight')
 
     expect(sound.play).not.toHaveBeenCalled()
   })
 
-  it('pauses with Escape and carries on when resumed', () => {
-    const { dinoLeft } = renderMaze('S....')
+  it('says better luck next time when time runs out, then starts the maze again with a life fewer', () => {
+    const { dinoLeft } = renderMaze(['S....'], 2)
+    press('ArrowRight')
+
+    wait(3)
+
+    const dialog = screen.getByRole('dialog', { name: "Time's up!" })
+    expect(within(dialog).getByText(/better luck next time/i)).toBeInTheDocument()
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Try again' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.getByLabelText(`${MAX_LIVES - 1} lives left`)).toBeInTheDocument()
+    expect(cookiesLeft()).toContain('4')
+    expect(dinoLeft()).toBeCloseTo(10)
+  })
+
+  it('goes back to the games after the last try, with a kind word and the score', () => {
+    const { bestScores, onExit } = renderMaze(['S....'], 2)
+
+    for (let attempt = 1; attempt < MAX_LIVES; attempt++) {
+      press('ArrowRight')
+      wait(3)
+      fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    }
+    press('ArrowRight')
+    wait(3)
+
+    const dialog = screen.getByRole('dialog', { name: "Time's up!" })
+    expect(within(dialog).getByText(/better luck next time/i)).toBeInTheDocument()
+    expect(within(dialog).queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument()
+    expect(bestScores.load()).toBe(10)
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Back to games' }))
+    expect(onExit).toHaveBeenCalledOnce()
+  })
+
+  it('pauses with Escape, stopping the clock, and carries on when resumed', () => {
+    renderMaze(['S...'])
     press('ArrowRight')
     press('Escape')
 
-    walkFor(3)
-    expect(dinoLeft()).toBeCloseTo(10)
+    wait(10.5)
     fireEvent.click(screen.getByRole('button', { name: 'Resume' }))
-    walkFor(1)
 
-    expect(dinoLeft()).toBeCloseTo(30, -1)
+    expect(timeLeft()).toContain(String(TIME_LIMIT_SECONDS))
   })
 
   it('goes back to the main menu from the pause screen', () => {
-    const { onExit } = renderMaze('S..')
+    const { onExit } = renderMaze(['S..'])
 
     fireEvent.click(screen.getByRole('button', { name: 'Pause' }))
     fireEvent.click(screen.getByRole('button', { name: 'Main menu' }))

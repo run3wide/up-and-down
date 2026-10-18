@@ -1,158 +1,175 @@
 import { describe, expect, it } from 'vitest'
 import { Maze } from './maze'
-import { CELLS_PER_SECOND, COOKIE_POINTS, MazeGame, PAR_SECONDS } from './mazeGame'
-
-const SECOND_PER_CELL = 1 / CELLS_PER_SECOND
+import { COOKIE_POINTS, MAX_LIVES, MazeGame, TIME_LIMIT_SECONDS } from './mazeGame'
 
 function gameIn(...rows: string[]) {
   return new MazeGame(Maze.fromRows(rows))
 }
 
+/** A 2 second clock on a corridor too long to finish before it runs out. */
+function gameTooBigForTheClock() {
+  const game = new MazeGame(Maze.fromRows(['S' + '.'.repeat(30)]), 2)
+  game.step('right')
+  return game
+}
+
+function loseAllButOneLife(game: MazeGame) {
+  for (let attempt = 1; attempt < MAX_LIVES; attempt++) {
+    game.tick(2)
+    game.tryAgain()
+    game.step('right')
+  }
+}
+
 describe('MazeGame', () => {
-  it('waits at the start until the first direction is chosen', () => {
+  it('waits at the start, with the clock stopped, until the first step', () => {
     const game = gameIn('S..')
 
     game.tick(5)
 
-    expect(game.snapshot()).toMatchObject({ phase: 'ready', x: 0, y: 0, elapsed: 0, cookiesLeft: 2 })
+    expect(game.snapshot()).toMatchObject({ phase: 'ready', x: 0, y: 0, secondsLeft: TIME_LIMIT_SECONDS, cookiesLeft: 2 })
   })
 
-  it('keeps walking in the chosen direction on its own', () => {
+  it('moves exactly one cell for each step, and no further', () => {
     const game = gameIn('S...')
 
-    game.steer('right')
-    game.tick(SECOND_PER_CELL * 1.5)
-
-    expect(game.snapshot()).toMatchObject({ phase: 'playing', x: 1.5, y: 0, heading: 'right' })
-  })
-
-  it('eats a cookie when it reaches its cell', () => {
-    const game = gameIn('S...')
-    game.steer('right')
-
-    const events = game.tick(SECOND_PER_CELL)
-
-    expect(events).toEqual([{ type: 'cookieEaten', cell: { row: 0, column: 1 } }])
-    expect(game.snapshot()).toMatchObject({ cookiesEaten: 1, cookiesLeft: 2 })
-  })
-
-  it('stops against a wall and waits for the next direction', () => {
-    const game = gameIn('S.#')
-    game.steer('right')
-
+    game.step('right')
     game.tick(5)
 
-    expect(game.snapshot()).toMatchObject({ x: 1, y: 0, heading: null })
+    expect(game.snapshot()).toMatchObject({ phase: 'playing', x: 1, y: 0, heading: 'right' })
   })
 
-  it('does not move into a wall it is asked to face', () => {
+  it.each([
+    ['up', { x: 1, y: 0 }],
+    ['down', { x: 1, y: 2 }],
+    ['left', { x: 0, y: 1 }],
+    ['right', { x: 2, y: 1 }],
+  ] as const)('steps %s', (direction, expected) => {
+    const game = gameIn('...', '.S.', '...')
+
+    game.step(direction)
+
+    expect(game.snapshot()).toMatchObject(expected)
+  })
+
+  it('eats the cookie in the cell it steps into', () => {
+    const game = gameIn('S..')
+
+    const events = game.step('right')
+
+    expect(events).toEqual([{ type: 'cookieEaten', cell: { row: 0, column: 1 } }])
+    expect(game.snapshot()).toMatchObject({ cookiesEaten: 1, cookiesLeft: 1 })
+  })
+
+  it('stays put when a wall is in the way, and the clock does not start', () => {
     const game = gameIn('S.', '#.')
-    game.steer('down')
 
-    game.tick(1)
+    const events = game.step('down')
 
-    expect(game.snapshot()).toMatchObject({ x: 0, y: 0, heading: null })
+    expect(events).toEqual([])
+    expect(game.snapshot()).toMatchObject({ phase: 'ready', x: 0, y: 0 })
   })
 
-  it('turns at the first gap after a turn is asked for', () => {
-    const game = gameIn('S...', '#.#.')
-    game.steer('right')
-    game.tick(SECOND_PER_CELL * 0.5)
+  it('does not eat a cookie twice when it walks back over the same cell', () => {
+    const game = gameIn('S..')
+    game.step('right')
 
-    game.steer('down')
-    game.tick(SECOND_PER_CELL)
-
-    expect(game.snapshot()).toMatchObject({ x: 1, y: 0.5, heading: 'down' })
+    expect(game.step('left')).toEqual([])
+    expect(game.step('right')).toEqual([])
+    expect(game.snapshot().cookiesEaten).toBe(1)
   })
 
-  it('walks on past a gap it was not asked to take', () => {
-    const game = gameIn('S...', '#.#.')
-    game.steer('right')
-
-    game.tick(SECOND_PER_CELL * 2)
-
-    expect(game.snapshot()).toMatchObject({ x: 2, y: 0, heading: 'right' })
-  })
-
-  it('can turn straight round between cells', () => {
-    const game = gameIn('.S..')
-    game.steer('right')
-    game.tick(SECOND_PER_CELL * 0.25)
-
-    game.steer('left')
-
-    expect(game.snapshot()).toMatchObject({ x: 1.25, heading: 'left' })
-    game.tick(SECOND_PER_CELL * 0.25)
-    expect(game.snapshot().x).toBeCloseTo(1)
-  })
-
-  it('carries leftover time across a corner', () => {
+  it('is won when the last cookie is eaten, scoring cookies plus a point for every second to spare', () => {
     const game = gameIn('S.', '#.')
-    game.steer('right')
-    game.steer('down')
+    game.step('right')
+    game.tick(10)
 
-    game.tick(SECOND_PER_CELL * 1.5)
-
-    expect(game.snapshot()).toMatchObject({ x: 1, y: 0.5, heading: 'down' })
-  })
-
-  it('is won when the last cookie is eaten, scoring cookies plus a bonus for speed', () => {
-    const game = gameIn('S.', '#.')
-    game.steer('right')
-    game.tick(SECOND_PER_CELL)
-    game.steer('down')
-
-    const events = game.tick(SECOND_PER_CELL)
+    const events = game.step('down')
 
     expect(events).toContainEqual({ type: 'won' })
-    const snapshot = game.snapshot()
-    expect(snapshot.phase).toBe('won')
-    expect(snapshot.cookiesLeft).toBe(0)
-    expect(snapshot.score).toBe(2 * COOKIE_POINTS + Math.round(PAR_SECONDS - SECOND_PER_CELL * 2))
+    expect(game.snapshot()).toMatchObject({ phase: 'won', cookiesLeft: 0, score: 2 * COOKIE_POINTS + (TIME_LIMIT_SECONDS - 10) })
   })
 
   it('stops there: nothing moves once it is won', () => {
-    const game = gameIn('S.#')
-    game.steer('right')
-    game.tick(SECOND_PER_CELL)
+    const game = gameIn('S..')
+    game.step('right')
+    game.step('right')
 
-    game.steer('left')
+    game.step('left')
     game.tick(5)
 
-    expect(game.snapshot()).toMatchObject({ phase: 'won', x: 1 })
+    expect(game.snapshot()).toMatchObject({ phase: 'won', x: 2, secondsLeft: TIME_LIMIT_SECONDS })
   })
 
-  it('gives no speed bonus to a slow dino', () => {
-    const game = gameIn('S..')
-    game.steer('down')
-    game.tick(PAR_SECONDS * 2)
-    game.steer('right')
-    game.tick(SECOND_PER_CELL * 2)
+  it('counts the clock down once it has set off', () => {
+    const game = gameIn('S....')
+    game.step('right')
 
-    expect(game.snapshot().score).toBe(2 * COOKIE_POINTS)
+    game.tick(1.5)
+
+    expect(game.snapshot().secondsLeft).toBe(TIME_LIMIT_SECONDS - 1.5)
   })
 
-  it('freezes while paused, including the clock', () => {
+  it('costs a life when time runs out, and stops there', () => {
+    const game = gameTooBigForTheClock()
+
+    const events = game.tick(5)
+
+    expect(events).toEqual([{ type: 'timeUp', livesLeft: MAX_LIVES - 1 }])
+    expect(game.snapshot()).toMatchObject({ phase: 'timeUp', lives: MAX_LIVES - 1, secondsLeft: 0 })
+    game.step('right')
+    expect(game.snapshot().x).toBe(1)
+  })
+
+  it('does not take a life from a dino that wins with the clock still running', () => {
+    const game = new MazeGame(Maze.fromRows(['S.']), 1)
+    game.step('right')
+
+    game.tick(5)
+
+    expect(game.snapshot()).toMatchObject({ phase: 'won', lives: MAX_LIVES })
+  })
+
+  it('starts the maze afresh on another try, keeping the lives lost so far', () => {
+    const game = gameTooBigForTheClock()
+    game.tick(5)
+
+    game.tryAgain()
+
+    expect(game.snapshot()).toMatchObject({
+      phase: 'ready',
+      lives: MAX_LIVES - 1,
+      x: 0,
+      y: 0,
+      heading: null,
+      cookiesEaten: 0,
+      secondsLeft: 2,
+    })
+  })
+
+  it('is over when the last life is lost, with no more tries', () => {
+    const game = gameTooBigForTheClock()
+    loseAllButOneLife(game)
+
+    const events = game.tick(5)
+
+    expect(events).toEqual([{ type: 'timeUp', livesLeft: 0 }])
+    expect(game.snapshot()).toMatchObject({ phase: 'over', lives: 0 })
+    game.tryAgain()
+    expect(game.snapshot().phase).toBe('over')
+  })
+
+  it('freezes while paused: no steps, no clock', () => {
     const game = gameIn('S...')
-    game.steer('right')
+    game.step('right')
     game.togglePause()
 
+    game.step('right')
     game.tick(5)
 
-    expect(game.snapshot()).toMatchObject({ paused: true, x: 0, elapsed: 0 })
+    expect(game.snapshot()).toMatchObject({ paused: true, x: 1, secondsLeft: TIME_LIMIT_SECONDS })
     game.togglePause()
-    game.tick(SECOND_PER_CELL)
-    expect(game.snapshot().x).toBe(1)
-  })
-
-  it('remembers the direction chosen while paused', () => {
-    const game = gameIn('S..')
-    game.togglePause()
-    game.steer('right')
-    game.togglePause()
-
-    game.tick(SECOND_PER_CELL)
-
-    expect(game.snapshot().x).toBe(1)
+    game.step('right')
+    expect(game.snapshot().x).toBe(2)
   })
 })

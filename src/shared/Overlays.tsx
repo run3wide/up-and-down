@@ -2,7 +2,7 @@ import './overlays.css'
 
 import type { BestScoreResult } from './bestScore'
 
-function Overlay({ title, children }: { title: string; children: React.ReactNode }) {
+export function Overlay({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="overlay">
       <div className="overlay__card" role="dialog" aria-modal="true" aria-label={title}>
@@ -31,11 +31,14 @@ interface GameOverOverlayProps {
   result: BestScoreResult
   onBackToGames: () => void
   title?: string
+  /** A kind word under the title, e.g. for a round that ended without a win. */
+  message?: string
 }
 
-export function GameOverOverlay({ score, result, onBackToGames, title = 'Game over' }: GameOverOverlayProps) {
+export function GameOverOverlay({ score, result, onBackToGames, title = 'Game over', message }: GameOverOverlayProps) {
   return (
     <Overlay title={title}>
+      {message && <p className="overlay__message">{message}</p>}
       <p className="overlay__score">Score: {score}</p>
       <p className="overlay__best">Best: {result.best}</p>
       {result.isNewBest && <p className="overlay__new-best">New best! 🎉</p>}

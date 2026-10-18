@@ -26,6 +26,11 @@
   font-size: clamp(2rem, 7vw, 3rem);
 }
 
+.overlay__message {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
 .overlay__score {
   margin: 0;
   font-size: 2rem;
