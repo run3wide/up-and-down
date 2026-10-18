@@ -1,4 +1,4 @@
-import type { SoundPlayer } from './lemon-volcano/application/SoundPlayer'
+import type { SoundPlayer } from './shared/sound/SoundPlayer'
 import { VolcanoScreen } from './lemon-volcano/ui/VolcanoScreen'
 import { COOKIE_MAZE } from './cookie-maze/domain/layout'
 import { MazeScreen } from './cookie-maze/ui/MazeScreen'
@@ -28,17 +28,17 @@ export function App({ random, bestScores, sound, basePath }: AppProps) {
 
   switch (playing) {
     case 'up-and-down':
-      return <GameScreen random={random} bestScores={bestScores['up-and-down']} onExit={backToGames} />
+      return <GameScreen random={random} bestScores={bestScores['up-and-down']} sound={sound} onExit={backToGames} />
     case 'lemon-volcano':
       return <VolcanoScreen random={random} bestScores={bestScores['lemon-volcano']} sound={sound} onExit={backToGames} />
     case 'dino-race':
-      return <RaceScreen random={random} bestScores={bestScores['dino-race']} createQuiz={() => mathQuiz(random)} onExit={backToGames} />
+      return <RaceScreen random={random} bestScores={bestScores['dino-race']} sound={sound} createQuiz={() => mathQuiz(random)} onExit={backToGames} />
     case 'little-chef':
       return <KitchenScreen random={random} bestScores={bestScores['little-chef']} onExit={backToGames} />
     case 'match-up':
       return <MatchScreen random={random} bestScores={bestScores['match-up']} onExit={backToGames} />
     case 'cookie-maze':
-      return <MazeScreen maze={COOKIE_MAZE} bestScores={bestScores['cookie-maze']} onExit={backToGames} />
+      return <MazeScreen maze={COOKIE_MAZE} bestScores={bestScores['cookie-maze']} sound={sound} onExit={backToGames} />
     case null:
       return <SplashScreen onPick={navigate} />
   }

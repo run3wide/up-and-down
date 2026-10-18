@@ -159,12 +159,6 @@
   }
 }
 
-.hud__actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-self: end;
-}
-
 /* Lava thrown at the screen: it splats, sticks for a couple of seconds, then rolls off the bottom leaving a trail. */
 .lava-splats {
   position: absolute;

@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
-import type { SoundPlayer } from '../application/SoundPlayer'
+import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { LEMONS_PER_ROUND } from '../domain/volcanoGame'
 import { VolcanoScreen } from './VolcanoScreen'
 

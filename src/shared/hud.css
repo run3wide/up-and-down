@@ -23,6 +23,12 @@
   box-shadow: 0 0.15rem 0.4rem #0002;
 }
 
+.hud__actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-self: end;
+}
+
 .hud__pause {
   justify-self: end;
   width: 3.25rem;

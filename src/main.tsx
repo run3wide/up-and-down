@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App'
-import { WebAudioSoundPlayer } from './lemon-volcano/infrastructure/WebAudioSoundPlayer'
+import { WebAudioSoundPlayer } from './shared/sound/WebAudioSoundPlayer'
 import { LocalStorageBestScoreStore } from './shared/LocalStorageBestScoreStore'
 import './index.css'
 

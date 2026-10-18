@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { recordFinalScore, type BestScoreResult, type BestScoreStore } from '../../shared/bestScore'
 import { Hearts } from '../../shared/Hearts'
 import { GameOverOverlay, PausedOverlay } from '../../shared/Overlays'
+import { SoundToggle } from '../../shared/SoundToggle'
+import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { useAnimationFrame } from '../../shared/useAnimationFrame'
 import { RaceSession } from '../application/RaceSession'
 import { FINISH_DISTANCE, buildCourse } from '../domain/course'
@@ -17,6 +19,7 @@ import './race.css'
 interface RaceScreenProps {
   random: () => number
   bestScores: BestScoreStore
+  sound: SoundPlayer
   /** Makes this race's brain-break quiz; leave out for a race with no questions. */
   createQuiz?: () => Quiz | null
   onExit: () => void
@@ -26,12 +29,13 @@ const CRASH_MILLISECONDS = 700
 const GO_DISTANCE = 25
 const PRAISE_MILLISECONDS = 4500
 
-export function RaceScreen({ random, bestScores, createQuiz, onExit }: RaceScreenProps) {
+export function RaceScreen({ random, bestScores, sound, createQuiz, onExit }: RaceScreenProps) {
   const [session] = useState(() => new RaceSession(new RaceGame(buildCourse(random), createQuiz?.() ?? null)))
   const [snapshot, setSnapshot] = useState(() => session.snapshot())
   const [result, setResult] = useState<BestScoreResult | null>(null)
   const [crashed, setCrashed] = useState(false)
   const [cookiePop, setCookiePop] = useState(0)
+  const [muted, setMuted] = useState(false)
   const [praise, setPraise] = useState<string | null>(null)
   const crashTimer = useRef<number | undefined>(undefined)
   const praiseTimer = useRef<number | undefined>(undefined)
@@ -50,6 +54,7 @@ export function RaceScreen({ random, bestScores, createQuiz, onExit }: RaceScree
   const react = useCallback(
     (events: RaceEvent[]) => {
       for (const event of events) {
+        if ((event.type === 'started' || event.type === 'finished') && !muted) sound.play('roar')
         if (event.type === 'cookieCollected') setCookiePop((pops) => pops + 1)
         if (event.type === 'crashed') {
           clearTimeout(crashTimer.current)
@@ -61,7 +66,7 @@ export function RaceScreen({ random, bestScores, createQuiz, onExit }: RaceScree
         }
       }
     },
-    [bestScores, session],
+    [bestScores, session, sound, muted],
   )
 
   const choose = useCallback(
@@ -89,7 +94,10 @@ export function RaceScreen({ random, bestScores, createQuiz, onExit }: RaceScree
   }, [session, refresh])
 
   useRaceControls({
-    hold: (direction) => session.hold(direction),
+    hold: (direction) => {
+      sound.unlock()
+      session.hold(direction)
+    },
     release: (direction) => session.release(direction),
     togglePause,
     choose,
@@ -98,6 +106,7 @@ export function RaceScreen({ random, bestScores, createQuiz, onExit }: RaceScree
   const dragTo = (event: React.PointerEvent) => {
     if (event.buttons === 0 || !stage.current) return
     const box = stage.current.getBoundingClientRect()
+    sound.unlock()
     session.dragTo(((event.clientX - box.left) / box.width) * 100)
   }
 
@@ -120,9 +129,12 @@ export function RaceScreen({ random, bestScores, createQuiz, onExit }: RaceScree
         <p className="hud__score" role="status">
           Score: {snapshot.cookies}
         </p>
-        <button className="hud__pause" onClick={togglePause} aria-label="Pause">
-          <span aria-hidden="true">❚❚</span>
-        </button>
+        <div className="hud__actions">
+          <SoundToggle muted={muted} onToggle={() => setMuted(!muted)} />
+          <button className="hud__pause" onClick={togglePause} aria-label="Pause">
+            <span aria-hidden="true">❚❚</span>
+          </button>
+        </div>
       </header>
       <div
         className="race__progress"

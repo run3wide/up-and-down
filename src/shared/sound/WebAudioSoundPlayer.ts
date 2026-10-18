@@ -1,5 +1,6 @@
-import type { SoundEffect, SoundPlayer } from '../application/SoundPlayer'
 import { scheduleEruption } from './eruptionSound'
+import { scheduleRoar } from './roarSound'
+import type { SoundEffect, SoundPlayer } from './SoundPlayer'
 
 /** Plays synthesised sounds with Web Audio, so the game ships no audio files and makes no network calls. */
 export class WebAudioSoundPlayer implements SoundPlayer {
@@ -15,6 +16,7 @@ export class WebAudioSoundPlayer implements SoundPlayer {
     const context = this.ensureContext()
     if (!context || !this.output || context.state !== 'running') return
     if (effect === 'eruption') scheduleEruption(context, this.output)
+    if (effect === 'roar') scheduleRoar(context, this.output)
   }
 
   private ensureContext(): AudioContext | null {

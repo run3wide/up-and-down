@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { SoundPlayer } from '../application/SoundPlayer'
 import { recordFinalScore, type BestScoreResult, type BestScoreStore } from '../../shared/bestScore'
 import { GameOverOverlay, PausedOverlay } from '../../shared/Overlays'
+import { SoundToggle } from '../../shared/SoundToggle'
+import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { useAnimationFrame } from '../../shared/useAnimationFrame'
 import { VolcanoSession } from '../application/VolcanoSession'
 import { VolcanoGame, LEMONS_PER_ROUND, type AimDirection, type VolcanoEvent, type Random } from '../domain/volcanoGame'
@@ -129,9 +130,7 @@ export function VolcanoScreen({ random, bestScores, sound, onExit }: VolcanoScre
           Score: {snapshot.score}
         </p>
         <div className="hud__actions">
-          <button className="hud__pause" onClick={() => setMuted(!muted)} aria-label={muted ? 'Unmute sound' : 'Mute sound'}>
-            <span aria-hidden="true">{muted ? '🔇' : '🔊'}</span>
-          </button>
+          <SoundToggle muted={muted} onToggle={() => setMuted(!muted)} />
           <button className="hud__pause" onClick={togglePause} aria-label="Pause">
             <span aria-hidden="true">❚❚</span>
           </button>

@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
+import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { Maze } from '../domain/maze'
 import { CELLS_PER_SECOND } from '../domain/mazeGame'
 import { MazeScreen } from './MazeScreen'
@@ -8,9 +9,10 @@ import { MazeScreen } from './MazeScreen'
 function renderMaze(...rows: string[]) {
   const bestScores = new InMemoryBestScoreStore()
   const onExit = vi.fn()
-  const { container } = render(<MazeScreen maze={Maze.fromRows(rows)} bestScores={bestScores} onExit={onExit} />)
+  const sound = { unlock: vi.fn(), play: vi.fn() } satisfies SoundPlayer
+  const { container } = render(<MazeScreen maze={Maze.fromRows(rows)} bestScores={bestScores} sound={sound} onExit={onExit} />)
   const dinoLeft = () => Number.parseFloat((container.querySelector('.maze__dino') as HTMLElement).style.left)
-  return { bestScores, onExit, dinoLeft }
+  return { bestScores, onExit, sound, dinoLeft }
 }
 
 function walkFor(cells: number) {
@@ -98,6 +100,27 @@ describe('MazeScreen', () => {
     expect(bestScores.load()).toBeGreaterThan(0)
     fireEvent.click(within(dialog).getByRole('button', { name: 'Back to games' }))
     expect(onExit).toHaveBeenCalledOnce()
+  })
+
+  it('roars when the last cookie is eaten, and not before', () => {
+    const { sound } = renderMaze('S...')
+
+    press('ArrowRight')
+    walkFor(2)
+    expect(sound.play).not.toHaveBeenCalled()
+    walkFor(2)
+
+    expect(sound.play).toHaveBeenCalledExactlyOnceWith('roar')
+  })
+
+  it('is silent while sound is muted', () => {
+    const { sound } = renderMaze('S..')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mute sound' }))
+    press('ArrowRight')
+    walkFor(3)
+
+    expect(sound.play).not.toHaveBeenCalled()
   })
 
   it('pauses with Escape and carries on when resumed', () => {

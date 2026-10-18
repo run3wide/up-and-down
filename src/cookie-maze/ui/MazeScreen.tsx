@@ -1,6 +1,8 @@
 import { useCallback, useState } from 'react'
 import { recordFinalScore, type BestScoreResult, type BestScoreStore } from '../../shared/bestScore'
 import { GameOverOverlay, PausedOverlay } from '../../shared/Overlays'
+import { SoundToggle } from '../../shared/SoundToggle'
+import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { useAnimationFrame } from '../../shared/useAnimationFrame'
 import { MazeSession } from '../application/MazeSession'
 import type { Direction, Maze } from '../domain/maze'
@@ -13,6 +15,7 @@ import './maze.css'
 interface MazeScreenProps {
   maze: Maze
   bestScores: BestScoreStore
+  sound: SoundPlayer
   onExit: () => void
 }
 
@@ -23,10 +26,11 @@ const ARROWS: readonly { direction: Direction; label: string; arrow: string }[] 
   { direction: 'down', label: 'Go down', arrow: '▼' },
 ]
 
-export function MazeScreen({ maze, bestScores, onExit }: MazeScreenProps) {
+export function MazeScreen({ maze, bestScores, sound, onExit }: MazeScreenProps) {
   const [session] = useState(() => new MazeSession(new MazeGame(maze)))
   const [snapshot, setSnapshot] = useState(() => session.snapshot())
   const [result, setResult] = useState<BestScoreResult | null>(null)
+  const [muted, setMuted] = useState(false)
   const [facing, setFacing] = useState<'left' | 'right'>('right')
 
   if ((snapshot.heading === 'left' || snapshot.heading === 'right') && snapshot.heading !== facing) setFacing(snapshot.heading)
@@ -35,9 +39,11 @@ export function MazeScreen({ maze, bestScores, onExit }: MazeScreenProps) {
 
   const react = useCallback(
     (events: MazeEvent[]) => {
-      if (events.some((event) => event.type === 'won')) setResult(recordFinalScore(bestScores, session.snapshot().score))
+      if (!events.some((event) => event.type === 'won')) return
+      setResult(recordFinalScore(bestScores, session.snapshot().score))
+      if (!muted) sound.play('roar')
     },
-    [bestScores, session],
+    [bestScores, session, sound, muted],
   )
 
   useAnimationFrame((elapsed) => {
@@ -47,10 +53,11 @@ export function MazeScreen({ maze, bestScores, onExit }: MazeScreenProps) {
 
   const steer = useCallback(
     (direction: Direction) => {
+      sound.unlock()
       session.steer(direction)
       refresh()
     },
-    [session, refresh],
+    [session, refresh, sound],
   )
 
   const togglePause = useCallback(() => {
@@ -70,9 +77,12 @@ export function MazeScreen({ maze, bestScores, onExit }: MazeScreenProps) {
         <p className="hud__score" role="status">
           🍪 left: {snapshot.cookiesLeft}
         </p>
-        <button className="hud__pause" onClick={togglePause} aria-label="Pause">
-          <span aria-hidden="true">❚❚</span>
-        </button>
+        <div className="hud__actions">
+          <SoundToggle muted={muted} onToggle={() => setMuted(!muted)} />
+          <button className="hud__pause" onClick={togglePause} aria-label="Pause">
+            <span aria-hidden="true">❚❚</span>
+          </button>
+        </div>
       </header>
       {snapshot.phase === 'ready' && (
         <p className="maze__hint">

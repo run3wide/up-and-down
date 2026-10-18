@@ -63,6 +63,14 @@ describe('the start of a race', () => {
   it('goes once the countdown ends', () => {
     expect(racing().snapshot().phase).toBe('racing')
   })
+
+  it('announces the start exactly once, when the countdown ends', () => {
+    const game = new RaceGame([])
+
+    const events = driveUntil(game, () => game.snapshot().distance > 1)
+
+    expect(events.filter((event) => event.type === 'started')).toHaveLength(1)
+  })
 })
 
 describe('driving', () => {

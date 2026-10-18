@@ -6,6 +6,7 @@ import { Game, type Direction, type GameEvent, type Random } from '../domain/gam
 import { WORLD_WIDTH } from '../domain/world'
 import { Hud } from './Hud'
 import { GameOverOverlay, PausedOverlay } from '../../shared/Overlays'
+import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { Playfield, type Burst } from './Playfield'
 import { useAnimationFrame } from '../../shared/useAnimationFrame'
 import { useKeyboardControls } from './useKeyboardControls'
@@ -16,17 +17,19 @@ import './game.css'
 interface GameScreenProps {
   random: Random
   bestScores: BestScoreStore
+  sound: SoundPlayer
   onExit: () => void
 }
 
 const MOOD_SECONDS = 0.6
 
-export function GameScreen({ random, bestScores, onExit }: GameScreenProps) {
+export function GameScreen({ random, bestScores, sound, onExit }: GameScreenProps) {
   const [session] = useState(() => new GameSession(new Game(random)))
   const [snapshot, setSnapshot] = useState(() => session.snapshot())
   const [mood, setMood] = useState<DinoMood>('idle')
   const [bursts, setBursts] = useState<readonly Burst[]>([])
   const [result, setResult] = useState<BestScoreResult | null>(null)
+  const [muted, setMuted] = useState(false)
   const nextBurstId = useRef(0)
   const timers = useRef<number[]>([])
   const stage = useRef<HTMLDivElement>(null)
@@ -38,7 +41,10 @@ export function GameScreen({ random, bestScores, onExit }: GameScreenProps) {
   const react = useCallback(
     (events: GameEvent[]) => {
       for (const event of events) {
-        if (event.type === 'caught') celebrate('cheer', 'sparkle')
+        if (event.type === 'caught') {
+          celebrate('cheer', 'sparkle')
+          if (!muted) sound.play('roar')
+        }
         if (event.type === 'missed') celebrate('oops', 'poof')
         if (event.type === 'gameOver') setResult(recordFinalScore(bestScores, session.snapshot().score))
       }
@@ -56,7 +62,7 @@ export function GameScreen({ random, bestScores, onExit }: GameScreenProps) {
         )
       }
     },
-    [bestScores, session],
+    [bestScores, session, sound, muted],
   )
 
   useAnimationFrame((elapsed) => {
@@ -70,13 +76,17 @@ export function GameScreen({ random, bestScores, onExit }: GameScreenProps) {
   }, [session, refresh])
 
   useKeyboardControls({
-    hold: (direction) => session.hold(direction),
+    hold: (direction) => {
+      sound.unlock()
+      session.hold(direction)
+    },
     release: (direction) => session.release(direction),
     togglePause,
   })
 
   const dragTo = (event: React.PointerEvent) => {
     if (event.buttons === 0 || !stage.current) return
+    sound.unlock()
     const box = stage.current.getBoundingClientRect()
     session.dragTo(((event.clientX - box.left) / box.width) * WORLD_WIDTH)
   }
@@ -89,7 +99,7 @@ export function GameScreen({ random, bestScores, onExit }: GameScreenProps) {
           <Playfield dinoX={snapshot.dinoX} ball={snapshot.ball} mood={mood} bursts={bursts} />
         </div>
       </div>
-      <Hud score={snapshot.score} lives={snapshot.lives} onPause={togglePause} />
+      <Hud score={snapshot.score} lives={snapshot.lives} muted={muted} onToggleSound={() => setMuted(!muted)} onPause={togglePause} />
       <TouchControls hold={(d) => session.hold(d)} release={(d) => session.release(d)} />
       {snapshot.phase === 'paused' && <PausedOverlay onResume={togglePause} onMainMenu={onExit} />}
       {snapshot.phase === 'over' && result && (

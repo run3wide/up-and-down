@@ -25,6 +25,7 @@ const NO_QUESTIONS_BEFORE_FINISH = 120
 export type Phase = 'countdown' | 'racing' | 'asking' | 'finished' | 'over'
 export type SteerDirection = 'left' | 'right'
 export type RaceEvent =
+  | { type: 'started' }
   | { type: 'cookieCollected' }
   | { type: 'crashed' }
   | { type: 'answeredCorrectly'; firstTry: boolean }
@@ -148,8 +149,9 @@ export class RaceGame {
 
   private runCountdown(dt: number): RaceEvent[] {
     this.countdownLeft -= dt
-    if (this.countdownLeft <= 0) this.phase = 'racing'
-    return []
+    if (this.countdownLeft > 0) return []
+    this.phase = 'racing'
+    return [{ type: 'started' }]
   }
 
   private drive(dt: number): RaceEvent[] {

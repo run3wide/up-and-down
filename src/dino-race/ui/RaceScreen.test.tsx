@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
+import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import type { MathQuestion, Quiz } from '../domain/quiz'
 import { QUIZ_BONUS_COOKIES } from '../domain/raceGame'
 import { RaceScreen } from './RaceScreen'
@@ -24,9 +25,10 @@ const brainBreakAfterTwoSeconds = (): Quiz => ({ nextDelay: () => 2, ask: () => 
 function renderRace(random = cookiesDownTheMiddle, bestScore = 0, createQuiz?: () => Quiz) {
   const bestScores = new InMemoryBestScoreStore(bestScore)
   const onExit = vi.fn()
-  const { container } = render(<RaceScreen random={random} bestScores={bestScores} createQuiz={createQuiz} onExit={onExit} />)
+  const sound = { unlock: vi.fn(), play: vi.fn() } satisfies SoundPlayer
+  const { container } = render(<RaceScreen random={random} bestScores={bestScores} sound={sound} createQuiz={createQuiz} onExit={onExit} />)
   const carLeft = () => Number.parseFloat((container.querySelector('.race-car') as HTMLElement).style.left)
-  return { bestScores, onExit, carLeft }
+  return { bestScores, onExit, sound, carLeft }
 }
 
 function driveFor(seconds: number) {
@@ -120,6 +122,27 @@ describe('RaceScreen', () => {
     driveFor(5)
 
     expect(Number(screen.getByRole('progressbar').getAttribute('aria-valuenow'))).toBeGreaterThan(before)
+  })
+
+  it('roars as the race starts and again at the finish line', () => {
+    const { sound } = renderRace()
+
+    driveFor(2.5)
+    expect(sound.play).not.toHaveBeenCalled()
+    driveFor(1)
+    expect(sound.play).toHaveBeenCalledExactlyOnceWith('roar')
+
+    driveFor(90)
+    expect(sound.play).toHaveBeenCalledTimes(2)
+  })
+
+  it('is silent while sound is muted', () => {
+    const { sound } = renderRace()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mute sound' }))
+    driveFor(90)
+
+    expect(sound.play).not.toHaveBeenCalled()
   })
 
   it('finishes the race at the line, records the best score and goes back to the menu', () => {

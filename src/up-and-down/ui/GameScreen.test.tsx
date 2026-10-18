@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
+import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { GameScreen } from './GameScreen'
 
 const middle = () => 0.5
@@ -8,8 +9,9 @@ const middle = () => 0.5
 function renderGame(bestScore = 0) {
   const bestScores = new InMemoryBestScoreStore(bestScore)
   const onExit = vi.fn()
-  render(<GameScreen random={middle} bestScores={bestScores} onExit={onExit} />)
-  return { bestScores, onExit }
+  const sound = { unlock: vi.fn(), play: vi.fn() } satisfies SoundPlayer
+  render(<GameScreen random={middle} bestScores={bestScores} sound={sound} onExit={onExit} />)
+  return { bestScores, onExit, sound }
 }
 
 function playFor(seconds: number) {
@@ -58,6 +60,34 @@ describe('GameScreen', () => {
     playFor(4)
 
     expect(screen.getByRole('status')).toHaveTextContent('Score: 1')
+  })
+
+  it('roars when the dinosaur catches the ball', () => {
+    const { sound } = renderGame()
+
+    playFor(4)
+
+    expect(sound.play).toHaveBeenCalledWith('roar')
+  })
+
+  it('stays quiet when the ball is missed', () => {
+    const { sound } = renderGame()
+
+    loseAllLivesByHidingFromTheBall()
+
+    expect(sound.play).not.toHaveBeenCalled()
+  })
+
+  it('is silent while sound is muted, and roars again once unmuted', () => {
+    const { sound } = renderGame()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mute sound' }))
+    playFor(4)
+    expect(sound.play).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Unmute sound' }))
+    playFor(4)
+    expect(sound.play).toHaveBeenCalledWith('roar')
   })
 
   it('pauses with Escape and resumes with the Resume button', () => {
