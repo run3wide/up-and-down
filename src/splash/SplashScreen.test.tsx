@@ -12,6 +12,7 @@ const matchUp = { name: 'Play Match Up, by Daniel' }
 const cookieMaze = { name: 'Play Cookie Maze, by Daniel' }
 const ticTacToe = { name: 'Play Tic Tac Toe, by Daniel' }
 const spellingBee = { name: 'Play Spelling Bee, by Daniel' }
+const brickBuilder = { name: 'Play Brick Builder, by Moses' }
 const dinoDig = { name: 'Play Dino Dig, by Moses' }
 const colouring = { name: 'Play Colouring, by Moses' }
 
@@ -29,6 +30,7 @@ describe('SplashScreen', () => {
     expect(screen.getByRole('button', ticTacToe)).toHaveTextContent('Daniel')
     expect(screen.getByRole('button', spellingBee)).toHaveTextContent('Daniel')
     expect(screen.getByRole('button', dinoDig)).toHaveTextContent('Moses')
+    expect(screen.getByRole('button', brickBuilder)).toHaveTextContent('Moses')
     expect(screen.getByRole('button', colouring)).toHaveTextContent('Moses')
   })
 
@@ -48,6 +50,7 @@ describe('SplashScreen', () => {
     ['Tic Tac Toe', ticTacToe, 'tic-tac-toe'],
     ['Spelling Bee', spellingBee, 'spelling-bee'],
     ['Dino Dig', dinoDig, 'dino-dig'],
+    ['Brick Builder', brickBuilder, 'brick-builder'],
     ['Colouring', colouring, 'colouring'],
   ])('starts %s when its card is chosen', async (_title, button, gameId) => {
     const onPick = vi.fn()

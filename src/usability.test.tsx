@@ -33,6 +33,7 @@ const GAMES: Record<GameId, Usability> = {
   'tic-tac-toe': { card: /^Play Tic Tac Toe/, onScreen: () => screen.getByRole('group', { name: 'Board' }), stylesheet: 'tic-tac-toe/ui/ticTacToe.css', layout: 'scrolls' },
   'spelling-bee': { card: /^Play Spelling Bee/, onScreen: () => screen.getByRole('group', { name: 'Alphabet' }), stylesheet: 'spelling-bee/ui/spelling.css', layout: 'scrolls' },
   'dino-dig': { card: /^Play Dino Dig/, onScreen: () => screen.getByRole('group', { name: 'Dig site' }), stylesheet: 'dino-dig/ui/dig.css', layout: 'scrolls' },
+  'brick-builder': { card: /^Play Brick Builder/, onScreen: () => screen.getByRole('group', { name: 'Baseplate' }), stylesheet: 'brick-builder/ui/builder.css', layout: 'scrolls' },
   colouring: { card: /^Play Colouring/, onScreen: () => screen.getByRole('group', { name: 'Pictures' }), stylesheet: 'colouring/ui/colouring.css', layout: 'scrolls' },
 }
 

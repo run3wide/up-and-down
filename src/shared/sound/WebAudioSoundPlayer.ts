@@ -13,6 +13,13 @@ import ribbitClip from './animals/Ribbit.mp3?inline'
 import squealClip from './animals/Squeal.ogg?inline'
 import whinnyClip from './animals/Whinny.ogg?inline'
 import woofClip from './animals/Bark.ogg?inline'
+import brayClip from './animals/Zebra.ogg?inline'
+import cluckClip from './animals/Cluck.ogg?inline'
+import lionClip from './animals/Lion.ogg?inline'
+import quackClip from './animals/Quack.ogg?inline'
+import squeakClip from './animals/Squeak.ogg?inline'
+import tigerClip from './animals/Tiger.ogg?inline'
+import yipClip from './animals/Fox.ogg?inline'
 
 const CLIPS: Partial<Record<SoundEffect, string>> = {
   roar: roarClip,
@@ -28,10 +35,17 @@ const CLIPS: Partial<Record<SoundEffect, string>> = {
   peep: peepClip,
   ribbit: ribbitClip,
   buzz: buzzClip,
+  quack: quackClip,
+  cluck: cluckClip,
+  squeak: squeakClip,
+  lion: lionClip,
+  tiger: tigerClip,
+  yip: yipClip,
+  bray: brayClip,
 }
 
 /** A long recording only needs its first moments, which then fade out rather than stop with a click. */
-const PLAY_SECONDS: Partial<Record<SoundEffect, number>> = { buzz: 1.5 }
+const PLAY_SECONDS: Partial<Record<SoundEffect, number>> = { buzz: 1.5, bray: 2 }
 const FADE_SECONDS = 0.25
 
 /** Slowed down, the announcer's "Winner!" drops into a big dinosaur voice. */

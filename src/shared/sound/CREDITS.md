@@ -14,3 +14,7 @@ The animal sounds in `animals/` are real recordings:
 - `Ribbit.mp3` is one of the "Ribbit Frog Sounds" (https://opengameart.org/content/ribbit-frog-sounds), CC0 (public domain).
 - `Buzz.ogg` is "Bombus buzz" by Mysid, a bumblebee recorded in Southern Finland, public domain
   (https://commons.wikimedia.org/wiki/File:Bombus_buzz.ogg).
+- `Quack`, `Cluck`, `Squeak`, `Lion`, `Tiger`, `Fox` and `Zebra` are CC0 (public domain) recordings from Freesound
+  (https://freesound.org/s/<id>/), shared by their authors without attribution being required: Quack 418509 ("single quack from a duck",
+  Mikes-MultiMedia), Cluck 668803 ("Chicken clucking 3", MBPL), Squeak 188043 ("Mouse", AntumDeluge), Lion 467762 ("lion.wav", SGAK),
+  Tiger 571288 ("tiger_roar.wav", Vaporpup), Fox 173208 ("foxBark2.wav", Setzilla), Zebra 850661 ("Zebras - Grant's Zebra Braying", TheKingOfGeeks360).

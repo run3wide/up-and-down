@@ -84,6 +84,12 @@ describe('App', () => {
     expect(screen.getByRole('group', { name: 'Board' })).toBeInTheDocument()
   })
 
+  it('opens Brick Builder straight away from its own address', () => {
+    renderApp('/brick-builder')
+
+    expect(screen.getByRole('heading', { name: 'Brick Builder' })).toBeInTheDocument()
+  })
+
   it('opens Dino Dig straight away from its own address', () => {
     renderApp('/dino-dig')
 
