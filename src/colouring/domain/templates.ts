@@ -780,6 +780,178 @@ const bigRocket: Template = {
   lines: [],
 }
 
+const pluto: Template = {
+  id: 'pluto',
+  name: 'Pluto',
+  regions: [
+    space,
+    ...cornerStars,
+    part('Far sun', circle(10, 60, 3)),
+    part('Planet', circle(50, 50, 22)),
+    part('Heart', together(circle(44, 46, 6), circle(54, 46, 6), poly([38.5, 48], [59.5, 48], [49, 60]))),
+    part('Dark patch', ellipse(44, 66, 6, 3)),
+    part('Crater 1', circle(60, 40, 3)),
+    part('Crater 2', circle(62, 58, 3.5)),
+    part('Crater 3', circle(36, 38, 2.5)),
+    part('Charon', circle(84, 22, 9)),
+    part('Charon crater 1', circle(81, 20, 2.5)),
+    part('Charon crater 2', circle(88, 26, 2)),
+    part('Nix', circle(16, 80, 3)),
+    part('Hydra', circle(88, 70, 2.5)),
+  ],
+  lines: [],
+}
+
+const moon: Template = {
+  id: 'moon',
+  name: 'Moon',
+  regions: [
+    space,
+    ...stars([10, 10], [34, 8], [62, 6], [12, 56], [92, 64]),
+    part('Earth', circle(86, 16, 8)),
+    part('Earth land 1', circle(84, 14, 3)),
+    part('Earth land 2', circle(89, 19, 2)),
+    part('Moon', circle(50, 52, 34)),
+    part('Sea 1', ellipse(42, 40, 9, 6)),
+    part('Sea 2', ellipse(60, 46, 7, 5)),
+    part('Crater 1', circle(30, 58, 5)),
+    part('Crater 2', circle(44, 68, 4)),
+    part('Crater 3', circle(66, 62, 6)),
+    part('Crater 4', circle(56, 30, 3)),
+    part('Crater 5', circle(34, 44, 3.5)),
+    part('Crater 6', circle(74, 40, 3)),
+  ],
+  lines: [],
+}
+
+/** A triangular ray around the sun: a base on the sun's edge and a tip pointing out. */
+const sunRay = (turns: number) => {
+  const angle = turns * 2 * Math.PI
+  const at = (radius: number, offset: number): [number, number] => [
+    Math.round((50 + radius * Math.cos(angle + offset)) * 100) / 100,
+    Math.round((50 + radius * Math.sin(angle + offset)) * 100) / 100,
+  ]
+  return poly(at(26, -0.13), at(42, 0), at(26, 0.13))
+}
+
+const sun: Template = {
+  id: 'sun',
+  name: 'Sun',
+  regions: [
+    space,
+    ...cornerStars,
+    ...Array.from({ length: 12 }, (_, i) => part(`Ray ${i + 1}`, sunRay(i / 12))),
+    part('Glow', circle(50, 50, 28)),
+    part('Sun', circle(50, 50, 24)),
+    part('Sunspot 1', circle(42, 44, 4)),
+    part('Sunspot 2', circle(58, 54, 3)),
+    part('Sunspot 3', circle(46, 60, 2.5)),
+    part('Mercury', circle(24, 78, 3)),
+  ],
+  lines: [],
+}
+
+const moonRocket: Template = {
+  id: 'moon-rocket',
+  name: 'Moon Rocket',
+  regions: [
+    part('Sky', rect(0, 0, 100, 86)),
+    part('Sun', circle(14, 14, 8)),
+    part('Daytime moon', circle(86, 14, 7)),
+    part('Cloud', together(circle(20, 40, 5), circle(27, 38, 7), circle(34, 41, 4.5))),
+    part('Ground', rect(0, 86, 100, 14)),
+    part('Tower', rect(68, 22, 6, 64)),
+    part('Tower top', poly([68, 22], [74, 22], [71, 16])),
+    part('Tower arm 1', rect(60, 36, 8, 2)),
+    part('Tower arm 2', rect(60, 56, 8, 2)),
+    part('Fin 1', poly([40, 74], [32, 86], [40, 86])),
+    part('Fin 2', poly([60, 74], [66, 86], [60, 86])),
+    part('First stage', rect(40, 60, 20, 26)),
+    part('First stage band 1', rect(40, 66, 20, 5)),
+    part('First stage band 2', rect(40, 76, 20, 4)),
+    part('Second stage', rect(40, 40, 20, 20)),
+    part('Second stage band', rect(40, 50, 20, 3)),
+    part('Third stage', rect(42, 30, 16, 10)),
+    part('Instrument ring', rect(42, 27, 16, 3)),
+    part('Service module', rect(44, 19, 12, 8)),
+    part('Command module', poly([44, 19], [56, 19], [52, 10], [48, 10])),
+    part('Escape tower', poly([49, 10], [51, 10], [50, 3])),
+    part('Launch pad', rect(28, 86, 44, 5)),
+    part('Smoke 1', circle(32, 90, 5)),
+    part('Smoke 2', circle(42, 93, 4)),
+    part('Smoke 3', circle(58, 93, 4)),
+    part('Flower 1', circle(8, 94, 3)),
+    part('Flower 2', circle(92, 94, 3)),
+  ],
+  lines: [],
+}
+
+const shuttleLaunch: Template = {
+  id: 'shuttle-launch',
+  name: 'Shuttle Launch',
+  regions: [
+    part('Sky', rect(0, 0, 100, 100)),
+    part('Sun', circle(14, 14, 8)),
+    part('Cloud 1', together(circle(80, 22, 5), circle(87, 20, 7), circle(94, 23, 4.5))),
+    part('Cloud 2', together(circle(10, 46, 4), circle(16, 44, 6), circle(22, 47, 4))),
+    part('Flame', poly([40, 78], [60, 78], [50, 100])),
+    part('Booster flame 1', poly([30, 78], [38, 78], [34, 96])),
+    part('Booster flame 2', poly([62, 78], [70, 78], [66, 96])),
+    part('Smoke 1', together(circle(18, 92, 8), circle(28, 97, 6))),
+    part('Smoke 2', together(circle(82, 92, 8), circle(72, 97, 6))),
+    part('Left booster', 'M30 78V30Q30 20 34 14Q38 20 38 30V78Z'),
+    part('Right booster', 'M62 78V30Q62 20 66 14Q70 20 70 30V78Z'),
+    part('Left booster stripe', rect(30, 50, 8, 3)),
+    part('Right booster stripe', rect(62, 50, 8, 3)),
+    part('External tank', 'M42 78V26Q42 8 50 8Q58 8 58 26V78Z'),
+    part('Left wing', poly([46, 56], [46, 72], [34, 74])),
+    part('Right wing', poly([54, 56], [54, 72], [66, 74])),
+    part('Orbiter body', 'M46 72V42Q46 30 50 26Q54 30 54 42V72Z'),
+    part('Orbiter nose', poly([46, 42], [54, 42], [50, 28])),
+    part('Cockpit window', poly([48, 38], [52, 38], [50, 33])),
+    part('Tail fin', poly([49, 58], [51, 58], [51, 68], [49, 68])),
+    part('Engine 1', circle(46.5, 73, 1.8)),
+    part('Engine 2', circle(50, 75, 1.8)),
+    part('Engine 3', circle(53.5, 73, 1.8)),
+  ],
+  lines: [],
+}
+
+const silverRocket: Template = {
+  id: 'silver-rocket',
+  name: 'Silver Rocket',
+  regions: [
+    part('Sky', rect(0, 0, 100, 86)),
+    part('Sun', circle(86, 14, 8)),
+    part('Daytime moon', circle(16, 14, 6)),
+    part('Cloud', together(circle(76, 40, 4), circle(82, 38, 6), circle(88, 41, 4))),
+    part('Ground', rect(0, 86, 100, 14)),
+    part('Tower', rect(70, 24, 5, 62)),
+    part('Catching arm 1', rect(57, 48, 13, 3)),
+    part('Catching arm 2', rect(57, 56, 13, 3)),
+    part('Booster', rect(43, 47, 14, 34)),
+    part('Grid fin 1', rect(38, 50, 5, 4)),
+    part('Grid fin 2', rect(57, 50, 5, 4)),
+    part('Booster engines', together(rect(44, 81, 3, 3), rect(48.5, 81, 3, 3), rect(53, 81, 3, 3))),
+    part('Ring', rect(43, 45, 14, 2)),
+    part('Ship body', rect(43, 24, 14, 21)),
+    part('Ship nose', 'M43 24C43 12 48 6 50 6C52 6 57 12 57 24Z'),
+    part('Heat tiles', rect(43, 24, 5, 21)),
+    part('Ship stripe', rect(48, 36, 9, 2)),
+    part('Front flap 1', poly([43, 26], [38, 32], [43, 34])),
+    part('Front flap 2', poly([57, 26], [62, 32], [57, 34])),
+    part('Back flap 1', poly([43, 38], [36, 48], [43, 45])),
+    part('Back flap 2', poly([57, 38], [64, 48], [57, 45])),
+    part('Launch pad', rect(34, 86, 38, 5)),
+    part('Steam 1', circle(38, 90, 5)),
+    part('Steam 2', circle(50, 92, 4)),
+    part('Steam 3', circle(62, 90, 5)),
+    part('Flower 1', circle(8, 94, 3)),
+    part('Flower 2', circle(92, 94, 3)),
+  ],
+  lines: [],
+}
+
 export const TEMPLATES: readonly Template[] = [
   tRex,
   volcano,
@@ -808,4 +980,10 @@ export const TEMPLATES: readonly Template[] = [
   astronaut,
   satellite,
   bigRocket,
+  pluto,
+  moon,
+  sun,
+  moonRocket,
+  shuttleLaunch,
+  silverRocket,
 ]

@@ -11,7 +11,8 @@ describe('colouring templates', () => {
 
   it.each(['car', 'truck', 'bus', 'garbage-truck', 'hippo', 'elephant', 'tiger', 'snake', 'hamburger',
     'mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune',
-    'space-shuttle', 'ufo', 'astronaut', 'satellite', 'big-rocket'])(
+    'space-shuttle', 'ufo', 'astronaut', 'satellite', 'big-rocket',
+    'pluto', 'moon', 'sun', 'moon-rocket', 'shuttle-launch', 'silver-rocket'])(
     'has a %s to colour',
     (id) => {
       expect(TEMPLATES.map((template) => template.id)).toContain(id)
