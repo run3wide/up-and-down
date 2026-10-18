@@ -6,6 +6,8 @@ import { mathQuiz } from './dino-race/domain/mathQuestions'
 import { RaceScreen } from './dino-race/ui/RaceScreen'
 import { KitchenScreen } from './little-chef/ui/KitchenScreen'
 import { MatchScreen } from './match-up/ui/MatchScreen'
+import type { CollectionStore } from './dino-dig/application/CollectionStore'
+import { DigScreen } from './dino-dig/ui/DigScreen'
 import { SpellingScreen } from './spelling-bee/ui/SpellingScreen'
 import { TicTacToeScreen } from './tic-tac-toe/ui/TicTacToeScreen'
 import { useRoute } from './routing/useRoute'
@@ -20,11 +22,12 @@ interface AppProps {
   random: Random
   bestScores: Record<GameId, BestScoreStore>
   sound: SoundPlayer
+  dinoDigCollection: CollectionStore
   /** Where the app is served from, so each game has its own address under it. */
   basePath: string
 }
 
-export function App({ random, bestScores, sound, basePath }: AppProps) {
+export function App({ random, bestScores, sound, dinoDigCollection, basePath }: AppProps) {
   const [playing, navigate] = useRoute(basePath)
   const backToGames = () => navigate(null)
 
@@ -45,6 +48,8 @@ export function App({ random, bestScores, sound, basePath }: AppProps) {
       return <TicTacToeScreen random={random} bestScores={bestScores['tic-tac-toe']} sound={sound} onExit={backToGames} />
     case 'spelling-bee':
       return <SpellingScreen random={random} bestScores={bestScores['spelling-bee']} sound={sound} onExit={backToGames} />
+    case 'dino-dig':
+      return <DigScreen random={random} bestScores={bestScores['dino-dig']} collection={dinoDigCollection} sound={sound} onExit={backToGames} />
     case null:
       return <SplashScreen onPick={navigate} />
   }

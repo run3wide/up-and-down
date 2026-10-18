@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App'
 import { WebAudioSoundPlayer } from './shared/sound/WebAudioSoundPlayer'
+import { LocalStorageCollectionStore } from './dino-dig/infrastructure/LocalStorageCollectionStore'
 import { LocalStorageBestScoreStore } from './shared/LocalStorageBestScoreStore'
 import './index.css'
 
@@ -14,10 +15,13 @@ const bestScores = {
   'cookie-maze': new LocalStorageBestScoreStore('cookie-maze:best-score'),
   'tic-tac-toe': new LocalStorageBestScoreStore('tic-tac-toe:best-score'),
   'spelling-bee': new LocalStorageBestScoreStore('spelling-bee:best-score'),
+  'dino-dig': new LocalStorageBestScoreStore('dino-dig:best-score'),
 }
+
+const dinoDigCollection = new LocalStorageCollectionStore('dino-dig:museum')
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App random={Math.random} bestScores={bestScores} sound={new WebAudioSoundPlayer()} basePath={import.meta.env.BASE_URL} />
+    <App random={Math.random} bestScores={bestScores} sound={new WebAudioSoundPlayer()} dinoDigCollection={dinoDigCollection} basePath={import.meta.env.BASE_URL} />
   </StrictMode>,
 )

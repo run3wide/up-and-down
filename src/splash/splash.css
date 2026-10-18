@@ -154,6 +154,10 @@
   background: linear-gradient(#ffffff, #d9f0ff);
 }
 
+.game-card--dino-dig {
+  background: linear-gradient(#ffffff, #f0dcc0);
+}
+
 .game-card--lemon-volcano {
   background: linear-gradient(#ffffff, #fff3b8);
 }
@@ -194,6 +198,10 @@
 
 .game-card__title--spelling-bee {
   color: #1fa67a;
+}
+
+.game-card__title--dino-dig {
+  color: #b5651d;
 }
 
 .game-card__title--match {
