@@ -9,6 +9,7 @@ import { MatchScreen } from './match-up/ui/MatchScreen'
 import type { CollectionStore } from './dino-dig/application/CollectionStore'
 import { DigScreen } from './dino-dig/ui/DigScreen'
 import type { GalleryStore } from './colouring/application/GalleryStore'
+import type { SketchStore } from './colouring/application/SketchStore'
 import { BuilderScreen } from './brick-builder/ui/BuilderScreen'
 import { ColouringScreen } from './colouring/ui/ColouringScreen'
 import { SpellingScreen } from './spelling-bee/ui/SpellingScreen'
@@ -28,11 +29,12 @@ interface AppProps {
   sound: SoundPlayer
   dinoDigCollection: CollectionStore
   colouringGallery: GalleryStore
+  colouringSketches: SketchStore
   /** Where the app is served from, so each game has its own address under it. */
   basePath: string
 }
 
-export function App({ random, bestScores, sound, dinoDigCollection, colouringGallery, basePath }: AppProps) {
+export function App({ random, bestScores, sound, dinoDigCollection, colouringGallery, colouringSketches, basePath }: AppProps) {
   const [playing, navigate] = useRoute(basePath)
   const backToGames = () => navigate(null)
   const openGame = (game: GameId) => {
@@ -60,7 +62,7 @@ export function App({ random, bestScores, sound, dinoDigCollection, colouringGal
     case 'dino-dig':
       return <DigScreen random={random} bestScores={bestScores['dino-dig']} collection={dinoDigCollection} sound={sound} onExit={backToGames} />
     case 'colouring':
-      return <ColouringScreen gallery={colouringGallery} onExit={backToGames} />
+      return <ColouringScreen gallery={colouringGallery} sketches={colouringSketches} onExit={backToGames} />
     case 'brick-builder':
       return <BuilderScreen onExit={backToGames} />
     case null:

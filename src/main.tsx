@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App'
 import { WebAudioSoundPlayer } from './shared/sound/WebAudioSoundPlayer'
+import { LocalStorageSketchStore } from './colouring/infrastructure/LocalStorageSketchStore'
 import { LocalStorageGalleryStore } from './colouring/infrastructure/LocalStorageGalleryStore'
 import { LocalStorageCollectionStore } from './dino-dig/infrastructure/LocalStorageCollectionStore'
 import { LocalStorageBestScoreStore } from './shared/LocalStorageBestScoreStore'
@@ -21,9 +22,10 @@ const bestScores = {
 
 const dinoDigCollection = new LocalStorageCollectionStore('dino-dig:museum')
 const colouringGallery = new LocalStorageGalleryStore('colouring:pictures')
+const colouringSketches = new LocalStorageSketchStore('colouring:sketch')
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App random={Math.random} bestScores={bestScores} sound={new WebAudioSoundPlayer()} dinoDigCollection={dinoDigCollection} colouringGallery={colouringGallery} basePath={import.meta.env.BASE_URL} />
+    <App random={Math.random} bestScores={bestScores} sound={new WebAudioSoundPlayer()} dinoDigCollection={dinoDigCollection} colouringGallery={colouringGallery} colouringSketches={colouringSketches} basePath={import.meta.env.BASE_URL} />
   </StrictMode>,
 )

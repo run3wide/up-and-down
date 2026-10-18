@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from './App'
 import { InMemoryCollectionStore } from './dino-dig/infrastructure/InMemoryCollectionStore'
 import { InMemoryGalleryStore } from './colouring/infrastructure/InMemoryGalleryStore'
+import { InMemorySketchStore } from './colouring/infrastructure/InMemorySketchStore'
 import { InMemoryBestScoreStore } from './shared/InMemoryBestScoreStore'
 
 const bestScores = () => ({
@@ -21,7 +22,7 @@ const silentSound = { unlock: () => {}, play: () => {} }
 
 function renderApp(path = '/', basePath = '/') {
   window.history.replaceState(null, '', path)
-  render(<App random={() => 0.5} bestScores={bestScores()} sound={silentSound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} basePath={basePath} />)
+  render(<App random={() => 0.5} bestScores={bestScores()} sound={silentSound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} colouringSketches={new InMemorySketchStore()} basePath={basePath} />)
 }
 
 function keyDown(key: string) {
