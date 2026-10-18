@@ -1,16 +1,16 @@
-import type { AimDirection, HoopsEvent, HoopsGame, HoopsSnapshot } from '../domain/hoopsGame'
+import type { AimDirection, VolcanoEvent, VolcanoGame, VolcanoSnapshot } from '../domain/volcanoGame'
 
 export const MAX_FRAME_SECONDS = 0.05
 
-export class HoopsSession {
-  private readonly game: HoopsGame
+export class VolcanoSession {
+  private readonly game: VolcanoGame
   private readonly held = new Set<AimDirection>()
 
-  constructor(game: HoopsGame) {
+  constructor(game: VolcanoGame) {
     this.game = game
   }
 
-  snapshot(): HoopsSnapshot {
+  snapshot(): VolcanoSnapshot {
     return this.game.snapshot()
   }
 
@@ -22,15 +22,15 @@ export class HoopsSession {
     this.held.delete(direction)
   }
 
-  shoot(): void {
-    this.game.shoot()
+  toss(): void {
+    this.game.toss()
   }
 
   togglePause(): void {
     this.game.togglePause()
   }
 
-  advance(elapsedSeconds: number): HoopsEvent[] {
+  advance(elapsedSeconds: number): VolcanoEvent[] {
     const dt = Math.min(elapsedSeconds, MAX_FRAME_SECONDS)
     if (this.held.size === 1) {
       const [direction] = this.held

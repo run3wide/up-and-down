@@ -1,16 +1,16 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
-import { SHOTS_PER_ROUND } from '../domain/hoopsGame'
-import { HoopsScreen } from './HoopsScreen'
+import { LEMONS_PER_ROUND } from '../domain/volcanoGame'
+import { VolcanoScreen } from './VolcanoScreen'
 
-/** 0.5 puts every hoop straight ahead, so shooting without aiming always scores. */
+/** 0.5 puts every crater straight ahead, so tossing without aiming always scores. */
 const straightAhead = () => 0.5
 
 function renderGame(bestScore = 0) {
   const bestScores = new InMemoryBestScoreStore(bestScore)
   const onExit = vi.fn()
-  render(<HoopsScreen random={straightAhead} bestScores={bestScores} onExit={onExit} />)
+  render(<VolcanoScreen random={straightAhead} bestScores={bestScores} onExit={onExit} />)
   return { bestScores, onExit }
 }
 
@@ -27,7 +27,7 @@ function press(key: string) {
   })
 }
 
-function shootAndWatch() {
+function tossAndWatch() {
   press(' ')
   playFor(3)
 }
@@ -40,24 +40,24 @@ afterEach(() => {
   vi.useRealTimers()
 })
 
-describe('HoopsScreen', () => {
-  it('starts with no score and every shot left', () => {
+describe('VolcanoScreen', () => {
+  it('starts with no score and every lemon left', () => {
     renderGame()
 
     expect(screen.getByRole('status')).toHaveTextContent('Score: 0')
-    expect(screen.getByLabelText(`${SHOTS_PER_ROUND} shots left`)).toBeInTheDocument()
+    expect(screen.getByLabelText(`${LEMONS_PER_ROUND} lemons left`)).toBeInTheDocument()
   })
 
-  it('shoots with the space bar and scores when the ball drops through the hoop', () => {
+  it('tosss with the space bar and scores when the lemon drops through the crater', () => {
     renderGame()
 
-    shootAndWatch()
+    tossAndWatch()
 
     expect(screen.getByRole('status')).toHaveTextContent('Score: 1')
-    expect(screen.getByLabelText(`${SHOTS_PER_ROUND - 1} shots left`)).toBeInTheDocument()
+    expect(screen.getByLabelText(`${LEMONS_PER_ROUND - 1} lemons left`)).toBeInTheDocument()
   })
 
-  it('misses when the arm has been aimed away from the hoop', () => {
+  it('misses when the arm has been aimed away from the crater', () => {
     renderGame()
     act(() => {
       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }))
@@ -67,7 +67,7 @@ describe('HoopsScreen', () => {
       window.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowLeft' }))
     })
 
-    shootAndWatch()
+    tossAndWatch()
 
     expect(screen.getByRole('status')).toHaveTextContent('Score: 0')
   })
@@ -82,37 +82,37 @@ describe('HoopsScreen', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  it('does not shoot while paused', () => {
+  it('does not toss while paused', () => {
     renderGame()
     press('Escape')
 
     press(' ')
 
-    expect(screen.getByLabelText(`${SHOTS_PER_ROUND} shots left`)).toBeInTheDocument()
+    expect(screen.getByLabelText(`${LEMONS_PER_ROUND} lemons left`)).toBeInTheDocument()
   })
 
   it('has on-screen controls for touch players', () => {
     renderGame()
 
-    for (const name of ['Aim left', 'Aim right', 'Shoot']) {
+    for (const name of ['Aim left', 'Aim right', 'Throw']) {
       expect(screen.getByRole('button', { name })).toBeInTheDocument()
     }
   })
 
-  it('shows the final score and best score after the last shot, and saves a new best', () => {
+  it('shows the final score and best score after the last lemon, and saves a new best', () => {
     const { bestScores } = renderGame(3)
 
-    for (let i = 0; i < SHOTS_PER_ROUND; i++) shootAndWatch()
+    for (let i = 0; i < LEMONS_PER_ROUND; i++) tossAndWatch()
 
     const gameOver = screen.getByRole('dialog', { name: 'Game over' })
-    expect(within(gameOver).getByText(`Score: ${SHOTS_PER_ROUND}`)).toBeInTheDocument()
-    expect(within(gameOver).getByText(`Best: ${SHOTS_PER_ROUND}`)).toBeInTheDocument()
-    expect(bestScores.load()).toBe(SHOTS_PER_ROUND)
+    expect(within(gameOver).getByText(`Score: ${LEMONS_PER_ROUND}`)).toBeInTheDocument()
+    expect(within(gameOver).getByText(`Best: ${LEMONS_PER_ROUND}`)).toBeInTheDocument()
+    expect(bestScores.load()).toBe(LEMONS_PER_ROUND)
   })
 
   it('goes back to the games menu from the end of the round', () => {
     const { onExit } = renderGame()
-    for (let i = 0; i < SHOTS_PER_ROUND; i++) shootAndWatch()
+    for (let i = 0; i < LEMONS_PER_ROUND; i++) tossAndWatch()
 
     fireEvent.click(screen.getByRole('button', { name: 'Back to games' }))
 

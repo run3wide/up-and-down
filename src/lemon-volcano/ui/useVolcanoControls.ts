@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react'
-import type { AimDirection } from '../domain/hoopsGame'
+import type { AimDirection } from '../domain/volcanoGame'
 
 interface Controls {
   hold(direction: AimDirection): void
   release(direction: AimDirection): void
-  shoot(): void
+  toss(): void
   togglePause(): void
 }
 
@@ -18,7 +18,7 @@ const DIRECTION_KEYS: Record<string, AimDirection> = {
 }
 const PAUSE_KEYS = new Set(['Escape', 'p', 'P'])
 
-export function useHoopsControls(controls: Controls): void {
+export function useVolcanoControls(controls: Controls): void {
   const latest = useRef(controls)
   useEffect(() => {
     latest.current = controls
@@ -32,7 +32,7 @@ export function useHoopsControls(controls: Controls): void {
         latest.current.hold(direction)
       } else if (event.key === ' ' && !isPressingButton(event)) {
         event.preventDefault()
-        if (!event.repeat) latest.current.shoot()
+        if (!event.repeat) latest.current.toss()
       } else if (PAUSE_KEYS.has(event.key) && !event.repeat) {
         event.preventDefault()
         latest.current.togglePause()
@@ -57,7 +57,7 @@ export function useHoopsControls(controls: Controls): void {
   }, [])
 }
 
-/** Space on a focused button (Resume, Back to games) should press that button, not shoot. */
+/** Space on a focused button (Resume, Back to games) should press that button, not toss. */
 function isPressingButton(event: KeyboardEvent): boolean {
   return event.target instanceof HTMLButtonElement
 }

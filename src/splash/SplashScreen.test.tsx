@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { SplashScreen } from './SplashScreen'
 
 const upAndDown = { name: 'Play Up and Down, by Daniel Robson' }
-const robotHoops = { name: 'Play Robot Hoops, by Moses Robson' }
+const lemonVolcano = { name: 'Play Lemon Volcano, by Moses Robson' }
 
 describe('SplashScreen', () => {
   it('offers both games with their authors', () => {
@@ -12,7 +12,7 @@ describe('SplashScreen', () => {
 
     expect(screen.getByRole('heading', { name: 'Pick a game' })).toBeInTheDocument()
     expect(screen.getByRole('button', upAndDown)).toHaveTextContent('Daniel Robson')
-    expect(screen.getByRole('button', robotHoops)).toHaveTextContent('Moses Robson')
+    expect(screen.getByRole('button', lemonVolcano)).toHaveTextContent('Moses Robson')
   })
 
   it('focuses the first game so keyboard players can begin straight away', () => {
@@ -23,7 +23,7 @@ describe('SplashScreen', () => {
 
   it.each([
     ['Up and Down', upAndDown, 'up-and-down'],
-    ['Robot Hoops', robotHoops, 'robot-hoops'],
+    ['Lemon Volcano', lemonVolcano, 'lemon-volcano'],
   ])('starts %s when its card is chosen', async (_title, button, gameId) => {
     const onPick = vi.fn()
     render(<SplashScreen onPick={onPick} />)

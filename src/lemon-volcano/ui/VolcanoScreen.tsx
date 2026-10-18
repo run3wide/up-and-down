@@ -2,15 +2,15 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { recordFinalScore, type BestScoreResult, type BestScoreStore } from '../../shared/bestScore'
 import { GameOverOverlay, PausedOverlay } from '../../shared/Overlays'
 import { useAnimationFrame } from '../../shared/useAnimationFrame'
-import { HoopsSession } from '../application/HoopsSession'
-import { HoopsGame, SHOTS_PER_ROUND, type AimDirection, type HoopsEvent, type Random } from '../domain/hoopsGame'
-import { Court, type RobotMood } from './Court'
-import { useHoopsControls } from './useHoopsControls'
+import { VolcanoSession } from '../application/VolcanoSession'
+import { VolcanoGame, LEMONS_PER_ROUND, type AimDirection, type VolcanoEvent, type Random } from '../domain/volcanoGame'
+import { Court, type StrawberryMood } from './Court'
+import { useVolcanoControls } from './useVolcanoControls'
 import '../../shared/hud.css'
 import '../../shared/controls.css'
-import './hoops.css'
+import './volcano.css'
 
-interface HoopsScreenProps {
+interface VolcanoScreenProps {
   random: Random
   bestScores: BestScoreStore
   onExit: () => void
@@ -18,10 +18,10 @@ interface HoopsScreenProps {
 
 const REACTION_MILLISECONDS = 900
 
-export function HoopsScreen({ random, bestScores, onExit }: HoopsScreenProps) {
-  const [session] = useState(() => new HoopsSession(new HoopsGame(random)))
+export function VolcanoScreen({ random, bestScores, onExit }: VolcanoScreenProps) {
+  const [session] = useState(() => new VolcanoSession(new VolcanoGame(random)))
   const [snapshot, setSnapshot] = useState(() => session.snapshot())
-  const [mood, setMood] = useState<RobotMood>('idle')
+  const [mood, setMood] = useState<StrawberryMood>('idle')
   const [scoredFlash, setScoredFlash] = useState(false)
   const [result, setResult] = useState<BestScoreResult | null>(null)
   const reaction = useRef<number | undefined>(undefined)
@@ -31,14 +31,14 @@ export function HoopsScreen({ random, bestScores, onExit }: HoopsScreenProps) {
   const refresh = useCallback(() => setSnapshot(session.snapshot()), [session])
 
   const react = useCallback(
-    (events: HoopsEvent[]) => {
+    (events: VolcanoEvent[]) => {
       for (const event of events) {
         if (event.type === 'scored') showReaction('cheer', true)
         if (event.type === 'missed') showReaction('oops', false)
         if (event.type === 'roundOver') setResult(recordFinalScore(bestScores, session.snapshot().score))
       }
 
-      function showReaction(nextMood: RobotMood, scored: boolean) {
+      function showReaction(nextMood: StrawberryMood, scored: boolean) {
         clearTimeout(reaction.current)
         setMood(nextMood)
         setScoredFlash(scored)
@@ -56,8 +56,8 @@ export function HoopsScreen({ random, bestScores, onExit }: HoopsScreenProps) {
     refresh()
   }, !snapshot.paused && snapshot.phase !== 'over')
 
-  const shoot = useCallback(() => {
-    session.shoot()
+  const toss = useCallback(() => {
+    session.toss()
     refresh()
   }, [session, refresh])
 
@@ -66,30 +66,30 @@ export function HoopsScreen({ random, bestScores, onExit }: HoopsScreenProps) {
     refresh()
   }, [session, refresh])
 
-  useHoopsControls({
+  useVolcanoControls({
     hold: (direction) => session.hold(direction),
     release: (direction) => session.release(direction),
-    shoot,
+    toss,
     togglePause,
   })
 
   return (
-    <main className="hoops">
-      <div className="hoops__stage-area">
-        <div className="hoops__stage">
+    <main className="lemon-volcano">
+      <div className="lemon-volcano__stage-area">
+        <div className="lemon-volcano__stage">
           <Court
             aim={snapshot.aim}
-            shot={snapshot.shot}
-            hoopX={snapshot.hoopX}
+            lemon={snapshot.lemon}
+            craterX={snapshot.craterX}
             mood={mood}
             showAim={snapshot.phase === 'aiming'}
             scoredFlash={scoredFlash}
           />
-          {scoredFlash && <p className="hoops__cheer" aria-hidden="true">Swish!</p>}
+          {scoredFlash && <p className="lemon-volcano__cheer" aria-hidden="true">Splash!</p>}
         </div>
       </div>
       <header className="hud">
-        <ShotsLeft count={snapshot.shotsLeft} />
+        <LemonsLeft count={snapshot.lemonsLeft} />
         <p className="hud__score" role="status">
           Score: {snapshot.score}
         </p>
@@ -97,11 +97,11 @@ export function HoopsScreen({ random, bestScores, onExit }: HoopsScreenProps) {
           <span aria-hidden="true">❚❚</span>
         </button>
       </header>
-      <p className="hoops__hint" aria-hidden="true">← → aim &nbsp;·&nbsp; Space shoot</p>
+      <p className="lemon-volcano__hint" aria-hidden="true">← → aim &nbsp;·&nbsp; Space throw</p>
       <TouchControls
         hold={(direction) => session.hold(direction)}
         release={(direction) => session.release(direction)}
-        shoot={shoot}
+        toss={toss}
       />
       {snapshot.paused && <PausedOverlay onResume={togglePause} />}
       {snapshot.phase === 'over' && result && (
@@ -111,11 +111,11 @@ export function HoopsScreen({ random, bestScores, onExit }: HoopsScreenProps) {
   )
 }
 
-function ShotsLeft({ count }: { count: number }) {
+function LemonsLeft({ count }: { count: number }) {
   return (
-    <div className="hoops__shots" role="img" aria-label={`${count} ${count === 1 ? 'shot' : 'shots'} left`}>
-      {Array.from({ length: SHOTS_PER_ROUND }, (_, i) => (
-        <span key={i} className={i < count ? 'shot-dot' : 'shot-dot shot-dot--used'} />
+    <div className="lemon-volcano__lemons" role="img" aria-label={`${count} ${count === 1 ? 'lemon' : 'lemons'} left`}>
+      {Array.from({ length: LEMONS_PER_ROUND }, (_, i) => (
+        <span key={i} className={i < count ? 'lemon-dot' : 'lemon-dot lemon-dot--used'} />
       ))}
     </div>
   )
@@ -124,22 +124,22 @@ function ShotsLeft({ count }: { count: number }) {
 interface TouchControlsProps {
   hold(direction: AimDirection): void
   release(direction: AimDirection): void
-  shoot(): void
+  toss(): void
 }
 
-function TouchControls({ hold, release, shoot }: TouchControlsProps) {
+function TouchControls({ hold, release, toss }: TouchControlsProps) {
   return (
     <div className="touch-controls">
       <AimButton direction="left" label="Aim left" arrow="◀" {...{ hold, release }} />
-      <button className="direction-button shoot-button" onClick={shoot}>
-        Shoot
+      <button className="direction-button toss-button" onClick={toss}>
+        Throw
       </button>
       <AimButton direction="right" label="Aim right" arrow="▶" {...{ hold, release }} />
     </div>
   )
 }
 
-function AimButton({ direction, label, arrow, hold, release }: Omit<TouchControlsProps, 'shoot'> & { direction: AimDirection; label: string; arrow: string }) {
+function AimButton({ direction, label, arrow, hold, release }: Omit<TouchControlsProps, 'toss'> & { direction: AimDirection; label: string; arrow: string }) {
   const stop = () => release(direction)
   return (
     <button

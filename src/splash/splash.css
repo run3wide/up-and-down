@@ -127,8 +127,8 @@
   background: linear-gradient(#ffffff, #d9f3ff);
 }
 
-.game-card--robot-hoops {
-  background: linear-gradient(#ffffff, #ffe7cc);
+.game-card--lemon-volcano {
+  background: linear-gradient(#ffffff, #fff3b8);
 }
 
 .game-card .logo {
@@ -139,7 +139,7 @@
 .game-card__title {
   font-size: clamp(2rem, 5.5vw, 3rem);
   line-height: 1;
-  color: #ff9a52;
+  color: #ffd400;
   -webkit-text-stroke: 0.06em var(--ink);
   paint-order: stroke fill;
   text-shadow: 0 0.07em 0 #0004;
@@ -149,7 +149,7 @@
   font-size: clamp(1rem, 2.6vw, 1.3rem);
 }
 
-.robot-icon {
+.strawberry-icon {
   width: clamp(5rem, 14vw, 7.5rem);
   animation: bob 3s ease-in-out infinite;
 }

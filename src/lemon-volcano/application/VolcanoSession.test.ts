@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { HoopsGame } from '../domain/hoopsGame'
-import { HoopsSession, MAX_FRAME_SECONDS } from './HoopsSession'
+import { VolcanoGame } from '../domain/volcanoGame'
+import { VolcanoSession, MAX_FRAME_SECONDS } from './VolcanoSession'
 
-const newSession = () => new HoopsSession(new HoopsGame(() => 0.5))
+const newSession = () => new VolcanoSession(new VolcanoGame(() => 0.5))
 
-describe('HoopsSession', () => {
+describe('VolcanoSession', () => {
   it('aims while a direction is held and stops when released', () => {
     const session = newSession()
 
@@ -40,9 +40,9 @@ describe('HoopsSession', () => {
     expect(long.snapshot().aim).toBeCloseTo(capped.snapshot().aim)
   })
 
-  it('shoots and reports the result as events', () => {
+  it('tosss and reports the result as events', () => {
     const session = newSession()
-    session.shoot()
+    session.toss()
 
     const events = []
     for (let i = 0; i < 60 * 5; i++) events.push(...session.advance(1 / 60))

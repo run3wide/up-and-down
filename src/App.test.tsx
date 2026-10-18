@@ -5,11 +5,12 @@ import { InMemoryBestScoreStore } from './shared/InMemoryBestScoreStore'
 
 const bestScores = () => ({
   'up-and-down': new InMemoryBestScoreStore(),
-  'robot-hoops': new InMemoryBestScoreStore(),
+  'lemon-volcano': new InMemoryBestScoreStore(),
 })
 
-function renderApp() {
-  render(<App random={() => 0.5} bestScores={bestScores()} />)
+function renderApp(path = '/', basePath = '/') {
+  window.history.replaceState(null, '', path)
+  render(<App random={() => 0.5} bestScores={bestScores()} basePath={basePath} />)
 }
 
 function keyDown(key: string) {
@@ -26,18 +27,51 @@ afterEach(() => {
   vi.useRealTimers()
 })
 
+const pickerHeading = () => screen.getByRole('heading', { name: 'Pick a game' })
+
 describe('App', () => {
   it('opens on the game picker', () => {
-    renderApp()
+    renderApp('/')
 
-    expect(screen.getByRole('heading', { name: 'Pick a game' })).toBeInTheDocument()
+    expect(pickerHeading()).toBeInTheDocument()
   })
 
-  it('plays a round of Robot Hoops and returns to the picker', () => {
-    renderApp()
-    fireEvent.click(screen.getByRole('button', { name: /Robot Hoops/ }))
+  it('opens a game straight away from its own address', () => {
+    renderApp('/lemon-volcano')
 
-    for (let shot = 0; shot < 8; shot++) {
+    expect(screen.getByLabelText('8 lemons left')).toBeInTheDocument()
+  })
+
+  it('opens the other game from its address, under a base path', () => {
+    renderApp('/up-and-down/up-and-down', '/up-and-down/')
+
+    expect(screen.getByLabelText('3 lives left')).toBeInTheDocument()
+  })
+
+  it('gives each game its own address when picked from the menu', () => {
+    renderApp('/')
+
+    fireEvent.click(screen.getByRole('button', { name: /Lemon Volcano/ }))
+
+    expect(window.location.pathname).toBe('/lemon-volcano')
+  })
+
+  it('follows the browser back button to the picker', () => {
+    renderApp('/')
+    fireEvent.click(screen.getByRole('button', { name: /Up and Down/ }))
+
+    act(() => {
+      window.history.replaceState(null, '', '/')
+      window.dispatchEvent(new PopStateEvent('popstate'))
+    })
+
+    expect(pickerHeading()).toBeInTheDocument()
+  })
+
+  it('plays a round of Lemon Volcano and returns to the picker address', () => {
+    renderApp('/lemon-volcano')
+
+    for (let throwNumber = 0; throwNumber < 8; throwNumber++) {
       keyDown(' ')
       act(() => {
         vi.advanceTimersByTime(3000)
@@ -45,12 +79,12 @@ describe('App', () => {
     }
     fireEvent.click(screen.getByRole('button', { name: 'Back to games' }))
 
-    expect(screen.getByRole('heading', { name: 'Pick a game' })).toBeInTheDocument()
+    expect(pickerHeading()).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/')
   })
 
   it('plays a round of Up and Down and returns to the picker', () => {
-    renderApp()
-    fireEvent.click(screen.getByRole('button', { name: /Up and Down/ }))
+    renderApp('/up-and-down')
     keyDown('ArrowLeft')
 
     act(() => {
@@ -58,6 +92,6 @@ describe('App', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Back to games' }))
 
-    expect(screen.getByRole('heading', { name: 'Pick a game' })).toBeInTheDocument()
+    expect(pickerHeading()).toBeInTheDocument()
   })
 })

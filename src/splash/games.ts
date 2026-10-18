@@ -1,1 +1,1 @@
-export type GameId = 'up-and-down' | 'robot-hoops'
+export type GameId = 'up-and-down' | 'lemon-volcano'
