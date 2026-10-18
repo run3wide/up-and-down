@@ -9,6 +9,7 @@ const dinoRace = { name: 'Play Dino Race, by Daniel' }
 const littleChef = { name: 'Play Little Chef, by Vanessa' }
 const matchUp = { name: 'Play Match Up, by Daniel' }
 const cookieMaze = { name: 'Play Cookie Maze, by Daniel' }
+const ticTacToe = { name: 'Play Tic Tac Toe' }
 
 describe('SplashScreen', () => {
   it('offers every game with their authors', () => {
@@ -36,6 +37,7 @@ describe('SplashScreen', () => {
     ['Little Chef', littleChef, 'little-chef'],
     ['Match Up', matchUp, 'match-up'],
     ['Cookie Maze', cookieMaze, 'cookie-maze'],
+    ['Tic Tac Toe', ticTacToe, 'tic-tac-toe'],
   ])('starts %s when its card is chosen', async (_title, button, gameId) => {
     const onPick = vi.fn()
     render(<SplashScreen onPick={onPick} />)

@@ -2,11 +2,15 @@ import { scheduleEruption } from './eruptionSound'
 import type { SoundEffect, SoundPlayer } from './SoundPlayer'
 import roarClip from './trexRoar.wav?inline'
 import victoryRoarClip from './trexVictoryRoar.wav?inline'
+import winnerClip from './winner.ogg?inline'
 
-const CLIPS: Partial<Record<SoundEffect, string>> = { roar: roarClip, victoryRoar: victoryRoarClip }
+const CLIPS: Partial<Record<SoundEffect, string>> = { roar: roarClip, victoryRoar: victoryRoarClip, winner: winnerClip }
+
+/** Slowed down, the announcer's "Winner!" drops into a big dinosaur voice. */
+const PLAYBACK_RATE: Partial<Record<SoundEffect, number>> = { winner: 0.7 }
 
 /**
- * Plays sounds with Web Audio. The eruption is synthesised; the dino roars are small CC0 clips (see CREDITS.md)
+ * Plays sounds with Web Audio. The eruption is synthesised; the dino roars and the "Winner!" are small CC0 clips (see CREDITS.md)
  * bundled into the app as data URLs, so the game still makes no network calls.
  */
 export class WebAudioSoundPlayer implements SoundPlayer {
@@ -31,6 +35,7 @@ export class WebAudioSoundPlayer implements SoundPlayer {
     try {
       const source = context.createBufferSource()
       source.buffer = await this.clip(context, effect)
+      source.playbackRate.value = PLAYBACK_RATE[effect] ?? 1
       source.connect(output)
       source.start()
     } catch {

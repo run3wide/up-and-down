@@ -143,6 +143,10 @@
   background: linear-gradient(#ffffff, #f4e3b8);
 }
 
+.game-card--tic-tac-toe {
+  background: linear-gradient(#ffffff, #dfe8ff);
+}
+
 .game-card--lemon-volcano {
   background: linear-gradient(#ffffff, #fff3b8);
 }
@@ -175,6 +179,10 @@
 
 .game-card__title--maze {
   color: #a8692e;
+}
+
+.game-card__title--tic-tac-toe {
+  color: #2f7de1;
 }
 
 .game-card__title--match {

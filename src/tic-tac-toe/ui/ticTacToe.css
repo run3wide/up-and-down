@@ -1,0 +1,95 @@
+.tic-tac-toe {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  justify-items: center;
+  align-content: start;
+  gap: 0.6rem;
+  padding: 4.5rem 1rem 1rem;
+  overflow-y: auto;
+  background: linear-gradient(#e8f0ff, #ffe9f3);
+}
+
+.tic-tac-toe__title {
+  margin: 0;
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
+}
+
+.tic-tac-toe__message {
+  min-height: 2.2rem;
+  margin: 0;
+  font-size: clamp(1.2rem, 4vw, 1.7rem);
+  text-align: center;
+}
+
+.tic-tac-toe__board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  width: min(100%, 22rem);
+}
+
+.tic-tac-toe-square {
+  aspect-ratio: 1;
+  font: inherit;
+  font-size: clamp(2.5rem, 12vw, 4.5rem);
+  line-height: 1;
+  color: var(--ink);
+  background: #fff;
+  border: 0;
+  border-radius: 1rem;
+  box-shadow: 0 0.2rem 0.5rem #0002;
+  cursor: pointer;
+}
+
+.tic-tac-toe-square:disabled {
+  cursor: default;
+}
+
+.tic-tac-toe-square--X {
+  color: #2f7de1;
+}
+
+.tic-tac-toe-square--O {
+  color: #ff8a1f;
+}
+
+.tic-tac-toe-square--line {
+  background: #fff3b8;
+}
+
+/* The dinosaur pops up beside the board and bobs, which stays still when motion is reduced. */
+.tic-tac-toe__winner {
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  width: clamp(7rem, 30vw, 11rem);
+  animation: tic-tac-toe-pop 0.5s ease-out;
+}
+
+.tic-tac-toe__winner .dino {
+  width: 100%;
+}
+
+.tic-tac-toe__shout {
+  margin: 0;
+  padding: 0.1em 0.7em;
+  font-size: clamp(1.3rem, 5vw, 2rem);
+  background: #fff;
+  border-radius: 999px;
+  box-shadow: 0 0.15rem 0.4rem #0002;
+}
+
+@keyframes tic-tac-toe-pop {
+  from {
+    transform: translateY(60%) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tic-tac-toe__winner {
+    animation: none;
+  }
+}

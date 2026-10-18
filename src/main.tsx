@@ -12,6 +12,7 @@ const bestScores = {
   'little-chef': new LocalStorageBestScoreStore('little-chef:best-score'),
   'match-up': new LocalStorageBestScoreStore('match-up:best-score'),
   'cookie-maze': new LocalStorageBestScoreStore('cookie-maze:best-score'),
+  'tic-tac-toe': new LocalStorageBestScoreStore('tic-tac-toe:best-score'),
 }
 
 createRoot(document.getElementById('root')!).render(

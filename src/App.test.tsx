@@ -10,6 +10,7 @@ const bestScores = () => ({
   'little-chef': new InMemoryBestScoreStore(),
   'match-up': new InMemoryBestScoreStore(),
   'cookie-maze': new InMemoryBestScoreStore(),
+  'tic-tac-toe': new InMemoryBestScoreStore(),
 })
 
 const silentSound = { unlock: () => {}, play: () => {} }
@@ -70,6 +71,12 @@ describe('App', () => {
     renderApp('/cookie-maze')
 
     expect(screen.getByRole('status')).toHaveTextContent('🍪 left:')
+  })
+
+  it('opens Tic Tac Toe straight away from its own address', () => {
+    renderApp('/tic-tac-toe')
+
+    expect(screen.getByRole('group', { name: 'Board' })).toBeInTheDocument()
   })
 
   it('opens the other game from its address, under a base path', () => {
