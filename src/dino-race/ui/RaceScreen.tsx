@@ -73,15 +73,17 @@ export function RaceScreen({ random, bestScores, sound, createQuiz, onExit }: Ra
   const choose = useCallback(
     (optionIndex: number) => {
       const explanation = session.snapshot().question?.explanation ?? ''
-      const right = session.answer(optionIndex).find((event) => event.type === 'answeredCorrectly')
+      const events = session.answer(optionIndex)
+      const right = events.find((event) => event.type === 'answeredCorrectly')
       if (right) {
         clearTimeout(praiseTimer.current)
         setPraise(right.firstTry ? `Brilliant! +${QUIZ_BONUS_COOKIES} 🍪  ${explanation}` : `You got it! ${explanation}`)
         praiseTimer.current = window.setTimeout(() => setPraise(null), PRAISE_MILLISECONDS)
       }
+      react(events)
       refresh()
     },
-    [session, refresh],
+    [session, react, refresh],
   )
 
   useAnimationFrame((elapsed) => {

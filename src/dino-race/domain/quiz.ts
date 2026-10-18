@@ -7,10 +7,8 @@ export interface MathQuestion {
   readonly explanation: string
 }
 
-/** Decides when the race stops for a question, and what it asks. */
+/** Decides what the brain break at the start of the race asks. */
 export interface Quiz {
-  /** Seconds of racing until the next question is due. */
-  nextDelay(): number
   /** `questionNumber` starts at 1 and gets harder as it grows. */
   ask(questionNumber: number): MathQuestion
 }

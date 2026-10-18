@@ -3,6 +3,7 @@ import type { CourseItem } from './course'
 import { FINISH_DISTANCE } from './course'
 import type { MathQuestion, Quiz } from './quiz'
 import {
+  BRAIN_BREAK_QUESTIONS,
   COUNTDOWN_SECONDS,
   INVULNERABLE_SECONDS,
   MAX_LIVES,
@@ -276,38 +277,35 @@ describe('pausing', () => {
 
 describe('brain breaks', () => {
   const question: MathQuestion = { prompt: '2x + 6x =', options: ['8x', '8', '8y'], correctIndex: 0, explanation: 'Same things go together' }
-  const quizEvery = (seconds: number): Quiz => ({ nextDelay: () => seconds, ask: () => question })
+  const quiz: Quiz = { ask: () => question }
 
-  function racingWithQuiz(quiz: Quiz, course: CourseItem[] = []): RaceGame {
+  function startedWithQuiz(course: CourseItem[] = []): RaceGame {
     const game = new RaceGame(course, quiz)
     game.tick(COUNTDOWN_SECONDS + FRAME)
     return game
   }
 
-  const driveUntilAsked = (game: RaceGame) => driveUntil(game, () => game.snapshot().phase !== 'racing')
+  function answerAllRight(game: RaceGame): void {
+    for (let i = 0; i < BRAIN_BREAK_QUESTIONS; i++) game.answer(0)
+  }
 
   it('never asks anything without a quiz', () => {
     const game = racing()
 
-    driveUntilAsked(game)
+    driveUntil(game, () => game.snapshot().phase !== 'racing')
 
     expect(game.snapshot().phase).toBe('finished')
     expect(game.snapshot().question).toBeNull()
   })
 
-  it('stops the race to ask a question once it is due', () => {
-    const game = racingWithQuiz(quizEvery(5))
+  it('asks the first question as soon as the countdown ends, before the car has moved', () => {
+    const game = startedWithQuiz()
 
-    driveUntilAsked(game)
-
-    expect(game.snapshot().phase).toBe('asking')
-    expect(game.snapshot().question).toEqual(question)
-    expect(game.snapshot().distance).toBeGreaterThan(100)
+    expect(game.snapshot()).toMatchObject({ phase: 'asking', question, distance: 0 })
   })
 
   it('freezes the car, the steering and the pause button while a question is up', () => {
-    const game = racingWithQuiz(quizEvery(5))
-    driveUntilAsked(game)
+    const game = startedWithQuiz()
     const frozen = game.snapshot()
 
     game.tick(2)
@@ -318,54 +316,39 @@ describe('brain breaks', () => {
     expect(game.snapshot()).toEqual(frozen)
   })
 
-  it('waits for a clear road, so a question never lands on top of an obstacle', () => {
-    const game = racingWithQuiz(quizEvery(5), [cone(1, 260, 70)])
-    game.placeCar(30)
+  it('numbers the questions from one, so they can get harder', () => {
+    const ask = vi.fn((_questionNumber: number) => question)
+    const game = new RaceGame([], { ask })
+    game.tick(COUNTDOWN_SECONDS + FRAME)
 
-    driveUntilAsked(game)
+    answerAllRight(game)
 
-    expect(game.snapshot().distance).toBeGreaterThan(260)
-    expect(game.snapshot().lives).toBe(MAX_LIVES)
+    expect(ask.mock.calls.map(([number]) => number)).toEqual(Array.from({ length: BRAIN_BREAK_QUESTIONS }, (_, i) => i + 1))
   })
 
-  it('keeps well away from the finish line', () => {
-    const game = racingWithQuiz(quizEvery(33.5))
+  it('asks a handful of questions, then the race starts and is never interrupted again', () => {
+    const game = startedWithQuiz()
 
-    driveUntilAsked(game)
+    answerAllRight(game)
+    expect(game.snapshot().phase).toBe('racing')
+    driveUntil(game, () => game.snapshot().phase !== 'racing')
 
     expect(game.snapshot().phase).toBe('finished')
     expect(game.snapshot().question).toBeNull()
   })
 
-  it('numbers the questions from one, so they can get harder', () => {
-    const ask = vi.fn((_questionNumber: number) => question)
-    const game = racingWithQuiz({ nextDelay: () => 3, ask })
-
-    driveUntilAsked(game)
-    game.answer(0)
-    driveUntilAsked(game)
-
-    expect(ask.mock.calls.map(([number]) => number)).toEqual([1, 2])
-  })
-
   describe('answering', () => {
-    function asked(): RaceGame {
-      const game = racingWithQuiz(quizEvery(5))
-      driveUntilAsked(game)
-      return game
-    }
-
-    it('rewards a right answer first time with bonus cookies, and the race carries on', () => {
-      const game = asked()
+    it('rewards a right answer first time with bonus cookies, and the next question comes up', () => {
+      const game = startedWithQuiz()
 
       const events = game.answer(0)
 
       expect(events).toEqual([{ type: 'answeredCorrectly', firstTry: true }])
-      expect(game.snapshot()).toMatchObject({ phase: 'racing', question: null, cookies: QUIZ_BONUS_COOKIES })
+      expect(game.snapshot()).toMatchObject({ phase: 'asking', question, cookies: QUIZ_BONUS_COOKIES, wrongPicks: [] })
     })
 
     it('is gentle with a wrong answer: no penalty, the question stays, and that pick is remembered', () => {
-      const game = asked()
+      const game = startedWithQuiz()
 
       const events = game.answer(1)
 
@@ -374,31 +357,30 @@ describe('brain breaks', () => {
     })
 
     it('still moves on once the right answer is found, but with no bonus after a slip', () => {
-      const game = asked()
+      const game = startedWithQuiz()
       game.answer(1)
       game.answer(2)
 
       const events = game.answer(0)
 
       expect(events).toEqual([{ type: 'answeredCorrectly', firstTry: false }])
-      expect(game.snapshot()).toMatchObject({ phase: 'racing', cookies: 0 })
+      expect(game.snapshot()).toMatchObject({ cookies: 0, wrongPicks: [] })
     })
 
-    it('asks again after another wait', () => {
-      const game = asked()
-      game.answer(0)
-      expect(game.snapshot().phase).toBe('racing')
+    it('races, with the start event, once the last question is answered right', () => {
+      const game = startedWithQuiz()
+      for (let i = 1; i < BRAIN_BREAK_QUESTIONS; i++) game.answer(0)
 
-      driveUntilAsked(game)
+      expect(game.answer(0)).toEqual([{ type: 'answeredCorrectly', firstTry: true }, { type: 'started' }])
 
-      expect(game.snapshot().phase).toBe('asking')
+      expect(game.snapshot()).toMatchObject({ phase: 'racing', question: null, cookies: QUIZ_BONUS_COOKIES * BRAIN_BREAK_QUESTIONS })
     })
 
     it('ignores an answer when nothing has been asked, or one that is not an option', () => {
       const racingGame = racing()
       expect(racingGame.answer(0)).toEqual([])
 
-      const game = asked()
+      const game = startedWithQuiz()
       expect(game.answer(7)).toEqual([])
       expect(game.snapshot().phase).toBe('asking')
     })

@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
 import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import type { MathQuestion, Quiz } from '../domain/quiz'
-import { QUIZ_BONUS_COOKIES } from '../domain/raceGame'
+import { BRAIN_BREAK_QUESTIONS, QUIZ_BONUS_COOKIES } from '../domain/raceGame'
 import { RaceScreen } from './RaceScreen'
 
 /**
@@ -20,7 +20,7 @@ const question: MathQuestion = {
   correctIndex: 0,
   explanation: 'Same things go together: 2x + 6x = 8x',
 }
-const brainBreakAfterTwoSeconds = (): Quiz => ({ nextDelay: () => 2, ask: () => question })
+const brainBreak = (): Quiz => ({ ask: () => question })
 
 function renderRace(random = cookiesDownTheMiddle, bestScore = 0, createQuiz?: () => Quiz) {
   const bestScores = new InMemoryBestScoreStore(bestScore)
@@ -205,8 +205,8 @@ describe('brain breaks', () => {
   const questionDialog = () => screen.getByRole('dialog', { name: 'Maths question' })
 
   function askedQuestion() {
-    const race = renderRace(cookiesDownTheMiddle, 0, brainBreakAfterTwoSeconds)
-    driveFor(3.3 + 2.5)
+    const race = renderRace(cookiesDownTheMiddle, 0, brainBreak)
+    driveFor(3.3)
     return race
   }
 
@@ -250,7 +250,6 @@ describe('brain breaks', () => {
 
     fireEvent.click(within(questionDialog()).getByRole('button', { name: '8x' }))
 
-    expect(screen.queryByRole('dialog', { name: 'Maths question' })).not.toBeInTheDocument()
     expect(score()).toBe(before + QUIZ_BONUS_COOKIES)
     expect(screen.getByText(/Same things go together: 2x \+ 6x = 8x/)).toBeInTheDocument()
   })
@@ -273,7 +272,7 @@ describe('brain breaks', () => {
 
     fireEvent.click(within(questionDialog()).getByRole('button', { name: '8x' }))
 
-    expect(screen.queryByRole('dialog', { name: 'Maths question' })).not.toBeInTheDocument()
+    expect(within(questionDialog()).getByRole('button', { name: '8y' })).toBeEnabled()
     expect(score()).toBe(before)
   })
 
@@ -283,19 +282,19 @@ describe('brain breaks', () => {
 
     press('1')
 
-    expect(screen.queryByRole('dialog', { name: 'Maths question' })).not.toBeInTheDocument()
     expect(score()).toBe(before + QUIZ_BONUS_COOKIES)
   })
 
-  it('races on afterwards, and asks again later', () => {
+  it('asks a few questions up front, then races on without stopping again', () => {
     askedQuestion()
-    press('1')
+    for (let i = 0; i < BRAIN_BREAK_QUESTIONS; i++) press('1')
+    expect(screen.queryByRole('dialog', { name: 'Maths question' })).not.toBeInTheDocument()
     const before = screen.getByRole('progressbar').getAttribute('aria-valuenow')
 
     driveFor(1)
     expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).not.toBe(before)
-    driveFor(4)
+    driveFor(10)
 
-    expect(questionDialog()).toBeInTheDocument()
+    expect(screen.queryByRole('dialog', { name: 'Maths question' })).not.toBeInTheDocument()
   })
 })

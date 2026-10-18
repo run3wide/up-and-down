@@ -6,8 +6,6 @@ const FRUIT = ['🍍', '🍌', '🍇', '🍓', '🍎']
 const LETTERS = ['x', 'y', 'p', 'z']
 const FIRST_LETTER_QUESTION = 3
 const FIRST_MIXED_QUESTION = 5
-const SHORTEST_WAIT_SECONDS = 4
-const LONGEST_WAIT_SECONDS = 6
 
 interface Term {
   readonly count: number
@@ -25,7 +23,6 @@ export function buildQuestion(random: Random, questionNumber: number): MathQuest
 
 export function mathQuiz(random: Random): Quiz {
   return {
-    nextDelay: () => SHORTEST_WAIT_SECONDS + random() * (LONGEST_WAIT_SECONDS - SHORTEST_WAIT_SECONDS),
     ask: (questionNumber) => buildQuestion(random, questionNumber),
   }
 }

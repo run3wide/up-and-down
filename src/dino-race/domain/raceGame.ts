@@ -8,6 +8,8 @@ export const MAX_SPEED = 70
 export const STEER_UNITS_PER_SECOND = 60
 export const INVULNERABLE_SECONDS = 1.5
 export const QUIZ_BONUS_COOKIES = 3
+/** Asked in one go before the race, so the driving itself is never interrupted. */
+export const BRAIN_BREAK_QUESTIONS = 5
 
 const ACCELERATION = 1.2
 const CAR_MIN_X = 27
@@ -17,10 +19,6 @@ const ITEM_HALF_WIDTH = 3
 const CONTACT_DEPTH = 5
 const VISIBLE_BEHIND = 15
 const VISIBLE_AHEAD = 100
-/** A question waits until the road is clear this far ahead, and never comes this close to the finish. */
-const CLEAR_ROAD_AHEAD = 90
-const CLEAR_ROAD_BEHIND = 8
-const NO_QUESTIONS_BEFORE_FINISH = 120
 
 export type Phase = 'countdown' | 'racing' | 'asking' | 'finished' | 'over'
 export type SteerDirection = 'left' | 'right'
@@ -72,7 +70,6 @@ export class RaceGame {
   private cookies = 0
   private invulnerableLeft = 0
   private readonly quiz: Quiz | null
-  private secondsUntilQuestion: number
   private questionsAsked = 0
   private question: MathQuestion | null = null
   private wrongPicks: number[] = []
@@ -80,7 +77,6 @@ export class RaceGame {
   constructor(course: readonly CourseItem[], quiz: Quiz | null = null) {
     this.course = course
     this.quiz = quiz
-    this.secondsUntilQuestion = quiz ? quiz.nextDelay() : Infinity
   }
 
   snapshot(): RaceSnapshot {
@@ -137,10 +133,7 @@ export class RaceGame {
   private answerRight(): RaceEvent[] {
     const firstTry = this.wrongPicks.length === 0
     if (firstTry) this.cookies += QUIZ_BONUS_COOKIES
-    this.question = null
-    this.phase = 'racing'
-    this.secondsUntilQuestion = this.quiz?.nextDelay() ?? Infinity
-    return [{ type: 'answeredCorrectly', firstTry }]
+    return [{ type: 'answeredCorrectly', firstTry }, ...this.askNextQuestionOrRace()]
   }
 
   private isActive(): boolean {
@@ -150,6 +143,19 @@ export class RaceGame {
   private runCountdown(dt: number): RaceEvent[] {
     this.countdownLeft -= dt
     if (this.countdownLeft > 0) return []
+    return this.askNextQuestionOrRace()
+  }
+
+  /** The race only starts, with its roar, once the brain break is over. */
+  private askNextQuestionOrRace(): RaceEvent[] {
+    if (this.quiz && this.questionsAsked < BRAIN_BREAK_QUESTIONS) {
+      this.questionsAsked += 1
+      this.question = this.quiz.ask(this.questionsAsked)
+      this.wrongPicks = []
+      this.phase = 'asking'
+      return []
+    }
+    this.question = null
     this.phase = 'racing'
     return [{ type: 'started' }]
   }
@@ -166,28 +172,7 @@ export class RaceGame {
       events.push({ type: 'finished' })
       return events
     }
-    this.askQuestionWhenDue(dt)
     return events
-  }
-
-  private askQuestionWhenDue(dt: number): void {
-    if (!this.quiz) return
-    this.secondsUntilQuestion -= dt
-    if (this.secondsUntilQuestion > 0 || !this.isGoodMomentToAsk()) return
-    this.questionsAsked += 1
-    this.question = this.quiz.ask(this.questionsAsked)
-    this.wrongPicks = []
-    this.phase = 'asking'
-  }
-
-  private isGoodMomentToAsk(): boolean {
-    if (this.distance > FINISH_DISTANCE - NO_QUESTIONS_BEFORE_FINISH) return false
-    return !this.course.some((item) => item.kind !== 'cookie' && !this.used.has(item.id) && this.isNearby(item))
-  }
-
-  private isNearby(item: CourseItem): boolean {
-    const ahead = item.at - this.distance
-    return ahead >= -CLEAR_ROAD_BEHIND && ahead <= CLEAR_ROAD_AHEAD
   }
 
   private touchItems(): RaceEvent[] {

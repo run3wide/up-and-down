@@ -148,15 +148,6 @@ describe('later questions mix two kinds of thing', () => {
 })
 
 describe('mathQuiz', () => {
-  it('asks again every 4 to 6 seconds', () => {
-    for (let seed = 1; seed <= 40; seed++) {
-      const delay = mathQuiz(seeded(seed)).nextDelay()
-
-      expect(delay).toBeGreaterThanOrEqual(4)
-      expect(delay).toBeLessThanOrEqual(6)
-    }
-  })
-
   it('asks the question it is asked for', () => {
     const quiz = mathQuiz(seeded(4))
 
