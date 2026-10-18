@@ -64,3 +64,12 @@
     opacity: 0;
   }
 }
+
+.big-button--quiet {
+  min-height: 3rem;
+  font-size: 1.3rem;
+  color: var(--ink);
+  background: #fff;
+  border-color: var(--ink);
+  box-shadow: 0 0.1em 0 var(--ink);
+}

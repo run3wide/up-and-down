@@ -70,6 +70,15 @@ describe('GameScreen', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
+  it('can go back to the games menu from the pause dialog', () => {
+    const { onExit } = renderGame()
+
+    keyDown('Escape')
+    fireEvent.click(within(screen.getByRole('dialog', { name: 'Paused' })).getByRole('button', { name: 'Main menu' }))
+
+    expect(onExit).toHaveBeenCalledOnce()
+  })
+
   it('pauses and resumes with the space bar', () => {
     renderGame()
 

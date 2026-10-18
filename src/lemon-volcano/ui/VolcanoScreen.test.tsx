@@ -82,6 +82,15 @@ describe('VolcanoScreen', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
+  it('can go back to the games menu from the pause dialog', () => {
+    const { onExit } = renderGame()
+
+    press('Escape')
+    fireEvent.click(within(screen.getByRole('dialog', { name: 'Paused' })).getByRole('button', { name: 'Main menu' }))
+
+    expect(onExit).toHaveBeenCalledOnce()
+  })
+
   it('does not toss while paused', () => {
     renderGame()
     press('Escape')

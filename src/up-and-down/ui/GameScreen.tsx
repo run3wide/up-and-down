@@ -91,7 +91,7 @@ export function GameScreen({ random, bestScores, onExit }: GameScreenProps) {
       </div>
       <Hud score={snapshot.score} lives={snapshot.lives} onPause={togglePause} />
       <TouchControls hold={(d) => session.hold(d)} release={(d) => session.release(d)} />
-      {snapshot.phase === 'paused' && <PausedOverlay onResume={togglePause} />}
+      {snapshot.phase === 'paused' && <PausedOverlay onResume={togglePause} onMainMenu={onExit} />}
       {snapshot.phase === 'over' && result && (
         <GameOverOverlay score={snapshot.score} result={result} onBackToGames={onExit} />
       )}

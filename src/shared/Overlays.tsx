@@ -13,11 +13,14 @@ function Overlay({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
-export function PausedOverlay({ onResume }: { onResume: () => void }) {
+export function PausedOverlay({ onResume, onMainMenu }: { onResume: () => void; onMainMenu: () => void }) {
   return (
     <Overlay title="Paused">
       <button className="big-button" autoFocus onClick={onResume}>
         Resume
+      </button>
+      <button className="big-button big-button--quiet" onClick={onMainMenu}>
+        Main menu
       </button>
     </Overlay>
   )

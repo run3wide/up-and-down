@@ -103,7 +103,7 @@ export function VolcanoScreen({ random, bestScores, onExit }: VolcanoScreenProps
         release={(direction) => session.release(direction)}
         toss={toss}
       />
-      {snapshot.paused && <PausedOverlay onResume={togglePause} />}
+      {snapshot.paused && <PausedOverlay onResume={togglePause} onMainMenu={onExit} />}
       {snapshot.phase === 'over' && result && (
         <GameOverOverlay score={snapshot.score} result={result} onBackToGames={onExit} />
       )}
