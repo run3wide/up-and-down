@@ -158,6 +158,10 @@
   background: linear-gradient(#ffffff, #f0dcc0);
 }
 
+.game-card--colouring {
+  background: linear-gradient(#ffffff, #ffd9e6);
+}
+
 .game-card--lemon-volcano {
   background: linear-gradient(#ffffff, #fff3b8);
 }
@@ -202,6 +206,10 @@
 
 .game-card__title--dino-dig {
   color: #b5651d;
+}
+
+.game-card__title--colouring {
+  color: #d6336c;
 }
 
 .game-card__title--match {

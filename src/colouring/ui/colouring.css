@@ -1,0 +1,118 @@
+.colouring {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem 1.25rem;
+  overflow-y: auto;
+  background: linear-gradient(#fff3d6, #ffd9e6);
+}
+
+.colouring__bar {
+  display: flex;
+  gap: 0.5rem;
+  width: min(100%, 36rem);
+}
+
+.colouring__tool {
+  min-height: 3rem;
+  padding: 0.2em 1.1em;
+  font-size: 1.15rem;
+  color: var(--ink);
+  background: #fff;
+  border: 0.12rem solid var(--ink);
+  border-radius: 999px;
+  box-shadow: 0 0.1rem 0 var(--ink);
+  cursor: pointer;
+}
+
+.colouring__title {
+  margin: 0;
+  font-size: clamp(1.5rem, 6vw, 2.2rem);
+  text-align: center;
+}
+
+.colouring__message {
+  min-height: 1.8rem;
+  margin: 0;
+  font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+  text-align: center;
+}
+
+.colouring__art {
+  flex: none;
+  width: min(100%, 36rem, 62vh);
+  aspect-ratio: 1;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 0.3rem 0.8rem #0003;
+  touch-action: manipulation;
+}
+
+.colouring__part {
+  stroke: var(--ink);
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+}
+
+.colouring__art [role='button'] {
+  cursor: pointer;
+}
+
+.colouring__line {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 0.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.colouring__palette {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+  width: min(100%, 36rem);
+}
+
+.colouring__swatch {
+  min-height: 3.25rem;
+  border: 0.15rem solid var(--ink);
+  border-radius: 50%;
+  box-shadow: 0 0.1rem 0 var(--ink);
+  cursor: pointer;
+}
+
+.colouring__swatch[aria-pressed='true'] {
+  outline: 0.3rem solid var(--ink);
+  outline-offset: 0.15rem;
+  transform: scale(1.08);
+}
+
+.colouring__shelf {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.8rem;
+  width: min(100%, 40rem);
+}
+
+.colouring__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+  color: var(--ink);
+  background: #fff;
+  border: 0.12rem solid var(--ink);
+  border-radius: 1rem;
+  box-shadow: 0 0.2rem 0 var(--ink);
+  cursor: pointer;
+}
+
+.colouring__card .colouring__art {
+  width: 100%;
+  box-shadow: none;
+}
