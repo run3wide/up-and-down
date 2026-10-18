@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest'
 import { App } from './App'
+import { InMemoryGalleryStore } from './colouring/infrastructure/InMemoryGalleryStore'
 import { InMemoryCollectionStore } from './dino-dig/infrastructure/InMemoryCollectionStore'
 import { InMemoryBestScoreStore } from './shared/InMemoryBestScoreStore'
 import type { SoundPlayer } from './shared/sound/SoundPlayer'
@@ -31,6 +32,7 @@ const GAMES: Record<GameId, Usability> = {
   'tic-tac-toe': { card: /^Play Tic Tac Toe/, onScreen: () => screen.getByRole('group', { name: 'Board' }), stylesheet: 'tic-tac-toe/ui/ticTacToe.css', layout: 'scrolls' },
   'spelling-bee': { card: /^Play Spelling Bee/, onScreen: () => screen.getByRole('group', { name: 'Alphabet' }), stylesheet: 'spelling-bee/ui/spelling.css', layout: 'scrolls' },
   'dino-dig': { card: /^Play Dino Dig/, onScreen: () => screen.getByRole('group', { name: 'Dig site' }), stylesheet: 'dino-dig/ui/dig.css', layout: 'scrolls' },
+  colouring: { card: /^Play Colouring/, onScreen: () => screen.getByRole('group', { name: 'Pictures' }), stylesheet: 'colouring/ui/colouring.css', layout: 'scrolls' },
 }
 
 const bestScores = () => Object.fromEntries(Object.keys(GAMES).map((game) => [game, new InMemoryBestScoreStore()])) as Record<GameId, InMemoryBestScoreStore>
@@ -42,7 +44,7 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame', 'performance', 'setTimeout', 'clearTimeout'] })
   window.history.replaceState(null, '', '/')
   sound = { unlock: vi.fn<SoundPlayer['unlock']>(), play: vi.fn<SoundPlayer['play']>() }
-  render(<App random={() => 0.5} bestScores={bestScores()} sound={sound} dinoDigCollection={new InMemoryCollectionStore()} basePath="/" />)
+  render(<App random={() => 0.5} bestScores={bestScores()} sound={sound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} basePath="/" />)
 })
 
 afterEach(() => {

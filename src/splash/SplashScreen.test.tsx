@@ -13,6 +13,7 @@ const cookieMaze = { name: 'Play Cookie Maze, by Daniel' }
 const ticTacToe = { name: 'Play Tic Tac Toe, by Daniel' }
 const spellingBee = { name: 'Play Spelling Bee, by Daniel' }
 const dinoDig = { name: 'Play Dino Dig, by Moses' }
+const colouring = { name: 'Play Colouring, by Moses' }
 
 describe('SplashScreen', () => {
   it('offers every game with their authors', () => {
@@ -28,6 +29,7 @@ describe('SplashScreen', () => {
     expect(screen.getByRole('button', ticTacToe)).toHaveTextContent('Daniel')
     expect(screen.getByRole('button', spellingBee)).toHaveTextContent('Daniel')
     expect(screen.getByRole('button', dinoDig)).toHaveTextContent('Moses')
+    expect(screen.getByRole('button', colouring)).toHaveTextContent('Moses')
   })
 
   it('focuses the first game so keyboard players can begin straight away', () => {
@@ -46,6 +48,7 @@ describe('SplashScreen', () => {
     ['Tic Tac Toe', ticTacToe, 'tic-tac-toe'],
     ['Spelling Bee', spellingBee, 'spelling-bee'],
     ['Dino Dig', dinoDig, 'dino-dig'],
+    ['Colouring', colouring, 'colouring'],
   ])('starts %s when its card is chosen', async (_title, button, gameId) => {
     const onPick = vi.fn()
     render(<SplashScreen onPick={onPick} />)

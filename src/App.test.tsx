@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from './App'
 import { InMemoryCollectionStore } from './dino-dig/infrastructure/InMemoryCollectionStore'
+import { InMemoryGalleryStore } from './colouring/infrastructure/InMemoryGalleryStore'
 import { InMemoryBestScoreStore } from './shared/InMemoryBestScoreStore'
 
 const bestScores = () => ({
@@ -20,7 +21,7 @@ const silentSound = { unlock: () => {}, play: () => {} }
 
 function renderApp(path = '/', basePath = '/') {
   window.history.replaceState(null, '', path)
-  render(<App random={() => 0.5} bestScores={bestScores()} sound={silentSound} dinoDigCollection={new InMemoryCollectionStore()} basePath={basePath} />)
+  render(<App random={() => 0.5} bestScores={bestScores()} sound={silentSound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} basePath={basePath} />)
 }
 
 function keyDown(key: string) {
@@ -86,6 +87,12 @@ describe('App', () => {
     renderApp('/dino-dig')
 
     expect(screen.getByRole('heading', { name: /^Dig for a/ })).toBeInTheDocument()
+  })
+
+  it('opens Colouring straight away from its own address', () => {
+    renderApp('/colouring')
+
+    expect(screen.getByRole('group', { name: 'Pictures' })).toBeInTheDocument()
   })
 
   it('opens Spelling Bee straight away from its own address', () => {

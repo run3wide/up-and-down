@@ -8,6 +8,8 @@ import { KitchenScreen } from './little-chef/ui/KitchenScreen'
 import { MatchScreen } from './match-up/ui/MatchScreen'
 import type { CollectionStore } from './dino-dig/application/CollectionStore'
 import { DigScreen } from './dino-dig/ui/DigScreen'
+import type { GalleryStore } from './colouring/application/GalleryStore'
+import { ColouringScreen } from './colouring/ui/ColouringScreen'
 import { SpellingScreen } from './spelling-bee/ui/SpellingScreen'
 import { TicTacToeScreen } from './tic-tac-toe/ui/TicTacToeScreen'
 import { useRoute } from './routing/useRoute'
@@ -20,14 +22,16 @@ type Random = () => number
 
 interface AppProps {
   random: Random
-  bestScores: Record<GameId, BestScoreStore>
+  /** Colouring is not scored, so it has no best score. */
+  bestScores: Record<Exclude<GameId, 'colouring'>, BestScoreStore>
   sound: SoundPlayer
   dinoDigCollection: CollectionStore
+  colouringGallery: GalleryStore
   /** Where the app is served from, so each game has its own address under it. */
   basePath: string
 }
 
-export function App({ random, bestScores, sound, dinoDigCollection, basePath }: AppProps) {
+export function App({ random, bestScores, sound, dinoDigCollection, colouringGallery, basePath }: AppProps) {
   const [playing, navigate] = useRoute(basePath)
   const backToGames = () => navigate(null)
   const openGame = (game: GameId) => {
@@ -54,6 +58,8 @@ export function App({ random, bestScores, sound, dinoDigCollection, basePath }: 
       return <SpellingScreen random={random} bestScores={bestScores['spelling-bee']} sound={sound} onExit={backToGames} />
     case 'dino-dig':
       return <DigScreen random={random} bestScores={bestScores['dino-dig']} collection={dinoDigCollection} sound={sound} onExit={backToGames} />
+    case 'colouring':
+      return <ColouringScreen gallery={colouringGallery} onExit={backToGames} />
     case null:
       return <SplashScreen onPick={openGame} />
   }
