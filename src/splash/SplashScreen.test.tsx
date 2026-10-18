@@ -12,7 +12,7 @@ const matchUp = { name: 'Play Match Up, by Daniel' }
 const cookieMaze = { name: 'Play Cookie Maze, by Daniel' }
 const ticTacToe = { name: 'Play Tic Tac Toe, by Daniel' }
 const spellingBee = { name: 'Play Spelling Bee, by Daniel' }
-const dinoDig = { name: 'Play Dino Dig, by Daniel' }
+const dinoDig = { name: 'Play Dino Dig, by Moses' }
 
 describe('SplashScreen', () => {
   it('offers every game with their authors', () => {
@@ -27,7 +27,7 @@ describe('SplashScreen', () => {
     expect(screen.getByRole('button', cookieMaze)).toHaveTextContent('Daniel')
     expect(screen.getByRole('button', ticTacToe)).toHaveTextContent('Daniel')
     expect(screen.getByRole('button', spellingBee)).toHaveTextContent('Daniel')
-    expect(screen.getByRole('button', dinoDig)).toHaveTextContent('Daniel')
+    expect(screen.getByRole('button', dinoDig)).toHaveTextContent('Moses')
   })
 
   it('focuses the first game so keyboard players can begin straight away', () => {

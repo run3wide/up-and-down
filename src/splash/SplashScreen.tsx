@@ -55,10 +55,10 @@ export function SplashScreen({ onPick }: { onPick: (game: GameId) => void }) {
             <span className="game-card__title game-card__title--spelling-bee" aria-hidden="true">Spelling Bee</span>
             <span className="game-card__byline">by Daniel</span>
           </button>
-          <button className="game-card game-card--dino-dig" aria-label="Play Dino Dig, by Daniel" onClick={() => onPick('dino-dig')}>
+          <button className="game-card game-card--dino-dig" aria-label="Play Dino Dig, by Moses" onClick={() => onPick('dino-dig')}>
             <span className="match-icon" aria-hidden="true">🦴🦖</span>
             <span className="game-card__title game-card__title--dino-dig" aria-hidden="true">Dino Dig</span>
-            <span className="game-card__byline">by Daniel</span>
+            <span className="game-card__byline">by Moses</span>
           </button>
         </div>
       </div>
