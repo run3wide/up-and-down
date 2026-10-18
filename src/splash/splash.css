@@ -135,6 +135,14 @@
   background: linear-gradient(#ffffff, #ffe2b8);
 }
 
+.game-card--match-up {
+  background: linear-gradient(#ffffff, #d8f5d0);
+}
+
+.game-card--cookie-maze {
+  background: linear-gradient(#ffffff, #f4e3b8);
+}
+
 .game-card--lemon-volcano {
   background: linear-gradient(#ffffff, #fff3b8);
 }
@@ -163,6 +171,21 @@
 
 .game-card__title--chef {
   color: #ff8a1f;
+}
+
+.game-card__title--maze {
+  color: #a8692e;
+}
+
+.game-card__title--match {
+  color: #6c5ce7;
+}
+
+.maze-icon,
+.match-icon {
+  font-size: clamp(2.5rem, 7vw, 4rem);
+  line-height: 1;
+  animation: bob 3s ease-in-out infinite;
 }
 
 .chef-icon {

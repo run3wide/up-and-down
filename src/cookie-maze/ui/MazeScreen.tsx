@@ -1,0 +1,96 @@
+import { useCallback, useState } from 'react'
+import { recordFinalScore, type BestScoreResult, type BestScoreStore } from '../../shared/bestScore'
+import { GameOverOverlay, PausedOverlay } from '../../shared/Overlays'
+import { useAnimationFrame } from '../../shared/useAnimationFrame'
+import { MazeSession } from '../application/MazeSession'
+import type { Direction, Maze } from '../domain/maze'
+import { MazeGame, type MazeEvent } from '../domain/mazeGame'
+import { MazeBoard } from './MazeBoard'
+import { useMazeControls } from './useMazeControls'
+import '../../shared/hud.css'
+import './maze.css'
+
+interface MazeScreenProps {
+  maze: Maze
+  bestScores: BestScoreStore
+  onExit: () => void
+}
+
+const ARROWS: readonly { direction: Direction; label: string; arrow: string }[] = [
+  { direction: 'up', label: 'Go up', arrow: '▲' },
+  { direction: 'left', label: 'Go left', arrow: '◀' },
+  { direction: 'right', label: 'Go right', arrow: '▶' },
+  { direction: 'down', label: 'Go down', arrow: '▼' },
+]
+
+export function MazeScreen({ maze, bestScores, onExit }: MazeScreenProps) {
+  const [session] = useState(() => new MazeSession(new MazeGame(maze)))
+  const [snapshot, setSnapshot] = useState(() => session.snapshot())
+  const [result, setResult] = useState<BestScoreResult | null>(null)
+  const [facing, setFacing] = useState<'left' | 'right'>('right')
+
+  if ((snapshot.heading === 'left' || snapshot.heading === 'right') && snapshot.heading !== facing) setFacing(snapshot.heading)
+
+  const refresh = useCallback(() => setSnapshot(session.snapshot()), [session])
+
+  const react = useCallback(
+    (events: MazeEvent[]) => {
+      if (events.some((event) => event.type === 'won')) setResult(recordFinalScore(bestScores, session.snapshot().score))
+    },
+    [bestScores, session],
+  )
+
+  useAnimationFrame((elapsed) => {
+    react(session.advance(elapsed))
+    refresh()
+  }, snapshot.phase === 'playing' && !snapshot.paused)
+
+  const steer = useCallback(
+    (direction: Direction) => {
+      session.steer(direction)
+      refresh()
+    },
+    [session, refresh],
+  )
+
+  const togglePause = useCallback(() => {
+    session.togglePause()
+    refresh()
+  }, [session, refresh])
+
+  useMazeControls({ steer, togglePause })
+
+  return (
+    <main className="maze">
+      <div className="maze__board-area">
+        <MazeBoard maze={maze} snapshot={snapshot} facing={facing} />
+      </div>
+      <header className="hud">
+        <span />
+        <p className="hud__score" role="status">
+          🍪 left: {snapshot.cookiesLeft}
+        </p>
+        <button className="hud__pause" onClick={togglePause} aria-label="Pause">
+          <span aria-hidden="true">❚❚</span>
+        </button>
+      </header>
+      {snapshot.phase === 'ready' && (
+        <p className="maze__hint">
+          <span className="maze__hint--keys">Press an arrow to go!</span>
+          <span className="maze__hint--touch">Tap an arrow to go!</span>
+        </p>
+      )}
+      <div className="maze__arrows">
+        {ARROWS.map(({ direction, label, arrow }) => (
+          <button key={direction} className={`direction-button maze__arrow maze__arrow--${direction}`} aria-label={label} onClick={() => steer(direction)}>
+            <span aria-hidden="true">{arrow}</span>
+          </button>
+        ))}
+      </div>
+      {snapshot.paused && <PausedOverlay onResume={togglePause} onMainMenu={onExit} />}
+      {snapshot.phase === 'won' && result && (
+        <GameOverOverlay title="Every cookie!" score={snapshot.score} result={result} onBackToGames={onExit} />
+      )}
+    </main>
+  )
+}

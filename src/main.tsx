@@ -10,6 +10,8 @@ const bestScores = {
   'lemon-volcano': new LocalStorageBestScoreStore('lemon-volcano:best-score'),
   'dino-race': new LocalStorageBestScoreStore('dino-race:best-score'),
   'little-chef': new LocalStorageBestScoreStore('little-chef:best-score'),
+  'match-up': new LocalStorageBestScoreStore('match-up:best-score'),
+  'cookie-maze': new LocalStorageBestScoreStore('cookie-maze:best-score'),
 }
 
 createRoot(document.getElementById('root')!).render(

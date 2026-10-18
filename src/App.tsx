@@ -1,8 +1,11 @@
 import type { SoundPlayer } from './lemon-volcano/application/SoundPlayer'
 import { VolcanoScreen } from './lemon-volcano/ui/VolcanoScreen'
+import { COOKIE_MAZE } from './cookie-maze/domain/layout'
+import { MazeScreen } from './cookie-maze/ui/MazeScreen'
 import { mathQuiz } from './dino-race/domain/mathQuestions'
 import { RaceScreen } from './dino-race/ui/RaceScreen'
 import { KitchenScreen } from './little-chef/ui/KitchenScreen'
+import { MatchScreen } from './match-up/ui/MatchScreen'
 import { useRoute } from './routing/useRoute'
 import type { BestScoreStore } from './shared/bestScore'
 import { SplashScreen } from './splash/SplashScreen'
@@ -32,6 +35,10 @@ export function App({ random, bestScores, sound, basePath }: AppProps) {
       return <RaceScreen random={random} bestScores={bestScores['dino-race']} createQuiz={() => mathQuiz(random)} onExit={backToGames} />
     case 'little-chef':
       return <KitchenScreen random={random} bestScores={bestScores['little-chef']} onExit={backToGames} />
+    case 'match-up':
+      return <MatchScreen random={random} bestScores={bestScores['match-up']} onExit={backToGames} />
+    case 'cookie-maze':
+      return <MazeScreen maze={COOKIE_MAZE} bestScores={bestScores['cookie-maze']} onExit={backToGames} />
     case null:
       return <SplashScreen onPick={navigate} />
   }

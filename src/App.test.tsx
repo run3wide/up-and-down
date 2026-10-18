@@ -8,6 +8,8 @@ const bestScores = () => ({
   'lemon-volcano': new InMemoryBestScoreStore(),
   'dino-race': new InMemoryBestScoreStore(),
   'little-chef': new InMemoryBestScoreStore(),
+  'match-up': new InMemoryBestScoreStore(),
+  'cookie-maze': new InMemoryBestScoreStore(),
 })
 
 const silentSound = { unlock: () => {}, play: () => {} }
@@ -56,6 +58,18 @@ describe('App', () => {
     renderApp('/little-chef')
 
     expect(screen.getByRole('group', { name: 'Ingredients' })).toBeInTheDocument()
+  })
+
+  it('opens Match Up straight away from its own address', () => {
+    renderApp('/match-up')
+
+    expect(screen.getByRole('group', { name: 'Cards' })).toBeInTheDocument()
+  })
+
+  it('opens Cookie Maze straight away from its own address', () => {
+    renderApp('/cookie-maze')
+
+    expect(screen.getByRole('status')).toHaveTextContent('🍪 left:')
   })
 
   it('opens the other game from its address, under a base path', () => {

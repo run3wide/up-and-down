@@ -1,0 +1,90 @@
+.match {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  justify-items: center;
+  align-content: start;
+  gap: 0.6rem;
+  padding: 4.5rem 1rem 1rem;
+  overflow-y: auto;
+  background: linear-gradient(#e6f7ff, #d8f5d0);
+}
+
+.match__title {
+  margin: 0;
+  font-size: clamp(1.6rem, 5.5vw, 2.6rem);
+  text-align: center;
+}
+
+.match__message {
+  min-height: 2.8rem;
+  margin: 0;
+  font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+  text-align: center;
+}
+
+.match__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6rem, 7.5rem));
+  justify-content: center;
+  align-content: start;
+  gap: 0.7rem;
+  width: min(100%, 34rem);
+}
+
+.match-card {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 0.1rem;
+  min-height: 6.5rem;
+  padding: 0.4rem;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  background: #fff;
+  border: 0.2rem solid #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 0.25rem 0 #0002;
+}
+
+.match-card--down {
+  font-size: 2.6rem;
+  color: #fff;
+  background: #6c5ce7;
+  cursor: pointer;
+}
+
+.match-card--down:not(:disabled):active {
+  transform: translateY(0.15rem);
+  box-shadow: 0 0.1rem 0 #0002;
+}
+
+.match-card--down:disabled {
+  cursor: default;
+  opacity: 0.8;
+}
+
+.match-card--up {
+  animation: pop-in 0.25s ease-out;
+}
+
+.match-card--matched {
+  background: #c8f5d0;
+  animation: pop-in 0.25s ease-out;
+}
+
+.match-card__face {
+  font-size: 2.6rem;
+  line-height: 1.1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
