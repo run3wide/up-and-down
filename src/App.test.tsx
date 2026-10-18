@@ -8,9 +8,11 @@ const bestScores = () => ({
   'lemon-volcano': new InMemoryBestScoreStore(),
 })
 
+const silentSound = { unlock: () => {}, play: () => {} }
+
 function renderApp(path = '/', basePath = '/') {
   window.history.replaceState(null, '', path)
-  render(<App random={() => 0.5} bestScores={bestScores()} basePath={basePath} />)
+  render(<App random={() => 0.5} bestScores={bestScores()} sound={silentSound} basePath={basePath} />)
 }
 
 function keyDown(key: string) {

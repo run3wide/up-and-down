@@ -101,7 +101,7 @@
 }
 
 .lava-spray circle {
-  animation: spray 0.8s ease-out forwards;
+  animation: spray 1.1s ease-out forwards;
 }
 
 @keyframes rumble {
@@ -125,12 +125,16 @@
 }
 
 @keyframes spray {
-  from {
-    translate: 0 4px;
+  0% {
+    translate: 0 2px;
     opacity: 1;
   }
-  to {
-    translate: 0 -3px;
+  45% {
+    translate: var(--dx) var(--dy);
+    opacity: 1;
+  }
+  100% {
+    translate: calc(var(--dx) * 1.5) 8px;
     opacity: 0;
   }
 }
@@ -151,5 +155,92 @@
   *::after {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+.hud__actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-self: end;
+}
+
+/* Lava thrown at the screen: it splats, sticks for a couple of seconds, then rolls off the bottom leaving a trail. */
+.lava-splats {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.lava-splat {
+  position: absolute;
+  border-radius: 48% 52% 46% 54% / 55% 45% 55% 45%;
+  background: radial-gradient(circle at 35% 30%, #fff1a0, #ffb02e 30%, #ff5a1f 65%, #c92a12);
+  box-shadow: 0 0 1.2rem #ff7a2f99, inset 0 -0.4rem 0.6rem #8f1d0a66;
+  transform-origin: center top;
+  animation: lava-stick-then-roll 5s var(--delay, 0s) cubic-bezier(0.4, 0, 0.9, 0.6) both;
+}
+
+.lava-splat::before {
+  content: '';
+  position: absolute;
+  bottom: 60%;
+  left: 32%;
+  width: 36%;
+  height: 0;
+  border-radius: 999px;
+  background: linear-gradient(#ff5a1f00, #ff6a22);
+  animation: lava-trail 5s var(--delay, 0s) linear both;
+}
+
+@keyframes lava-stick-then-roll {
+  0% {
+    transform: scale(0.1);
+    opacity: 0;
+  }
+  5% {
+    transform: scale(1.3, 1.1);
+    opacity: 1;
+  }
+  10%,
+  40% {
+    transform: scale(1);
+    translate: 0 0;
+  }
+  100% {
+    translate: 0 110vh;
+    transform: scale(0.85, 1.3);
+    opacity: 0.9;
+  }
+}
+
+@keyframes lava-trail {
+  0%,
+  40% {
+    height: 0;
+  }
+  100% {
+    height: 110vh;
+  }
+}
+
+/* Lava flowing down the mountain: each stream draws itself downward, glows, then cools and fades. */
+.lava-flow path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation:
+    lava-run 2.6s var(--delay, 0s) cubic-bezier(0.3, 0.1, 0.5, 1) forwards,
+    lava-cool 1.2s calc(var(--delay, 0s) + 3.4s) ease-in forwards;
+}
+
+@keyframes lava-run {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes lava-cool {
+  to {
+    opacity: 0;
   }
 }

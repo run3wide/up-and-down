@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App'
+import { WebAudioSoundPlayer } from './lemon-volcano/infrastructure/WebAudioSoundPlayer'
 import { LocalStorageBestScoreStore } from './shared/LocalStorageBestScoreStore'
 import './index.css'
 
@@ -11,6 +12,6 @@ const bestScores = {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App random={Math.random} bestScores={bestScores} basePath={import.meta.env.BASE_URL} />
+    <App random={Math.random} bestScores={bestScores} sound={new WebAudioSoundPlayer()} basePath={import.meta.env.BASE_URL} />
   </StrictMode>,
 )

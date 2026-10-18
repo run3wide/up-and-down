@@ -15,9 +15,11 @@ interface CourtProps {
   mood: StrawberryMood
   showAim: boolean
   scoredFlash: boolean
+  /** Which eruption's lava is still flowing down the mountain, or null once it has cooled. */
+  lavaFlow: number | null
 }
 
-export function Court({ aim, lemon, craterX, mood, showAim, scoredFlash }: CourtProps) {
+export function Court({ aim, lemon, craterX, mood, showAim, scoredFlash, lavaFlow }: CourtProps) {
   const droppedIntoLava = scoredFlash && lemon !== null
   const visibleLemon = lemon ?? { x: STRAWBERRY_X, y: LAUNCH_Y }
   return (
@@ -41,7 +43,7 @@ export function Court({ aim, lemon, craterX, mood, showAim, scoredFlash }: Court
         </radialGradient>
       </defs>
       <rect x="-100" y={GROUND_TOP} width="300" height="100" fill="url(#court-grass)" />
-      <VolcanoBody x={craterX} scored={scoredFlash} />
+      <VolcanoBody x={craterX} scored={scoredFlash} lavaFlow={lavaFlow} />
       {showAim && <AimArrow aim={aim} />}
       <StrawberryFigure aim={aim} mood={mood} />
       {!droppedIntoLava && <LemonSprite x={visibleLemon.x} y={visibleLemon.y} />}
@@ -65,13 +67,14 @@ function LemonSprite({ x, y }: { x: number; y: number }) {
 }
 
 /** The mountain and the glowing crater mouth; the lemon is drawn after this, so it drops into the lava. */
-function VolcanoBody({ x, scored }: { x: number; scored: boolean }) {
+function VolcanoBody({ x, scored, lavaFlow }: { x: number; scored: boolean; lavaFlow: number | null }) {
   const top = screenY(CRATER_Y)
   const mouth = CRATER_HALF_WIDTH + 1.5
   return (
     <g className={scored ? 'volcano-peak volcano-peak--erupting' : 'volcano-peak'}>
       <path d={`M${x - mouth} ${top} L${x + mouth} ${top} L${x + 22} ${GROUND_TOP + 1} L${x - 22} ${GROUND_TOP + 1} Z`} fill="url(#court-rock)" />
       <path d={`M${x - 5} ${top + 2} Q${x - 7} ${top + 14} ${x - 10} ${top + 30} M${x + 3} ${top + 2} Q${x + 5} ${top + 18} ${x + 7} ${top + 32}`} stroke="#ff7a2f" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeOpacity="0.85" />
+      {lavaFlow !== null && <LavaFlows key={lavaFlow} x={x} top={top} />}
       <ellipse cx={x} cy={top} rx={mouth} ry="2.2" fill="#5a3324" />
       <ellipse cx={x} cy={top} rx={CRATER_HALF_WIDTH} ry="1.7" fill="url(#court-lava)" />
       <g className="smoke-puffs" fill="#fff" fillOpacity="0.75">
@@ -79,14 +82,38 @@ function VolcanoBody({ x, scored }: { x: number; scored: boolean }) {
         <circle className="puff puff--2" cx={x + 2} cy={top - 8} r="1.8" />
       </g>
       {scored && (
-        <g className="lava-spray" fill="#ff8a2f">
-          <circle cx={x - 4} cy={top - 6} r="1.1" />
-          <circle cx={x} cy={top - 10} r="1.4" fill="#ffd23f" />
-          <circle cx={x + 4} cy={top - 6} r="1.1" />
-          <circle cx={x - 2} cy={top - 13} r="0.8" fill="#ffd23f" />
-          <circle cx={x + 3} cy={top - 12} r="0.8" />
+        <g className="lava-spray">
+          {Array.from({ length: 12 }, (_, i) => (
+            <circle
+              key={i}
+              cx={x}
+              cy={top}
+              r={0.8 + (i % 3) * 0.35}
+              fill={i % 2 === 0 ? '#ff8a2f' : '#ffd23f'}
+              style={{ '--dx': `${(i - 5.5) * 1.5}px`, '--dy': `${-(11 + (i % 4) * 3.5)}px` } as React.CSSProperties}
+            />
+          ))}
         </g>
       )}
+    </g>
+  )
+}
+
+/** Red lava pouring over the rim and down the flanks; remounting (new key) restarts the flow. */
+function LavaFlows({ x, top }: { x: number; top: number }) {
+  const streams = [
+    `M${x - 6} ${top + 1} C${x - 9} ${top + 10} ${x - 7} ${top + 19} ${x - 12} ${top + 27} S${x - 17} ${top + 39} ${x - 19} ${top + 46}`,
+    `M${x + 5} ${top + 1} C${x + 8} ${top + 8} ${x + 6} ${top + 20} ${x + 11} ${top + 28} S${x + 14} ${top + 39} ${x + 17} ${top + 46}`,
+    `M${x} ${top + 2} C${x - 3} ${top + 12} ${x + 3} ${top + 20} ${x} ${top + 30} S${x - 3} ${top + 40} ${x + 1} ${top + 47}`,
+  ]
+  return (
+    <g className="lava-flows">
+      {streams.map((d, i) => (
+        <g key={i} className="lava-flow" style={{ '--delay': `${i * 0.25}s` } as React.CSSProperties}>
+          <path d={d} pathLength="1" stroke="#d4271a" strokeWidth="3.6" fill="none" strokeLinecap="round" />
+          <path d={d} pathLength="1" stroke="#ff9d2e" strokeWidth="1.4" fill="none" strokeLinecap="round" />
+        </g>
+      ))}
     </g>
   )
 }

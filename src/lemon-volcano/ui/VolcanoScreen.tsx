@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import type { SoundPlayer } from '../application/SoundPlayer'
 import { recordFinalScore, type BestScoreResult, type BestScoreStore } from '../../shared/bestScore'
 import { GameOverOverlay, PausedOverlay } from '../../shared/Overlays'
 import { useAnimationFrame } from '../../shared/useAnimationFrame'
 import { VolcanoSession } from '../application/VolcanoSession'
 import { VolcanoGame, LEMONS_PER_ROUND, type AimDirection, type VolcanoEvent, type Random } from '../domain/volcanoGame'
 import { Court, type StrawberryMood } from './Court'
+import { LavaSplats } from './LavaSplats'
+import { SPLAT_LIFETIME_MILLISECONDS, lavaSplatsForEruption, type LavaSplat } from './lavaEruption'
 import { useVolcanoControls } from './useVolcanoControls'
 import '../../shared/hud.css'
 import '../../shared/controls.css'
@@ -13,29 +16,59 @@ import './volcano.css'
 interface VolcanoScreenProps {
   random: Random
   bestScores: BestScoreStore
+  sound: SoundPlayer
   onExit: () => void
 }
 
 const REACTION_MILLISECONDS = 900
+const LAVA_FLOW_MILLISECONDS = 4800
 
-export function VolcanoScreen({ random, bestScores, onExit }: VolcanoScreenProps) {
+export function VolcanoScreen({ random, bestScores, sound, onExit }: VolcanoScreenProps) {
   const [session] = useState(() => new VolcanoSession(new VolcanoGame(random)))
   const [snapshot, setSnapshot] = useState(() => session.snapshot())
   const [mood, setMood] = useState<StrawberryMood>('idle')
   const [scoredFlash, setScoredFlash] = useState(false)
   const [result, setResult] = useState<BestScoreResult | null>(null)
+  const [muted, setMuted] = useState(false)
+  const [lavaFlow, setLavaFlow] = useState<number | null>(null)
+  const [splats, setSplats] = useState<readonly LavaSplat[]>([])
   const reaction = useRef<number | undefined>(undefined)
+  const splatTimers = useRef<number[]>([])
+  const eruptions = useRef(0)
+  const nextSplatId = useRef(0)
 
-  useEffect(() => () => clearTimeout(reaction.current), [])
+  useEffect(
+    () => () => {
+      clearTimeout(reaction.current)
+      splatTimers.current.forEach(clearTimeout)
+    },
+    [],
+  )
 
   const refresh = useCallback(() => setSnapshot(session.snapshot()), [session])
 
   const react = useCallback(
     (events: VolcanoEvent[]) => {
       for (const event of events) {
-        if (event.type === 'scored') showReaction('cheer', true)
+        if (event.type === 'scored') erupt()
         if (event.type === 'missed') showReaction('oops', false)
         if (event.type === 'roundOver') setResult(recordFinalScore(bestScores, session.snapshot().score))
+      }
+
+      function erupt() {
+        showReaction('cheer', true)
+        if (!muted) sound.play('eruption')
+        const eruption = eruptions.current++
+        setLavaFlow(eruption)
+        splatTimers.current.push(window.setTimeout(() => setLavaFlow((flowing) => (flowing === eruption ? null : flowing)), LAVA_FLOW_MILLISECONDS))
+        const fresh = lavaSplatsForEruption(eruption, nextSplatId.current)
+        nextSplatId.current += fresh.length
+        setSplats((current) => [...current, ...fresh])
+        splatTimers.current.push(
+          window.setTimeout(() => {
+            setSplats((current) => current.filter((splat) => !fresh.includes(splat)))
+          }, SPLAT_LIFETIME_MILLISECONDS),
+        )
       }
 
       function showReaction(nextMood: StrawberryMood, scored: boolean) {
@@ -48,7 +81,7 @@ export function VolcanoScreen({ random, bestScores, onExit }: VolcanoScreenProps
         }, REACTION_MILLISECONDS)
       }
     },
-    [bestScores, session],
+    [bestScores, session, sound, muted],
   )
 
   useAnimationFrame((elapsed) => {
@@ -57,9 +90,10 @@ export function VolcanoScreen({ random, bestScores, onExit }: VolcanoScreenProps
   }, !snapshot.paused && snapshot.phase !== 'over')
 
   const toss = useCallback(() => {
+    sound.unlock()
     session.toss()
     refresh()
-  }, [session, refresh])
+  }, [session, refresh, sound])
 
   const togglePause = useCallback(() => {
     session.togglePause()
@@ -84,6 +118,7 @@ export function VolcanoScreen({ random, bestScores, onExit }: VolcanoScreenProps
             mood={mood}
             showAim={snapshot.phase === 'aiming'}
             scoredFlash={scoredFlash}
+            lavaFlow={lavaFlow}
           />
           {scoredFlash && <p className="lemon-volcano__cheer" aria-hidden="true">Splash!</p>}
         </div>
@@ -93,10 +128,16 @@ export function VolcanoScreen({ random, bestScores, onExit }: VolcanoScreenProps
         <p className="hud__score" role="status">
           Score: {snapshot.score}
         </p>
-        <button className="hud__pause" onClick={togglePause} aria-label="Pause">
-          <span aria-hidden="true">❚❚</span>
-        </button>
+        <div className="hud__actions">
+          <button className="hud__pause" onClick={() => setMuted(!muted)} aria-label={muted ? 'Unmute sound' : 'Mute sound'}>
+            <span aria-hidden="true">{muted ? '🔇' : '🔊'}</span>
+          </button>
+          <button className="hud__pause" onClick={togglePause} aria-label="Pause">
+            <span aria-hidden="true">❚❚</span>
+          </button>
+        </div>
       </header>
+      <LavaSplats splats={splats} />
       <p className="lemon-volcano__hint" aria-hidden="true">← → aim &nbsp;·&nbsp; Space throw</p>
       <TouchControls
         hold={(direction) => session.hold(direction)}
