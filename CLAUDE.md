@@ -37,6 +37,7 @@ Two games, each its own bounded context, picked from the splash screen. After a 
 ## Conventions
 
 - TDD; test the domain without React. UI tests drive the loop with Vitest fake timers (fake `requestAnimationFrame`) and use `fireEvent` — `userEvent` hangs under fake timers.
+- Usability and safety suites: `src/usability.test.tsx` opens every game from the picker (one case set per game; `Record<GameId, …>` forces a new game to be added there), `src/childSafety.test.ts` guards the kid-safety and privacy rules. jsdom has no layout, so `test-support/loadStyles` puts the real CSS on the page to check the cascade (scrolling, grid sizing), but whether a screen *fits* needs a real browser: screenshot it at true phone width (headless Chrome clamps `--window-size` to ~500px, so use a 390px-wide iframe) in portrait and landscape.
 - tsconfig has `erasableSyntaxOnly`: no constructor parameter properties or enums.
 - Domain-driven names: code uses the game's own words (lemon, crater, brain break), not generic ones.
 

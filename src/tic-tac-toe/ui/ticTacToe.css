@@ -2,6 +2,7 @@
   position: relative;
   height: 100%;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto 1fr auto;
   justify-items: center;
   align-content: start;
@@ -25,9 +26,11 @@
 
 .tic-tac-toe__board {
   display: grid;
+  align-self: start;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.6rem;
-  width: min(100%, 22rem);
+  /* Square, and never taller than what is left under the title, so the whole board shows on a phone held sideways too. */
+  width: min(100%, 22rem, max(9rem, calc(100dvh - 14rem)));
 }
 
 .tic-tac-toe-square {

@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
+import { loadStyles } from '../../test-support/loadStyles'
 import { TicTacToeScreen } from './TicTacToeScreen'
 
 const firstEmptySquare = () => 0
@@ -81,5 +82,20 @@ describe('TicTacToeScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Back to games' }))
 
     expect(onExit).toHaveBeenCalled()
+  })
+
+  it('sizes the board to the screen, not to its squares, so no part of it falls off a phone', () => {
+    const removeStyles = loadStyles('index.css', 'shared/hud.css', 'shared/overlays.css', 'tic-tac-toe/ui/ticTacToe.css')
+    renderBoard()
+
+    const page = getComputedStyle(screen.getByRole('main'))
+    const board = getComputedStyle(screen.getByRole('group', { name: 'Board' }))
+
+    expect(page.gridTemplateColumns).toBe('minmax(0, 1fr)')
+    expect(board.width).toMatch(/^min\(100%,/)
+    expect(board.width).toContain('dvh')
+    // A board stretched to the page's spare height would pass that height to its square squares, and widen.
+    expect(board.alignSelf).toBe('start')
+    removeStyles()
   })
 })
