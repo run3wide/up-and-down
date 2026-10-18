@@ -26,9 +26,16 @@ export function PausedOverlay({ onResume, onMainMenu }: { onResume: () => void; 
   )
 }
 
-export function GameOverOverlay({ score, result, onBackToGames }: { score: number; result: BestScoreResult; onBackToGames: () => void }) {
+interface GameOverOverlayProps {
+  score: number
+  result: BestScoreResult
+  onBackToGames: () => void
+  title?: string
+}
+
+export function GameOverOverlay({ score, result, onBackToGames, title = 'Game over' }: GameOverOverlayProps) {
   return (
-    <Overlay title="Game over">
+    <Overlay title={title}>
       <p className="overlay__score">Score: {score}</p>
       <p className="overlay__best">Best: {result.best}</p>
       {result.isNewBest && <p className="overlay__new-best">New best! 🎉</p>}

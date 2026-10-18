@@ -1,6 +1,6 @@
 import type { GameId } from '../splash/games'
 
-const GAMES: readonly GameId[] = ['up-and-down', 'lemon-volcano']
+const GAMES: readonly GameId[] = ['up-and-down', 'lemon-volcano', 'turbo-race']
 
 /** `base` is where the app is served from, e.g. "/" in development or "/up-and-down/" on GitHub Pages. */
 export function gameAtPath(pathname: string, base: string): GameId | null {

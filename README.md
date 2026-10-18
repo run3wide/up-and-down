@@ -1,11 +1,12 @@
 # Up and Down (and Lemon Volcano)
 
-Two gentle browser games for kids, picked from a splash screen. No backend, no accounts, no network calls; best scores stay on the device.
+Three gentle browser games for kids, picked from a splash screen. No backend, no accounts, no network calls; best scores stay on the device.
 
 - **Up and Down** (by Daniel Robson): a ball is thrown up and falls back down; move the dinosaur to catch it. Three lives, difficulty ramps with the score.
+- **Turbo Race** (by Daniel Robson): steer the car left and right down the road to the finish line, dodge cones and rocks, grab coins. Three lives.
 - **Lemon Volcano** (by Moses Robson): aim the strawberry left and right, press Space to throw a lemon into the volcano. Fixed power, eight lemons a round.
 
-Each game has its own address: `/up-and-down` and `/lemon-volcano` (under `/up-and-down/` on GitHub Pages).
+Each game has its own address: `/up-and-down`, `/lemon-volcano` and `/turbo-race` (under `/up-and-down/` on GitHub Pages).
 
 ## Run it
 
@@ -28,4 +29,5 @@ pnpm build      # type-check + production build into dist/
 ## Controls
 
 - Up and Down: move with ← → or A / D, drag on the playfield, or the on-screen buttons on touch devices. Pause with Esc, Space or P.
+- Turbo Race: steer with ← → or A / D, drag on the road, or the on-screen buttons. Pause with Esc, Space or P.
 - Lemon Volcano: aim with ← → or A / D, throw with Space. Pause with Esc or P. On touch devices use the Aim and Throw buttons.

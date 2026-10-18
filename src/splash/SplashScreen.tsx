@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { RaceCar } from '../art/RaceCar'
 import { StrawberryIcon } from '../art/StrawberryIcon'
 import type { GameId } from './games'
 import { Logo } from './Logo'
@@ -23,6 +24,11 @@ export function SplashScreen({ onPick }: { onPick: (game: GameId) => void }) {
             <StrawberryIcon />
             <span className="game-card__title" aria-hidden="true">Lemon Volcano</span>
             <span className="game-card__byline">by Moses Robson</span>
+          </button>
+          <button className="game-card game-card--turbo-race" aria-label="Play Turbo Race, by Daniel Robson" onClick={() => onPick('turbo-race')}>
+            <RaceCar className="race-car-icon" />
+            <span className="game-card__title game-card__title--turbo" aria-hidden="true">Turbo Race</span>
+            <span className="game-card__byline">by Daniel Robson</span>
           </button>
         </div>
       </div>

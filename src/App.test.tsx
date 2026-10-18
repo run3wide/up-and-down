@@ -6,6 +6,7 @@ import { InMemoryBestScoreStore } from './shared/InMemoryBestScoreStore'
 const bestScores = () => ({
   'up-and-down': new InMemoryBestScoreStore(),
   'lemon-volcano': new InMemoryBestScoreStore(),
+  'turbo-race': new InMemoryBestScoreStore(),
 })
 
 const silentSound = { unlock: () => {}, play: () => {} }
@@ -42,6 +43,12 @@ describe('App', () => {
     renderApp('/lemon-volcano')
 
     expect(screen.getByLabelText('8 lemons left')).toBeInTheDocument()
+  })
+
+  it('opens Turbo Race straight away from its own address', () => {
+    renderApp('/turbo-race')
+
+    expect(screen.getByRole('progressbar', { name: 'Race progress' })).toBeInTheDocument()
   })
 
   it('opens the other game from its address, under a base path', () => {

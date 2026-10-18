@@ -102,7 +102,7 @@
   justify-items: center;
   align-content: end;
   gap: 0.4rem;
-  width: clamp(14rem, 38vw, 22rem);
+  width: clamp(13rem, 28vw, 19rem);
   min-height: clamp(13rem, 34vh, 17rem);
   padding: 1rem 1rem 1.25rem;
   color: var(--ink);
@@ -127,6 +127,10 @@
   background: linear-gradient(#ffffff, #d9f3ff);
 }
 
+.game-card--turbo-race {
+  background: linear-gradient(#ffffff, #ffd9df);
+}
+
 .game-card--lemon-volcano {
   background: linear-gradient(#ffffff, #fff3b8);
 }
@@ -147,6 +151,16 @@
 
 .game-card__byline {
   font-size: clamp(1rem, 2.6vw, 1.3rem);
+}
+
+.game-card__title--turbo {
+  color: #ff4f6d;
+}
+
+.race-car-icon {
+  width: clamp(3rem, 8vw, 4.5rem);
+  rotate: 8deg;
+  animation: bob 3s ease-in-out infinite;
 }
 
 .strawberry-icon {

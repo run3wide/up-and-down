@@ -1,0 +1,217 @@
+.race {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  background: #3a9a4f;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.race__stage-area {
+  container-type: size;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: linear-gradient(#4cb862, #2f8f48);
+}
+
+.race__stage {
+  container-type: size;
+  position: relative;
+  width: min(100cqw, 100cqh);
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: linear-gradient(#4cb862, #2f8f48);
+}
+
+.road {
+  position: absolute;
+  inset: 0 20%;
+  background: #4a4f5c;
+  border-inline: 1.2cqw solid #fff;
+  box-shadow: 0 0 0 0.8cqw #c92a3f inset;
+}
+
+.road__centre-line {
+  position: absolute;
+  inset: 0 calc(50% - 0.6cqw);
+  background: linear-gradient(#ffd23f 55%, transparent 55%) 0 calc(var(--travelled) * 1cqh) / 100% 16cqh;
+}
+
+.tree,
+.road-item,
+.race-car,
+.finish-line {
+  position: absolute;
+  pointer-events: none;
+}
+
+.tree {
+  width: 9cqw;
+  translate: -50% 50%;
+}
+
+.road-item {
+  translate: -50% 50%;
+}
+
+.tree svg,
+.road-item svg,
+.race-car svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.road-item--coin svg {
+  filter: drop-shadow(0 0 0.8cqw #ffd23f);
+  animation: coin-spin 1.2s ease-in-out infinite;
+}
+
+.finish-line {
+  inset-inline: 20%;
+  height: 6cqh;
+  translate: 0 50%;
+  background:
+    conic-gradient(#222 25%, #fff 0 50%, #222 0 75%, #fff 0) 0 0 / 6cqh 6cqh;
+}
+
+.race-car {
+  translate: -50% 0;
+}
+
+.race-car svg {
+  height: 100%;
+  filter: drop-shadow(0 0.6cqh 0.5cqh #0006);
+}
+
+.race-car--crashed svg {
+  animation: spin-out 0.7s ease-out;
+}
+
+.race-car--flashing svg {
+  animation: flash 0.3s steps(2, jump-none) infinite;
+}
+
+.race-car--crashed.race-car--flashing svg {
+  animation: spin-out 0.7s ease-out;
+}
+
+.coin-pop {
+  position: absolute;
+  inset: -20% 0 auto;
+  text-align: center;
+  font-size: 4cqw;
+  color: #fff3a8;
+  -webkit-text-stroke: 0.4cqw #7a5a00;
+  paint-order: stroke fill;
+  animation: pop-up 0.7s ease-out forwards;
+}
+
+.race__call {
+  position: absolute;
+  inset: 22% 0 auto;
+  margin: 0;
+  text-align: center;
+  font-size: 22cqw;
+  line-height: 1;
+  color: #fff;
+  -webkit-text-stroke: 1.2cqw var(--ink);
+  paint-order: stroke fill;
+  text-shadow: 0 1cqw 0 #0004;
+  animation: call-pop 0.9s ease-out;
+  pointer-events: none;
+}
+
+.race__call--go {
+  color: #7cf08a;
+  animation: call-pop 0.8s ease-out forwards;
+}
+
+.race__progress {
+  position: absolute;
+  inset: 4.6rem 1rem auto;
+  height: 0.7rem;
+  max-width: 28rem;
+  margin-inline: auto;
+  background: #ffffff80;
+  border-radius: 999px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.race__progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd23f, #ff4f6d);
+  border-radius: 999px;
+}
+
+.race__hint {
+  position: absolute;
+  inset: 5.8rem 0 auto;
+  margin: 0;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #fff;
+  text-shadow: 0 0.1rem 0.2rem #0006;
+  pointer-events: none;
+}
+
+@media (pointer: coarse) {
+  .race__hint {
+    display: none;
+  }
+}
+
+@keyframes coin-spin {
+  50% {
+    transform: scaleX(0.35);
+  }
+}
+
+@keyframes spin-out {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes flash {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes pop-up {
+  from {
+    opacity: 1;
+  }
+  to {
+    translate: 0 -3cqw;
+    opacity: 0;
+  }
+}
+
+@keyframes call-pop {
+  from {
+    scale: 1.6;
+    opacity: 0;
+  }
+  25% {
+    scale: 1;
+    opacity: 1;
+  }
+  to {
+    opacity: 0.9;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

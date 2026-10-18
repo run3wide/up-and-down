@@ -35,3 +35,19 @@
   box-shadow: 0 0.15rem 0.4rem #0002;
   cursor: pointer;
 }
+
+/* Hearts */
+.hud__lives {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.heart {
+  width: clamp(1.6rem, 5vw, 2.6rem);
+  filter: drop-shadow(0 0.1rem 0.1rem #0003);
+  transition: transform 0.3s;
+}
+
+.heart--lost {
+  transform: scale(0.8);
+}
