@@ -152,3 +152,36 @@
   opacity: 0.85;
   pointer-events: none;
 }
+
+.brick-builder__pictures {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  width: min(100%, 36rem);
+}
+
+.brick-builder__pictures .brick-builder__tool[aria-pressed='true'] {
+  color: #fff;
+  background: var(--ink);
+}
+
+.brick-builder__guide {
+  position: absolute;
+  height: 10%;
+  box-sizing: border-box;
+  border-radius: 0.3rem;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.brick-builder__bar .brick-builder__tool,
+.brick-builder__pictures .brick-builder__tool {
+  padding: 0.2em 0.8em;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.brick-builder__bar .hud__pause {
+  margin-left: auto;
+}

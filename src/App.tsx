@@ -67,7 +67,7 @@ export function App({ random, bestScores, sound, dinoDigCollection, colouringGal
     case 'put-it-in-the-bucket':
       return <BucketScreen random={random} bestScores={bestScores['put-it-in-the-bucket']} onExit={backToGames} />
     case 'brick-builder':
-      return <BuilderScreen onExit={backToGames} />
+      return <BuilderScreen sound={sound} onExit={backToGames} />
     case null:
       return <SplashScreen onPick={openGame} />
   }

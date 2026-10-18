@@ -1,3 +1,4 @@
+import { scheduleBrickPop, scheduleBrickSnap, scheduleBuiltIt } from './brickSounds'
 import { scheduleEruption } from './eruptionSound'
 import type { SoundEffect, SoundPlayer } from './SoundPlayer'
 import roarClip from './trexRoar.wav?inline'
@@ -44,6 +45,14 @@ const CLIPS: Partial<Record<SoundEffect, string>> = {
   bray: brayClip,
 }
 
+/** Sounds that are made rather than recorded. */
+const SYNTHESISED: Partial<Record<SoundEffect, (context: BaseAudioContext, destination: AudioNode) => void>> = {
+  eruption: scheduleEruption,
+  brickSnap: scheduleBrickSnap,
+  brickPop: scheduleBrickPop,
+  builtIt: scheduleBuiltIt,
+}
+
 /** A long recording only needs its first moments, which then fade out rather than stop with a click. */
 const PLAY_SECONDS: Partial<Record<SoundEffect, number>> = { buzz: 1.5, bray: 2 }
 const FADE_SECONDS = 0.25
@@ -52,7 +61,7 @@ const FADE_SECONDS = 0.25
 const PLAYBACK_RATE: Partial<Record<SoundEffect, number>> = { winner: 0.7 }
 
 /**
- * Plays sounds with Web Audio. The eruption is synthesised; the dino roars, the "Winner!" and the animal calls are small CC0 or public-domain clips (see CREDITS.md)
+ * Plays sounds with Web Audio. The eruption and the brick sounds are synthesised; the dino roars, the "Winner!" and the animal calls are small CC0 or public-domain clips (see CREDITS.md)
  * bundled into the app as data URLs, so the game still makes no network calls.
  */
 export class WebAudioSoundPlayer implements SoundPlayer {
@@ -69,7 +78,8 @@ export class WebAudioSoundPlayer implements SoundPlayer {
   play(effect: SoundEffect): void {
     const context = this.ensureContext()
     if (!context || !this.output || context.state !== 'running') return
-    if (effect === 'eruption') scheduleEruption(context, this.output)
+    const synthesise = SYNTHESISED[effect]
+    if (synthesise) synthesise(context, this.output)
     else void this.playClip(context, this.output, effect)
   }
 
