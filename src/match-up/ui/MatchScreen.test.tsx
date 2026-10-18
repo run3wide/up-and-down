@@ -4,6 +4,7 @@ import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
 import { KINDS } from '../domain/kinds'
 import { MatchGame } from '../domain/matchGame'
 import { MatchScreen } from './MatchScreen'
+import { inFrame } from '../../test-support/inFrame'
 
 /** The screen deals the same board as a game built with the same random source, so we can read where things are. */
 const anyOrder = () => 0
@@ -12,7 +13,7 @@ const dealt = () => new MatchGame(KINDS, anyOrder).snapshot().cards
 function renderMatch() {
   const bestScores = new InMemoryBestScoreStore()
   const onExit = vi.fn()
-  render(<MatchScreen random={anyOrder} bestScores={bestScores} onExit={onExit} />)
+  render(inFrame(<MatchScreen random={anyOrder} bestScores={bestScores} onExit={onExit} />))
   return { bestScores, onExit }
 }
 

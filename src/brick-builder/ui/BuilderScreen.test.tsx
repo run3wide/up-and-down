@@ -1,10 +1,11 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { BuilderScreen } from './BuilderScreen'
+import { inFrame } from '../../test-support/inFrame'
 
-function renderBuilder(onExit = () => {}) {
+function renderBuilder() {
   const sound = { unlock: vi.fn(), play: vi.fn() }
-  render(<BuilderScreen sound={sound} onExit={onExit} />)
+  render(inFrame(<BuilderScreen sound={sound} />))
   return { sound }
 }
 
@@ -95,15 +96,6 @@ describe('BuilderScreen', () => {
     fireEvent.pointerUp(window, { clientX: 500, clientY: 1300 })
 
     expect(placed()).toHaveLength(0)
-  })
-
-  it('goes back to the games', () => {
-    const onExit = vi.fn()
-    renderBuilder(onExit)
-
-    fireEvent.click(screen.getByRole('button', { name: 'Back to games' }))
-
-    expect(onExit).toHaveBeenCalled()
   })
 
   it('clicks when a brick lands, and pops when one comes off', () => {

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { FrameControls } from '../../shared/frame/FrameControls'
 import { recordFinalScore, type BestScoreStore } from '../../shared/bestScore'
 import { PausedOverlay } from '../../shared/Overlays'
 import { BucketGame, type BucketEvent } from '../domain/bucketGame'
@@ -119,12 +120,8 @@ export function BucketScreen({ random, bestScores, onExit }: BucketScreenProps) 
         <p className="hud__score" role="status">
           Score: {snapshot.sorted}
         </p>
-        <div className="hud__actions">
-          <button className="hud__pause" onClick={() => setPaused(true)} aria-label="Pause">
-            <span aria-hidden="true">❚❚</span>
-          </button>
-        </div>
       </header>
+      <FrameControls pause={{ paused, onPause: () => setPaused(true) }} />
       <button
         key={snapshot.sorted}
         className={`bucket-game__item${picked ? ' bucket-game__item--picked' : ''}${dragGhost ? ' bucket-game__item--dragging' : ''}`}

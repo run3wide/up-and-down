@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { recordFinalScore, type BestScoreStore } from '../../shared/bestScore'
 import { PausedOverlay } from '../../shared/Overlays'
-import { SoundToggle } from '../../shared/SoundToggle'
+import { FrameControls } from '../../shared/frame/FrameControls'
 import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import type { CollectionStore } from '../application/CollectionStore'
 import { DigGame, type DigEvent } from '../domain/digGame'
@@ -179,12 +179,9 @@ export function DigScreen({ random, bestScores, collection, sound, onExit }: Dig
           <button className="hud__pause" onClick={() => setShowMuseum(true)} aria-label="Museum">
             <span aria-hidden="true">🏛️</span>
           </button>
-          <SoundToggle muted={muted} onToggle={() => setMuted(!muted)} />
-          <button className="hud__pause" onClick={() => setPaused(true)} aria-label="Pause">
-            <span aria-hidden="true">❚❚</span>
-          </button>
         </div>
       </header>
+      <FrameControls sound={{ muted, onToggle: () => setMuted(!muted) }} pause={{ paused, onPause: () => setPaused(true) }} />
       <h1 className="dig__title">Dig for a {dinosaur.name}!</h1>
       <p className="dig__message" role="alert">
         {message}

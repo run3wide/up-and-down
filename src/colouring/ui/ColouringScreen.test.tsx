@@ -1,14 +1,15 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { InMemoryGalleryStore } from '../infrastructure/InMemoryGalleryStore'
 import { InMemorySketchStore } from '../infrastructure/InMemorySketchStore'
 import { TEMPLATES } from '../domain/templates'
 import { ColouringScreen } from './ColouringScreen'
+import { inFrame } from '../../test-support/inFrame'
 
 const trex = TEMPLATES.find(({ id }) => id === 't-rex')!
 
-function renderScreen(gallery = new InMemoryGalleryStore(), onExit = () => {}, sketches = new InMemorySketchStore()) {
-  render(<ColouringScreen gallery={gallery} sketches={sketches} onExit={onExit} />)
+function renderScreen(gallery = new InMemoryGalleryStore(), sketches = new InMemorySketchStore()) {
+  render(inFrame(<ColouringScreen gallery={gallery} sketches={sketches} />))
   return gallery
 }
 
@@ -123,18 +124,9 @@ describe('ColouringScreen', () => {
     expect(screen.getByRole('button', { name: `T-Rex, 1 of ${trex.regions.length} parts coloured` })).toBeInTheDocument()
   })
 
-  it('leaves for the game picker from the shelf', () => {
-    const onExit = vi.fn()
-    renderScreen(new InMemoryGalleryStore(), onExit)
-
-    fireEvent.click(screen.getByRole('button', { name: 'Back to games' }))
-
-    expect(onExit).toHaveBeenCalledOnce()
-  })
-
   describe('free drawing', () => {
     const openPad = (sketches = new InMemorySketchStore()) => {
-      renderScreen(new InMemoryGalleryStore(), () => {}, sketches)
+      renderScreen(new InMemoryGalleryStore(), sketches)
       fireEvent.click(screen.getByRole('button', { name: /^Free draw/ }))
       const pad = screen.getByRole('application', { name: /^Drawing pad/ })
       // jsdom has no layout: say the pad is 200px square at the top left, so one pixel is half a unit.
@@ -216,7 +208,7 @@ describe('ColouringScreen', () => {
 
     it('picks up the drawing from last time, and shows it on the shelf', () => {
       const sketches = new InMemorySketchStore([{ colour: 'green', brush: 'thin', points: [[1, 1], [9, 9]] }])
-      renderScreen(new InMemoryGalleryStore(), () => {}, sketches)
+      renderScreen(new InMemoryGalleryStore(), sketches)
 
       expect(screen.getByRole('button', { name: 'Free draw, started' })).toBeInTheDocument()
     })

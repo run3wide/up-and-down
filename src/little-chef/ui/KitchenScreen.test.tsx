@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
 import { RECIPES } from '../domain/recipes'
 import { KitchenScreen } from './KitchenScreen'
+import { inFrame } from '../../test-support/inFrame'
 
 /** With every random value at 0 the first order is the first recipe: a pizza. */
 const alwaysFirstRecipe = () => 0
@@ -10,7 +11,7 @@ const alwaysFirstRecipe = () => 0
 function renderKitchen(bestScore = 0) {
   const bestScores = new InMemoryBestScoreStore(bestScore)
   const onExit = vi.fn()
-  render(<KitchenScreen random={alwaysFirstRecipe} bestScores={bestScores} onExit={onExit} />)
+  render(inFrame(<KitchenScreen random={alwaysFirstRecipe} bestScores={bestScores} onExit={onExit} />))
   return { bestScores, onExit }
 }
 

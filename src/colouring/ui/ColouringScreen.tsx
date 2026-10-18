@@ -15,10 +15,9 @@ import './colouring.css'
 interface ColouringScreenProps {
   gallery: GalleryStore
   sketches: SketchStore
-  onExit: () => void
 }
 
-export function ColouringScreen({ gallery, sketches, onExit }: ColouringScreenProps) {
+export function ColouringScreen({ gallery, sketches }: ColouringScreenProps) {
   const [saved, setSaved] = useState(() => gallery.load())
   const [sketch, setSketch] = useState(() => sketches.load())
   const [picture, setPicture] = useState<Picture | null>(null)
@@ -57,7 +56,7 @@ export function ColouringScreen({ gallery, sketches, onExit }: ColouringScreenPr
     return <Sketchpad snapshot={drawingSnapshot} onChange={changeDrawing} onShelf={showShelf} />
   }
 
-  if (!picture || !snapshot) return <Shelf saved={saved} sketch={sketch} onOpen={open} onOpenSketchpad={openSketchpad} onExit={onExit} />
+  if (!picture || !snapshot) return <Shelf saved={saved} sketch={sketch} onOpen={open} onOpenSketchpad={openSketchpad} />
 
   const change = (edit: (picture: Picture) => void) => {
     edit(picture)
@@ -74,17 +73,11 @@ interface ShelfProps {
   sketch: readonly Stroke[]
   onOpen: (template: Template) => void
   onOpenSketchpad: () => void
-  onExit: () => void
 }
 
-function Shelf({ saved, sketch, onOpen, onOpenSketchpad, onExit }: ShelfProps) {
+function Shelf({ saved, sketch, onOpen, onOpenSketchpad }: ShelfProps) {
   return (
     <main className="colouring">
-      <header className="colouring__bar">
-        <button className="colouring__tool" onClick={onExit}>
-          Back to games
-        </button>
-      </header>
       <h1 className="colouring__title">Pick a picture to colour</h1>
       <div className="colouring__shelf" role="group" aria-label="Pictures">
         {TEMPLATES.map((template) => {

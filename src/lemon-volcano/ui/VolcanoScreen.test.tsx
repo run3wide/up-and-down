@@ -4,6 +4,7 @@ import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
 import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { LEMONS_PER_ROUND } from '../domain/volcanoGame'
 import { VolcanoScreen } from './VolcanoScreen'
+import { inFrame } from '../../test-support/inFrame'
 
 /** 0.5 puts every crater straight ahead, so tossing without aiming always scores. */
 const straightAhead = () => 0.5
@@ -12,7 +13,7 @@ function renderGame(bestScore = 0) {
   const bestScores = new InMemoryBestScoreStore(bestScore)
   const onExit = vi.fn()
   const sound = { unlock: vi.fn(), play: vi.fn() } satisfies SoundPlayer
-  const { container } = render(<VolcanoScreen random={straightAhead} bestScores={bestScores} sound={sound} onExit={onExit} />)
+  const { container } = render(inFrame(<VolcanoScreen random={straightAhead} bestScores={bestScores} sound={sound} onExit={onExit} />))
   const lavaSplats = () => container.querySelectorAll('.lava-splat')
   const lavaFlows = () => container.querySelectorAll('.lava-flow')
   return { bestScores, onExit, sound, lavaSplats, lavaFlows }

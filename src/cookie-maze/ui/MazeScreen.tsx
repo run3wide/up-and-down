@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { recordFinalScore, type BestScoreResult, type BestScoreStore } from '../../shared/bestScore'
 import { Hearts } from '../../shared/Hearts'
 import { GameOverOverlay, Overlay, PausedOverlay } from '../../shared/Overlays'
-import { SoundToggle } from '../../shared/SoundToggle'
+import { FrameControls } from '../../shared/frame/FrameControls'
 import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { useAnimationFrame } from '../../shared/useAnimationFrame'
 import { MazeSession } from '../application/MazeSession'
@@ -118,13 +118,8 @@ export function MazeScreen({ levels, bestScores, sound, onExit }: MazeScreenProp
             ⏱ {Math.ceil(snapshot.secondsLeft)}
           </p>
         </div>
-        <div className="hud__actions">
-          <SoundToggle muted={muted} onToggle={() => setMuted(!muted)} />
-          <button className="hud__pause" onClick={togglePause} aria-label="Pause">
-            <span aria-hidden="true">❚❚</span>
-          </button>
-        </div>
       </header>
+      <FrameControls sound={{ muted, onToggle: () => setMuted(!muted) }} pause={{ paused: snapshot.paused, onPause: togglePause }} />
       <p className="maze__level">
         Maze {snapshot.mazeNumber} of {snapshot.mazeCount}
       </p>

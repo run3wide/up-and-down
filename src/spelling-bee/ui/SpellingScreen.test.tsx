@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
 import { WORDS } from '../domain/words'
 import { SpellingScreen } from './SpellingScreen'
+import { inFrame } from '../../test-support/inFrame'
 
 /** With every random value at 0 the first word is the first of the shortest: CAT. */
 const alwaysFirstWord = () => 0
@@ -11,7 +12,7 @@ function renderSpelling(bestScore = 0) {
   const bestScores = new InMemoryBestScoreStore(bestScore)
   const onExit = vi.fn()
   const sound = { unlock: vi.fn(), play: vi.fn() }
-  render(<SpellingScreen random={alwaysFirstWord} bestScores={bestScores} sound={sound} onExit={onExit} />)
+  render(inFrame(<SpellingScreen random={alwaysFirstWord} bestScores={bestScores} sound={sound} onExit={onExit} />))
   return { bestScores, onExit, sound }
 }
 

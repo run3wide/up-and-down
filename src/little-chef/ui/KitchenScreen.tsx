@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import { FrameControls } from '../../shared/frame/FrameControls'
 import { recordFinalScore, type BestScoreResult, type BestScoreStore } from '../../shared/bestScore'
 import { Hearts } from '../../shared/Hearts'
 import { GameOverOverlay, PausedOverlay } from '../../shared/Overlays'
@@ -46,10 +47,8 @@ export function KitchenScreen({ random, bestScores, onExit }: KitchenScreenProps
         <p className="hud__score" role="status">
           Score: {snapshot.dishesCooked}
         </p>
-        <button className="hud__pause" onClick={() => setPaused(true)} aria-label="Pause">
-          <span aria-hidden="true">❚❚</span>
-        </button>
       </header>
+      <FrameControls pause={{ paused, onPause: () => setPaused(true) }} />
       <section className="kitchen__order">
         <p className="kitchen__order-label">Order up!</p>
         <h1 key={snapshot.dish} className="kitchen__dish-name">

@@ -5,6 +5,7 @@ import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import type { MathQuestion, Quiz } from '../domain/quiz'
 import { BRAIN_BREAK_QUESTIONS, QUIZ_BONUS_COOKIES } from '../domain/raceGame'
 import { RaceScreen } from './RaceScreen'
+import { inFrame } from '../../test-support/inFrame'
 
 /**
  * With every random value at 0.5 the course is nothing but cookies down the middle of the road,
@@ -26,7 +27,7 @@ function renderRace(random = cookiesDownTheMiddle, bestScore = 0, createQuiz?: (
   const bestScores = new InMemoryBestScoreStore(bestScore)
   const onExit = vi.fn()
   const sound = { unlock: vi.fn(), play: vi.fn() } satisfies SoundPlayer
-  const { container } = render(<RaceScreen random={random} bestScores={bestScores} sound={sound} createQuiz={createQuiz} onExit={onExit} />)
+  const { container } = render(inFrame(<RaceScreen random={random} bestScores={bestScores} sound={sound} createQuiz={createQuiz} onExit={onExit} />))
   const carLeft = () => Number.parseFloat((container.querySelector('.race-car') as HTMLElement).style.left)
   return { bestScores, onExit, sound, carLeft }
 }

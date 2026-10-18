@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Dino } from '../../art/Dino'
 import { recordFinalScore, type BestScoreStore } from '../../shared/bestScore'
-import { SoundToggle } from '../../shared/SoundToggle'
+import { FrameControls } from '../../shared/frame/FrameControls'
 import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { TicTacToeGame, type TicTacToeEvent } from '../domain/ticTacToeGame'
 import '../../shared/hud.css'
@@ -12,7 +12,6 @@ interface TicTacToeScreenProps {
   random: () => number
   bestScores: BestScoreStore
   sound: SoundPlayer
-  onExit: () => void
 }
 
 const MESSAGES = {
@@ -22,7 +21,7 @@ const MESSAGES = {
   drawn: 'A tie! Let’s try again.',
 } as const
 
-export function TicTacToeScreen({ random, bestScores, sound, onExit }: TicTacToeScreenProps) {
+export function TicTacToeScreen({ random, bestScores, sound }: TicTacToeScreenProps) {
   const [game] = useState(() => new TicTacToeGame(random))
   const [snapshot, setSnapshot] = useState(() => game.snapshot())
   const [muted, setMuted] = useState(false)
@@ -51,14 +50,11 @@ export function TicTacToeScreen({ random, bestScores, sound, onExit }: TicTacToe
   return (
     <main className="tic-tac-toe">
       <header className="hud">
-        <button className="hud__pause" onClick={onExit} aria-label="Back to games">
-          <span aria-hidden="true">🏠</span>
-        </button>
         <p className="hud__score" role="status">
           Wins: {snapshot.wins}
         </p>
-        <SoundToggle muted={muted} onToggle={() => setMuted(!muted)} />
       </header>
+      <FrameControls sound={{ muted, onToggle: () => setMuted(!muted) }} />
       <h1 className="tic-tac-toe__title">Tic Tac Toe</h1>
       <p className="tic-tac-toe__message" role="alert">
         {MESSAGES[snapshot.phase]}

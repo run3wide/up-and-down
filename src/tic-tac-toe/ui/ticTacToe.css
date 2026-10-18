@@ -30,7 +30,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 0.6rem;
   /* Square, and never taller than what is left under the title, so the whole board shows on a phone held sideways too. */
-  width: min(100%, 22rem, max(9rem, calc(100dvh - 14rem)));
+  width: min(100%, 22rem, max(9rem, calc(100dvh - 18rem)));
 }
 
 .tic-tac-toe-square {

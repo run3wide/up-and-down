@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
 import { ITEMS } from '../domain/items'
 import { BucketScreen } from './BucketScreen'
+import { inFrame } from '../../test-support/inFrame'
 
 /** With every random value at 0 the first item is the first of the list: a cow. */
 const alwaysFirstItem = () => 0
@@ -10,7 +11,7 @@ const alwaysFirstItem = () => 0
 function renderBuckets(bestScore = 0) {
   const bestScores = new InMemoryBestScoreStore(bestScore)
   const onExit = vi.fn()
-  render(<BucketScreen random={alwaysFirstItem} bestScores={bestScores} onExit={onExit} />)
+  render(inFrame(<BucketScreen random={alwaysFirstItem} bestScores={bestScores} onExit={onExit} />))
   return { bestScores, onExit }
 }
 

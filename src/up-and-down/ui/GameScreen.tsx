@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { DinoMood } from '../../art/Dino'
+import { FrameControls } from '../../shared/frame/FrameControls'
 import { recordFinalScore, type BestScoreResult, type BestScoreStore } from '../../shared/bestScore'
 import { GameSession } from '../application/GameSession'
 import { Game, type Direction, type GameEvent, type Random } from '../domain/game'
@@ -99,7 +100,8 @@ export function GameScreen({ random, bestScores, sound, onExit }: GameScreenProp
           <Playfield dinoX={snapshot.dinoX} ball={snapshot.ball} mood={mood} bursts={bursts} />
         </div>
       </div>
-      <Hud score={snapshot.score} lives={snapshot.lives} muted={muted} onToggleSound={() => setMuted(!muted)} onPause={togglePause} />
+      <Hud score={snapshot.score} lives={snapshot.lives} />
+      <FrameControls sound={{ muted, onToggle: () => setMuted(!muted) }} pause={{ paused: snapshot.phase === 'paused', onPause: togglePause }} />
       <TouchControls hold={(d) => session.hold(d)} release={(d) => session.release(d)} />
       {snapshot.phase === 'paused' && <PausedOverlay onResume={togglePause} onMainMenu={onExit} />}
       {snapshot.phase === 'over' && result && (

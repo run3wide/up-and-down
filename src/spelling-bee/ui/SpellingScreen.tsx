@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { recordFinalScore, type BestScoreStore } from '../../shared/bestScore'
 import { PausedOverlay } from '../../shared/Overlays'
-import { SoundToggle } from '../../shared/SoundToggle'
+import { FrameControls } from '../../shared/frame/FrameControls'
 import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { SpellingGame, type SpellingEvent } from '../domain/spellingGame'
 import { WORDS } from '../domain/words'
@@ -146,13 +146,8 @@ export function SpellingScreen({ random, bestScores, sound, onExit }: SpellingSc
         <p className="hud__score" role="status">
           Score: {snapshot.wordsSpelled}
         </p>
-        <div className="hud__actions">
-          <SoundToggle muted={muted} onToggle={() => setMuted(!muted)} />
-          <button className="hud__pause" onClick={() => setPaused(true)} aria-label="Pause">
-            <span aria-hidden="true">❚❚</span>
-          </button>
-        </div>
       </header>
+      <FrameControls sound={{ muted, onToggle: () => setMuted(!muted) }} pause={{ paused, onPause: () => setPaused(true) }} />
       <div key={snapshot.emoji + snapshot.wordsSpelled} className="speller__picture" role="img" aria-label="Picture to spell">
         {snapshot.emoji}
       </div>

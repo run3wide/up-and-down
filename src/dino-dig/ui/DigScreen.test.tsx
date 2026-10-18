@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
 import { InMemoryCollectionStore } from '../infrastructure/InMemoryCollectionStore'
 import { DigScreen } from './DigScreen'
+import { inFrame } from '../../test-support/inFrame'
 
 /** With every random value at 0 the first dig is the T-Rex, buried in the first five cells: skull, ribs, arm, leg, tail. */
 const alwaysFirst = () => 0
@@ -11,7 +12,7 @@ function renderDig(collection = new InMemoryCollectionStore(), bestScore = 0) {
   const bestScores = new InMemoryBestScoreStore(bestScore)
   const onExit = vi.fn()
   const sound = { unlock: vi.fn(), play: vi.fn() }
-  render(<DigScreen random={alwaysFirst} bestScores={bestScores} collection={collection} sound={sound} onExit={onExit} />)
+  render(inFrame(<DigScreen random={alwaysFirst} bestScores={bestScores} collection={collection} sound={sound} onExit={onExit} />))
   return { bestScores, collection, onExit, sound }
 }
 

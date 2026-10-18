@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
 import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { GameScreen } from './GameScreen'
+import { inFrame } from '../../test-support/inFrame'
 
 const middle = () => 0.5
 
@@ -10,7 +11,7 @@ function renderGame(bestScore = 0) {
   const bestScores = new InMemoryBestScoreStore(bestScore)
   const onExit = vi.fn()
   const sound = { unlock: vi.fn(), play: vi.fn() } satisfies SoundPlayer
-  render(<GameScreen random={middle} bestScores={bestScores} sound={sound} onExit={onExit} />)
+  render(inFrame(<GameScreen random={middle} bestScores={bestScores} sound={sound} onExit={onExit} />))
   return { bestScores, onExit, sound }
 }
 

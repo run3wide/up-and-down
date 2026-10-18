@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import { FrameControls } from '../../shared/frame/FrameControls'
 import { recordFinalScore, type BestScoreResult, type BestScoreStore } from '../../shared/bestScore'
 import { Hearts } from '../../shared/Hearts'
 import { GameOverOverlay, PausedOverlay } from '../../shared/Overlays'
@@ -51,10 +52,8 @@ export function MatchScreen({ random, bestScores, onExit }: MatchScreenProps) {
         <p className="hud__score" role="status">
           Score: {snapshot.boardsCleared}
         </p>
-        <button className="hud__pause" onClick={() => setPaused(true)} aria-label="Pause">
-          <span aria-hidden="true">❚❚</span>
-        </button>
       </header>
+      <FrameControls pause={{ paused, onPause: () => setPaused(true) }} />
       <h1 className="match__title">Find two that are alike</h1>
       <p className="match__message" role="alert">
         {message}

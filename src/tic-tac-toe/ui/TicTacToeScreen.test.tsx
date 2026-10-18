@@ -3,12 +3,13 @@ import { describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
 import { loadStyles } from '../../test-support/loadStyles'
 import { TicTacToeScreen } from './TicTacToeScreen'
+import { inFrame } from '../../test-support/inFrame'
 
 const firstEmptySquare = () => 0
 
-function renderBoard(sound = { unlock: vi.fn(), play: vi.fn() }, onExit = vi.fn()) {
-  render(<TicTacToeScreen random={firstEmptySquare} bestScores={new InMemoryBestScoreStore()} sound={sound} onExit={onExit} />)
-  return { sound, onExit }
+function renderBoard(sound = { unlock: vi.fn(), play: vi.fn() }) {
+  render(inFrame(<TicTacToeScreen random={firstEmptySquare} bestScores={new InMemoryBestScoreStore()} sound={sound} />))
+  return { sound }
 }
 
 const square = (number: number) => screen.getAllByRole('button', { name: new RegExp(`^Square ${number},`) })[0]
@@ -74,14 +75,6 @@ describe('TicTacToeScreen', () => {
     expect(screen.getAllByRole('button', { name: /^Square \d, empty$/ })).toHaveLength(9)
     expect(screen.queryByRole('img', { name: 'T-Rex' })).not.toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent('Wins: 1')
-  })
-
-  it('goes back to the games', () => {
-    const { onExit } = renderBoard()
-
-    fireEvent.click(screen.getByRole('button', { name: 'Back to games' }))
-
-    expect(onExit).toHaveBeenCalled()
   })
 
   it('sizes the board to the screen, not to its squares, so no part of it falls off a phone', () => {

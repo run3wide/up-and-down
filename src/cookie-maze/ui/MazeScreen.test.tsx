@@ -6,6 +6,7 @@ import { Maze } from '../domain/maze'
 import { MAX_LIVES, STAR_BONUS_SECONDS } from '../domain/mazeGame'
 import type { MazeLevel } from '../domain/mazeRun'
 import { MazeScreen } from './MazeScreen'
+import { inFrame } from '../../test-support/inFrame'
 
 const CLOCK = 120
 
@@ -18,7 +19,7 @@ function renderMaze(rows: string[], timeLimit?: number, ...laterMazes: MazeLevel
   const onExit = vi.fn()
   const sound = { unlock: vi.fn(), play: vi.fn() } satisfies SoundPlayer
   const { container } = render(
-    <MazeScreen levels={[level(rows, timeLimit), ...laterMazes]} bestScores={bestScores} sound={sound} onExit={onExit} />,
+    inFrame(<MazeScreen levels={[level(rows, timeLimit), ...laterMazes]} bestScores={bestScores} sound={sound} onExit={onExit} />),
   )
   const dinoLeft = () => Number.parseFloat((container.querySelector('.maze__dino') as HTMLElement).style.left)
   return { bestScores, onExit, sound, container, dinoLeft }

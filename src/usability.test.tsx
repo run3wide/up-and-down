@@ -58,10 +58,8 @@ afterEach(() => {
 const openFromPicker = (game: Usability) => fireEvent.click(screen.getByRole('button', { name: game.card }))
 
 function leaveTheGame() {
-  const home = screen.queryByRole('button', { name: 'Back to games' })
-  if (home) return fireEvent.click(home)
-  fireEvent.click(screen.getByRole('button', { name: 'Pause' }))
-  fireEvent.click(screen.getByRole('button', { name: 'Main menu' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Home' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Yes, go home' }))
 }
 
 describe.each(Object.entries(GAMES) as [GameId, Usability][])('%s, from the picker', (id, game) => {

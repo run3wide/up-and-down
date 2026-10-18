@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { recordFinalScore, type BestScoreResult, type BestScoreStore } from '../../shared/bestScore'
 import { GameOverOverlay, PausedOverlay } from '../../shared/Overlays'
-import { SoundToggle } from '../../shared/SoundToggle'
+import { FrameControls } from '../../shared/frame/FrameControls'
 import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { useAnimationFrame } from '../../shared/useAnimationFrame'
 import { VolcanoSession } from '../application/VolcanoSession'
@@ -129,13 +129,8 @@ export function VolcanoScreen({ random, bestScores, sound, onExit }: VolcanoScre
         <p className="hud__score" role="status">
           Score: {snapshot.score}
         </p>
-        <div className="hud__actions">
-          <SoundToggle muted={muted} onToggle={() => setMuted(!muted)} />
-          <button className="hud__pause" onClick={togglePause} aria-label="Pause">
-            <span aria-hidden="true">❚❚</span>
-          </button>
-        </div>
       </header>
+      <FrameControls sound={{ muted, onToggle: () => setMuted(!muted) }} pause={{ paused: snapshot.paused, onPause: togglePause }} />
       <LavaSplats splats={splats} />
       <p className="lemon-volcano__hint" aria-hidden="true">← → aim &nbsp;·&nbsp; Space throw</p>
       <TouchControls

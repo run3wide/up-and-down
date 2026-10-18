@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { SoundToggle } from '../../shared/SoundToggle'
+import { FrameControls } from '../../shared/frame/FrameControls'
 import type { SoundPlayer } from '../../shared/sound/SoundPlayer'
 import { Baseplate, COLUMNS, MAX_LAYERS, snapColumn } from '../domain/baseplate'
 import { BLUEPRINTS, type Blueprint } from '../domain/blueprint'
@@ -13,7 +13,6 @@ const DRAG_THRESHOLD_PX = 8
 
 interface BuilderScreenProps {
   sound: SoundPlayer
-  onExit: () => void
 }
 
 interface Dragging {
@@ -28,7 +27,7 @@ const brickName = (kind: BrickKind) => `${colourName(kind)} brick, ${kind.width}
 const colourName = (kind: BrickKind) => kind.id.split('-')[0]
 const capitalised = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 
-export function BuilderScreen({ sound, onExit }: BuilderScreenProps) {
+export function BuilderScreen({ sound }: BuilderScreenProps) {
   const [plate] = useState(() => new Baseplate())
   const [bricks, setBricks] = useState(() => [...plate.bricks()])
   const [chosen, setChosen] = useState<BrickKind | null>(null)
@@ -119,14 +118,11 @@ export function BuilderScreen({ sound, onExit }: BuilderScreenProps) {
   return (
     <main className="brick-builder">
       <header className="brick-builder__bar">
-        <button className="brick-builder__tool" onClick={onExit}>
-          Back to games
-        </button>
         <button className="brick-builder__tool" onClick={() => (plate.clear(), refresh())}>
           Start again
         </button>
-        <SoundToggle muted={muted} onToggle={() => setMuted(!muted)} />
       </header>
+      <FrameControls sound={{ muted, onToggle: () => setMuted(!muted) }} />
       <h1 className="brick-builder__title">Brick Builder</h1>
       <div className="brick-builder__pictures" role="group" aria-label="Pictures">
         {[null, ...BLUEPRINTS].map((option) => (

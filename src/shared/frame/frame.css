@@ -1,0 +1,63 @@
+.game-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.game-frame__bar {
+  flex: none;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  background: #fff;
+  box-shadow: 0 0.1rem 0.4rem #0002;
+  /* Keeps its shadow above the game. */
+  position: relative;
+  z-index: 1;
+}
+
+.game-frame__title {
+  margin: 0;
+  overflow: hidden;
+  font-size: clamp(1.1rem, 4vw, 1.6rem);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.game-frame__controls {
+  display: flex;
+  gap: 0.5rem;
+  justify-self: end;
+}
+
+.game-frame__button {
+  width: 3rem;
+  height: 3rem;
+  font-size: 1.1rem;
+  color: var(--ink);
+  background: #eef3ff;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.game-frame__button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* The game fills what the bar leaves; each game's root is height: 100% of this. */
+.game-frame__content {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+/* The "Leave game?" card dims the bar too. */
+.game-frame > .overlay {
+  z-index: 2;
+}
