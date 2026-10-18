@@ -30,6 +30,10 @@ interface AppProps {
 export function App({ random, bestScores, sound, dinoDigCollection, basePath }: AppProps) {
   const [playing, navigate] = useRoute(basePath)
   const backToGames = () => navigate(null)
+  const openGame = (game: GameId) => {
+    sound.unlock()
+    navigate(game)
+  }
 
   switch (playing) {
     case 'up-and-down':
@@ -51,6 +55,6 @@ export function App({ random, bestScores, sound, dinoDigCollection, basePath }: 
     case 'dino-dig':
       return <DigScreen random={random} bestScores={bestScores['dino-dig']} collection={dinoDigCollection} sound={sound} onExit={backToGames} />
     case null:
-      return <SplashScreen onPick={navigate} />
+      return <SplashScreen onPick={openGame} />
   }
 }
