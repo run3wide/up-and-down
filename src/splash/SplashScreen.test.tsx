@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { SplashScreen } from './SplashScreen'
+import { loadStyles } from '../test-support/loadStyles'
 
 const upAndDown = { name: 'Play Up and Down, by Daniel' }
 const lemonVolcano = { name: 'Play Lemon Volcano, by Moses' }
@@ -46,5 +47,31 @@ describe('SplashScreen', () => {
     await userEvent.click(screen.getByRole('button', button))
 
     expect(onPick).toHaveBeenCalledExactlyOnceWith(gameId)
+  })
+
+  // jsdom has no layout, so it cannot tell us the cards overflow; it can tell us whether overflow would be reachable.
+  describe('on a screen too small for every card', () => {
+    function renderStyled() {
+      const removeStyles = loadStyles('index.css', 'splash/splash.css')
+      render(<SplashScreen onPick={() => {}} />)
+      return removeStyles
+    }
+
+    it('can be scrolled to reach the last game, because the page itself does not scroll', () => {
+      const removeStyles = renderStyled()
+
+      expect(getComputedStyle(document.body).overflow).toBe('hidden')
+      expect(getComputedStyle(screen.getByRole('main')).overflowY).toBe('auto')
+
+      removeStyles()
+    })
+
+    it('does not clip the top of the content when it is taller than the screen', () => {
+      const removeStyles = renderStyled()
+
+      expect(getComputedStyle(screen.getByRole('main')).alignItems).toBe('start')
+
+      removeStyles()
+    })
   })
 })
