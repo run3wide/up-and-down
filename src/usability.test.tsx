@@ -31,7 +31,7 @@ const GAMES: Record<GameId, Usability> = {
   'match-up': { card: /^Play Match Up/, onScreen: () => screen.getByRole('group', { name: 'Cards' }), stylesheet: 'match-up/ui/match.css', layout: 'scrolls' },
   'cookie-maze': { card: /^Play Cookie Maze/, onScreen: () => screen.getByRole('status'), stylesheet: 'cookie-maze/ui/maze.css', layout: 'fixed-stage' },
   'tic-tac-toe': { card: /^Play Tic Tac Toe/, onScreen: () => screen.getByRole('group', { name: 'Board' }), stylesheet: 'tic-tac-toe/ui/ticTacToe.css', layout: 'scrolls' },
-  'spelling-bee': { card: /^Play Spelling Bee/, onScreen: () => screen.getByRole('group', { name: 'Alphabet' }), stylesheet: 'spelling-bee/ui/spelling.css', layout: 'scrolls' },
+  'spelling-bee': { card: /^Play Spelling Bee/, onScreen: () => screen.getByRole('group', { name: 'Levels' }), stylesheet: 'spelling-bee/ui/spelling.css', layout: 'scrolls' },
   'dino-dig': { card: /^Play Dino Dig/, onScreen: () => screen.getByRole('group', { name: 'Dig site' }), stylesheet: 'dino-dig/ui/dig.css', layout: 'scrolls' },
   'brick-builder': { card: /^Play Brick Builder/, onScreen: () => screen.getByRole('group', { name: 'Baseplate' }), stylesheet: 'brick-builder/ui/builder.css', layout: 'scrolls' },
   'put-it-in-the-bucket': { card: /^Play Put It In The Bucket/, onScreen: () => screen.getByRole('group', { name: 'Levels' }), stylesheet: 'put-it-in-the-bucket/ui/bucket.css', layout: 'scrolls' },
@@ -48,7 +48,7 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame', 'performance', 'setTimeout', 'clearTimeout'] })
   window.history.replaceState(null, '', '/')
   sound = { unlock: vi.fn<SoundPlayer['unlock']>(), play: vi.fn<SoundPlayer['play']>() }
-  render(<App random={() => 0.5} bestScores={bestScores()} bucketBestScores={{ easy: new InMemoryBestScoreStore(), medium: new InMemoryBestScoreStore(), hard: new InMemoryBestScoreStore() }} sound={sound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} colouringSketches={new InMemorySketchStore()} basePath="/" />)
+  render(<App random={() => 0.5} bestScores={bestScores()} bucketBestScores={{ easy: new InMemoryBestScoreStore(), medium: new InMemoryBestScoreStore(), hard: new InMemoryBestScoreStore() }} spellingBestScores={{ easy: new InMemoryBestScoreStore(), medium: new InMemoryBestScoreStore(), hard: new InMemoryBestScoreStore() }} sound={sound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} colouringSketches={new InMemorySketchStore()} basePath="/" />)
 })
 
 afterEach(() => {

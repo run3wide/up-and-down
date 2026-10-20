@@ -17,6 +17,7 @@ import { cluesForHunt } from './treasure-map/domain/treasureGame'
 import { TreasureScreen } from './treasure-map/ui/TreasureScreen'
 import { BuilderScreen } from './brick-builder/ui/BuilderScreen'
 import { ColouringScreen } from './colouring/ui/ColouringScreen'
+import type { Difficulty as SpellingDifficulty } from './spelling-bee/domain/words'
 import { SpellingScreen } from './spelling-bee/ui/SpellingScreen'
 import { TicTacToeScreen } from './tic-tac-toe/ui/TicTacToeScreen'
 import { useRoute } from './routing/useRoute'
@@ -31,9 +32,11 @@ type Random = () => number
 interface AppProps {
   random: Random
   /** Colouring is not scored, so it has no best score. */
-  bestScores: Record<Exclude<GameId, 'colouring' | 'brick-builder' | 'put-it-in-the-bucket'>, BestScoreStore>
+  bestScores: Record<Exclude<GameId, 'colouring' | 'brick-builder' | 'put-it-in-the-bucket' | 'spelling-bee'>, BestScoreStore>
   /** The bucket game keeps a best score for each level. */
   bucketBestScores: Record<Difficulty, BestScoreStore>
+  /** Spelling Bee does too. */
+  spellingBestScores: Record<SpellingDifficulty, BestScoreStore>
   sound: SoundPlayer
   dinoDigCollection: CollectionStore
   colouringGallery: GalleryStore
@@ -42,7 +45,7 @@ interface AppProps {
   basePath: string
 }
 
-export function App({ random, bestScores, bucketBestScores, sound, dinoDigCollection, colouringGallery, colouringSketches, basePath }: AppProps) {
+export function App({ random, bestScores, bucketBestScores, spellingBestScores, sound, dinoDigCollection, colouringGallery, colouringSketches, basePath }: AppProps) {
   const [playing, navigate] = useRoute(basePath)
   const backToGames = () => navigate(null)
   const openGame = (game: GameId) => {
@@ -75,7 +78,7 @@ export function App({ random, bestScores, bucketBestScores, sound, dinoDigCollec
       case 'tic-tac-toe':
         return <TicTacToeScreen random={random} bestScores={bestScores['tic-tac-toe']} sound={sound} />
       case 'spelling-bee':
-        return <SpellingScreen random={random} bestScores={bestScores['spelling-bee']} sound={sound} onExit={backToGames} />
+        return <SpellingScreen random={random} bestScores={spellingBestScores} sound={sound} onExit={backToGames} />
       case 'dino-dig':
         return <DigScreen random={random} bestScores={bestScores['dino-dig']} collection={dinoDigCollection} sound={sound} onExit={backToGames} />
       case 'colouring':

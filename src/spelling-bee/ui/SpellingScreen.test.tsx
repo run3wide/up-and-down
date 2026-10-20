@@ -1,25 +1,27 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
-import { WORDS } from '../domain/words'
+import { DIFFICULTIES, LEVELS, type Difficulty } from '../domain/words'
 import { SpellingScreen } from './SpellingScreen'
 import { inFrame } from '../../test-support/inFrame'
 
 /** With every random value at 0 the first word is the first of the shortest: CAT. */
 const alwaysFirstWord = () => 0
 
-function renderSpelling(bestScore = 0) {
-  const bestScores = new InMemoryBestScoreStore(bestScore)
+function renderSpelling(bestScore = 0, level: Difficulty = 'easy') {
+  const allBestScores = Object.fromEntries(DIFFICULTIES.map((difficulty) => [difficulty, new InMemoryBestScoreStore(difficulty === level ? bestScore : 0)])) as Record<Difficulty, InMemoryBestScoreStore>
   const onExit = vi.fn()
   const sound = { unlock: vi.fn(), play: vi.fn() }
-  render(inFrame(<SpellingScreen random={alwaysFirstWord} bestScores={bestScores} sound={sound} onExit={onExit} />))
-  return { bestScores, onExit, sound }
+  render(inFrame(<SpellingScreen random={alwaysFirstWord} bestScores={allBestScores} sound={sound} onExit={onExit} />))
+  fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${level}`, 'i') }))
+  return { bestScores: allBestScores[level], allBestScores, onExit, sound }
 }
 
 const alphabet = () => within(screen.getByRole('group', { name: 'Alphabet' }))
 const letter = (name: string) => alphabet().getByRole('button', { name })
 const blanks = () => within(screen.getByRole('group', { name: 'Word' })).getAllByRole('button')
-const currentWord = () => WORDS.find((word) => word.emoji === screen.getByRole('img', { name: /^Picture/ }).textContent)!
+/** The dinosaur is DINO on easy and DINOSAUR on hard, so the picture is told apart by how many blanks it has. */
+const currentWord = () => Object.values(LEVELS).flat().find((word) => word.emoji === screen.getByRole('img', { name: /^Picture/ }).textContent && word.spelling.length === blanks().length)!
 
 function tapLetterThenBlank(name: string, position: number) {
   fireEvent.click(letter(name))
@@ -174,5 +176,37 @@ describe('SpellingScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Main menu' }))
 
     expect(onExit).toHaveBeenCalled()
+  })
+
+  it('asks which level to play before any picture appears', () => {
+    const allBestScores = Object.fromEntries(DIFFICULTIES.map((difficulty) => [difficulty, new InMemoryBestScoreStore()])) as Record<Difficulty, InMemoryBestScoreStore>
+    render(inFrame(<SpellingScreen random={alwaysFirstWord} bestScores={allBestScores} sound={{ unlock: vi.fn(), play: vi.fn() }} onExit={vi.fn()} />))
+
+    const levels = within(screen.getByRole('group', { name: 'Levels' })).getAllByRole('button')
+
+    expect(levels.map((level) => level.textContent)).toEqual([expect.stringMatching(/Easy.*CAT/), expect.stringMatching(/Medium.*BANANA/), expect.stringMatching(/Hard.*WATERMELON/)])
+    expect(screen.queryByRole('img', { name: /^Picture/ })).not.toBeInTheDocument()
+  })
+
+  it('plays medium with six and seven letter words', () => {
+    renderSpelling(0, 'medium')
+
+    expect(blanks().length).toBeGreaterThanOrEqual(6)
+    expect(blanks().length).toBeLessThanOrEqual(7)
+  })
+
+  it('spells a ten letter word on hard, and keeps the score for that level alone', () => {
+    const { allBestScores } = renderSpelling(0, 'hard')
+    while (blanks().length < 10) {
+      spellCurrentWord()
+      fireEvent.click(screen.getByRole('button', { name: 'Next word' }))
+    }
+
+    spellCurrentWord()
+
+    expect(screen.getByRole('alert')).toHaveTextContent(/WATERMELON|STRAWBERRY|HELICOPTER/)
+    expect(allBestScores.hard.load()).toBeGreaterThan(0)
+    expect(allBestScores.easy.load()).toBe(0)
+    expect(allBestScores.medium.load()).toBe(0)
   })
 })

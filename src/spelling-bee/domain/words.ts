@@ -49,3 +49,47 @@ export const WORDS: readonly Word[] = [
   { spelling: 'HORSE', emoji: '🐴', sound: 'neigh' },
   { spelling: 'SHEEP', emoji: '🐑', sound: 'baa' },
 ]
+
+export const DIFFICULTIES = ['easy', 'medium', 'hard'] as const
+export type Difficulty = (typeof DIFFICULTIES)[number]
+
+const MEDIUM_WORDS: readonly Word[] = [
+  { spelling: 'BANANA', emoji: '🍌' },
+  { spelling: 'ORANGE', emoji: '🍊' },
+  { spelling: 'CARROT', emoji: '🥕' },
+  { spelling: 'MONKEY', emoji: '🐵' },
+  { spelling: 'RABBIT', emoji: '🐰' },
+  { spelling: 'TURTLE', emoji: '🐢' },
+  { spelling: 'PARROT', emoji: '🦜' },
+  { spelling: 'COOKIE', emoji: '🍪' },
+  { spelling: 'ROCKET', emoji: '🚀' },
+  { spelling: 'PLANET', emoji: '🪐' },
+  { spelling: 'FLOWER', emoji: '🌸' },
+  { spelling: 'CHEESE', emoji: '🧀' },
+  { spelling: 'GIRAFFE', emoji: '🦒' },
+  { spelling: 'PENGUIN', emoji: '🐧' },
+  { spelling: 'DOLPHIN', emoji: '🐬' },
+  { spelling: 'RAINBOW', emoji: '🌈' },
+  { spelling: 'BALLOON', emoji: '🎈' },
+]
+
+const HARD_WORDS: readonly Word[] = [
+  { spelling: 'AIRPLANE', emoji: '✈️' },
+  { spelling: 'SQUIRREL', emoji: '🐿️' },
+  { spelling: 'MOUNTAIN', emoji: '⛰️' },
+  { spelling: 'ELEPHANT', emoji: '🐘' },
+  { spelling: 'KANGAROO', emoji: '🦘' },
+  { spelling: 'SANDWICH', emoji: '🥪' },
+  { spelling: 'DINOSAUR', emoji: '🦖', sound: 'roar' },
+  { spelling: 'PINEAPPLE', emoji: '🍍' },
+  { spelling: 'BUTTERFLY', emoji: '🦋' },
+  { spelling: 'HAMBURGER', emoji: '🍔' },
+  { spelling: 'BLUEBERRY', emoji: '🫐' },
+  { spelling: 'SUNFLOWER', emoji: '🌻' },
+  { spelling: 'CHOCOLATE', emoji: '🍫' },
+  { spelling: 'STRAWBERRY', emoji: '🍓' },
+  { spelling: 'WATERMELON', emoji: '🍉' },
+  { spelling: 'HELICOPTER', emoji: '🚁' },
+]
+
+export const LEVELS: Record<Difficulty, readonly Word[]> = { easy: WORDS, medium: MEDIUM_WORDS, hard: HARD_WORDS }
