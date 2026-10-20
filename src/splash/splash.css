@@ -158,6 +158,10 @@
   background: linear-gradient(#ffffff, #ffe9b0);
 }
 
+.game-card--dino-clues {
+  background: linear-gradient(#ffffff, #d6f0c2);
+}
+
 .game-card--dino-dig {
   background: linear-gradient(#ffffff, #f0dcc0);
 }
@@ -230,6 +234,10 @@
 
 .game-card__title--treasure-map {
   color: #b5651d;
+}
+
+.game-card__title--dino-clues {
+  color: #2f9e44;
 }
 
 .game-card__title--bucket {
