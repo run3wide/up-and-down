@@ -16,14 +16,15 @@ const bestScores = () => ({
   'tic-tac-toe': new InMemoryBestScoreStore(),
   'spelling-bee': new InMemoryBestScoreStore(),
   'dino-dig': new InMemoryBestScoreStore(),
-  'put-it-in-the-bucket': new InMemoryBestScoreStore(),
 })
+
+const bucketBestScores = () => ({ easy: new InMemoryBestScoreStore(), medium: new InMemoryBestScoreStore(), hard: new InMemoryBestScoreStore() })
 
 const silentSound = { unlock: () => {}, play: () => {} }
 
 function renderApp(path = '/', basePath = '/') {
   window.history.replaceState(null, '', path)
-  render(<App random={() => 0.5} bestScores={bestScores()} sound={silentSound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} colouringSketches={new InMemorySketchStore()} basePath={basePath} />)
+  render(<App random={() => 0.5} bestScores={bestScores()} bucketBestScores={bucketBestScores()} sound={silentSound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} colouringSketches={new InMemorySketchStore()} basePath={basePath} />)
 }
 
 function keyDown(key: string) {
@@ -94,7 +95,7 @@ describe('App', () => {
   it('opens Put It In The Bucket straight away from its own address', () => {
     renderApp('/put-it-in-the-bucket')
 
-    expect(screen.getByRole('group', { name: 'Buckets' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Levels' })).toBeInTheDocument()
   })
 
   it('opens Dino Dig straight away from its own address', () => {
