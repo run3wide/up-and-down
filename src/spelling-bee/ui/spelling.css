@@ -23,18 +23,23 @@
 }
 
 .speller__word {
+  --gap: clamp(0.4rem, 2vw, 0.8rem);
+  container-type: inline-size;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: clamp(0.4rem, 2vw, 0.8rem);
+  gap: var(--gap);
+  width: 100%;
 }
 
 .speller__blank {
+  --width: min(clamp(3.4rem, 14vw, 5rem), calc((100cqw - (var(--per-row) - 1) * var(--gap)) / var(--per-row)));
   position: relative;
-  width: clamp(3.4rem, 14vw, 5rem);
+  width: var(--width);
   aspect-ratio: 4 / 5;
   padding: 0;
   font: inherit;
-  font-size: clamp(2.2rem, 9vw, 3.4rem);
+  font-size: min(clamp(2.2rem, 9vw, 3.4rem), calc(var(--width) * 0.68));
   color: var(--ink);
   background: #ffffffaa;
   border: 0;
@@ -121,4 +126,51 @@
 @keyframes nuh-uh-fade {
   0%, 60% { opacity: 1; }
   100% { opacity: 0; }
+}
+
+.speller--levels {
+  grid-template-rows: auto 1fr;
+}
+
+.speller__levels-heading {
+  margin: 0;
+  font-size: clamp(1.6rem, 6vw, 2.4rem);
+}
+
+.speller__levels {
+  display: grid;
+  gap: 1rem;
+  width: min(100%, 26rem);
+}
+
+.speller__level {
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  padding: 0.8rem 1rem;
+  font: inherit;
+  color: var(--ink);
+  background: #fff;
+  border: 0.3rem solid #4c9be8;
+  border-radius: 1.5rem;
+  box-shadow: 0 0.3rem 0 #0002;
+  cursor: pointer;
+}
+
+.speller__level-name {
+  font-size: clamp(1.4rem, 5vw, 1.9rem);
+}
+
+.speller__level-example {
+  font-size: clamp(1.2rem, 4.5vw, 1.6rem);
+  letter-spacing: 0.1rem;
+}
+
+.speller .hud {
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+}
+
+.speller .hud__score {
+  white-space: nowrap;
 }

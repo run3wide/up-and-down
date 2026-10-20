@@ -14,18 +14,18 @@ const bestScores = () => ({
   'match-up': new InMemoryBestScoreStore(),
   'cookie-maze': new InMemoryBestScoreStore(),
   'tic-tac-toe': new InMemoryBestScoreStore(),
-  'spelling-bee': new InMemoryBestScoreStore(),
   'dino-dig': new InMemoryBestScoreStore(),
   'treasure-map': new InMemoryBestScoreStore(),
 })
 
+const spellingBestScores = () => ({ easy: new InMemoryBestScoreStore(), medium: new InMemoryBestScoreStore(), hard: new InMemoryBestScoreStore() })
 const bucketBestScores = () => ({ easy: new InMemoryBestScoreStore(), medium: new InMemoryBestScoreStore(), hard: new InMemoryBestScoreStore() })
 
 const silentSound = { unlock: () => {}, play: () => {} }
 
 function renderApp(path = '/', basePath = '/') {
   window.history.replaceState(null, '', path)
-  render(<App random={() => 0.5} bestScores={bestScores()} bucketBestScores={bucketBestScores()} sound={silentSound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} colouringSketches={new InMemorySketchStore()} basePath={basePath} />)
+  render(<App random={() => 0.5} bestScores={bestScores()} bucketBestScores={bucketBestScores()} spellingBestScores={spellingBestScores()} sound={silentSound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} colouringSketches={new InMemorySketchStore()} basePath={basePath} />)
 }
 
 function keyDown(key: string) {
@@ -114,7 +114,7 @@ describe('App', () => {
   it('opens Spelling Bee straight away from its own address', () => {
     renderApp('/spelling-bee')
 
-    expect(screen.getByRole('group', { name: 'Alphabet' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Levels' })).toBeInTheDocument()
   })
 
   it('opens the other game from its address, under a base path', () => {

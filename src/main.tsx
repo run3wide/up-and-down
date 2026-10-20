@@ -16,9 +16,15 @@ const bestScores = {
   'match-up': new LocalStorageBestScoreStore('match-up:best-score'),
   'cookie-maze': new LocalStorageBestScoreStore('cookie-maze:best-score'),
   'tic-tac-toe': new LocalStorageBestScoreStore('tic-tac-toe:best-score'),
-  'spelling-bee': new LocalStorageBestScoreStore('spelling-bee:best-score'),
   'dino-dig': new LocalStorageBestScoreStore('dino-dig:best-score'),
   'treasure-map': new LocalStorageBestScoreStore('treasure-map:best-score'),
+}
+
+// Easy keeps the key each game always used, so existing best scores survive.
+const spellingBestScores = {
+  easy: new LocalStorageBestScoreStore('spelling-bee:best-score'),
+  medium: new LocalStorageBestScoreStore('spelling-bee:medium:best-score'),
+  hard: new LocalStorageBestScoreStore('spelling-bee:hard:best-score'),
 }
 
 // Easy keeps the key the game always used, so existing best scores survive.
@@ -34,6 +40,6 @@ const colouringSketches = new LocalStorageSketchStore('colouring:sketch')
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App random={Math.random} bestScores={bestScores} bucketBestScores={bucketBestScores} sound={new WebAudioSoundPlayer()} dinoDigCollection={dinoDigCollection} colouringGallery={colouringGallery} colouringSketches={colouringSketches} basePath={import.meta.env.BASE_URL} />
+    <App random={Math.random} bestScores={bestScores} bucketBestScores={bucketBestScores} spellingBestScores={spellingBestScores} sound={new WebAudioSoundPlayer()} dinoDigCollection={dinoDigCollection} colouringGallery={colouringGallery} colouringSketches={colouringSketches} basePath={import.meta.env.BASE_URL} />
   </StrictMode>,
 )
