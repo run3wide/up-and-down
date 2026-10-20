@@ -35,6 +35,7 @@ const GAMES: Record<GameId, Usability> = {
   'dino-dig': { card: /^Play Dino Dig/, onScreen: () => screen.getByRole('group', { name: 'Dig site' }), stylesheet: 'dino-dig/ui/dig.css', layout: 'scrolls' },
   'brick-builder': { card: /^Play Brick Builder/, onScreen: () => screen.getByRole('group', { name: 'Baseplate' }), stylesheet: 'brick-builder/ui/builder.css', layout: 'scrolls' },
   'put-it-in-the-bucket': { card: /^Play Put It In The Bucket/, onScreen: () => screen.getByRole('group', { name: 'Levels' }), stylesheet: 'put-it-in-the-bucket/ui/bucket.css', layout: 'scrolls' },
+  'treasure-map': { card: /^Play Treasure Map/, onScreen: () => screen.getByRole('region', { name: 'Clue' }), stylesheet: 'treasure-map/ui/treasure.css', layout: 'scrolls' },
   colouring: { card: /^Play Colouring/, onScreen: () => screen.getByRole('group', { name: 'Pictures' }), stylesheet: 'colouring/ui/colouring.css', layout: 'scrolls' },
 }
 

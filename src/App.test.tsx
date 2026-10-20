@@ -16,6 +16,7 @@ const bestScores = () => ({
   'tic-tac-toe': new InMemoryBestScoreStore(),
   'spelling-bee': new InMemoryBestScoreStore(),
   'dino-dig': new InMemoryBestScoreStore(),
+  'treasure-map': new InMemoryBestScoreStore(),
 })
 
 const bucketBestScores = () => ({ easy: new InMemoryBestScoreStore(), medium: new InMemoryBestScoreStore(), hard: new InMemoryBestScoreStore() })
