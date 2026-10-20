@@ -5,6 +5,7 @@ import { InMemorySketchStore } from '../infrastructure/InMemorySketchStore'
 import { TEMPLATES } from '../domain/templates'
 import { ColouringScreen } from './ColouringScreen'
 import { inFrame } from '../../test-support/inFrame'
+import { loadStyles } from '../../test-support/loadStyles'
 
 const trex = TEMPLATES.find(({ id }) => id === 't-rex')!
 
@@ -220,5 +221,23 @@ describe('ColouringScreen', () => {
 
       expect(screen.getByRole('group', { name: 'Pictures' })).toBeInTheDocument()
     })
+  })
+
+  it('does not draw a box around a part that has focus: the ring would be the size of the part\'s bounding box, not its shape', () => {
+    const removeStyles = loadStyles('colouring/ui/colouring.css')
+    const rules = [...document.styleSheets].flatMap((sheet) => [...sheet.cssRules] as CSSStyleRule[])
+    const focusRule = rules.find((rule) => rule.selectorText === '.colouring__part:focus')
+
+    expect(focusRule?.style.getPropertyValue('outline')).toBe('none')
+    removeStyles()
+  })
+
+  it('shows which part has keyboard focus by outlining its own shape', () => {
+    const removeStyles = loadStyles('colouring/ui/colouring.css')
+    const rules = [...document.styleSheets].flatMap((sheet) => [...sheet.cssRules] as CSSStyleRule[])
+    const shapeRule = rules.find((rule) => rule.selectorText === '.colouring__part:focus-visible')
+
+    expect(Number(shapeRule?.style.strokeWidth)).toBeGreaterThan(1)
+    removeStyles()
   })
 })

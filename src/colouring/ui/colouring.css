@@ -56,6 +56,17 @@
   stroke-linejoin: round;
 }
 
+/* The browser's own focus ring is a box round the part's bounding box, blown up by the SVG's scale; outline the shape instead. */
+.colouring__part:focus {
+  outline: none;
+}
+
+.colouring__part:focus-visible {
+  stroke: #ff9f1c;
+  stroke-width: 1.6;
+  paint-order: stroke;
+}
+
 .colouring__art [role='button'] {
   cursor: pointer;
 }
