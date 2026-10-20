@@ -18,7 +18,13 @@ const bestScores = {
   'tic-tac-toe': new LocalStorageBestScoreStore('tic-tac-toe:best-score'),
   'spelling-bee': new LocalStorageBestScoreStore('spelling-bee:best-score'),
   'dino-dig': new LocalStorageBestScoreStore('dino-dig:best-score'),
-  'put-it-in-the-bucket': new LocalStorageBestScoreStore('put-it-in-the-bucket:best-score'),
+}
+
+// Easy keeps the key the game always used, so existing best scores survive.
+const bucketBestScores = {
+  easy: new LocalStorageBestScoreStore('put-it-in-the-bucket:best-score'),
+  medium: new LocalStorageBestScoreStore('put-it-in-the-bucket:medium:best-score'),
+  hard: new LocalStorageBestScoreStore('put-it-in-the-bucket:hard:best-score'),
 }
 
 const dinoDigCollection = new LocalStorageCollectionStore('dino-dig:museum')
@@ -27,6 +33,6 @@ const colouringSketches = new LocalStorageSketchStore('colouring:sketch')
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App random={Math.random} bestScores={bestScores} sound={new WebAudioSoundPlayer()} dinoDigCollection={dinoDigCollection} colouringGallery={colouringGallery} colouringSketches={colouringSketches} basePath={import.meta.env.BASE_URL} />
+    <App random={Math.random} bestScores={bestScores} bucketBestScores={bucketBestScores} sound={new WebAudioSoundPlayer()} dinoDigCollection={dinoDigCollection} colouringGallery={colouringGallery} colouringSketches={colouringSketches} basePath={import.meta.env.BASE_URL} />
   </StrictMode>,
 )

@@ -1,18 +1,19 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
-import { ITEMS } from '../domain/items'
+import { DIFFICULTIES, ITEMS, type Difficulty } from '../domain/items'
 import { BucketScreen } from './BucketScreen'
 import { inFrame } from '../../test-support/inFrame'
 
 /** With every random value at 0 the first item is the first of the list: a cow. */
 const alwaysFirstItem = () => 0
 
-function renderBuckets(bestScore = 0) {
-  const bestScores = new InMemoryBestScoreStore(bestScore)
+function renderBuckets(bestScore = 0, level: Difficulty = 'easy') {
+  const bestScores = Object.fromEntries(DIFFICULTIES.map((difficulty) => [difficulty, new InMemoryBestScoreStore(difficulty === level ? bestScore : 0)])) as Record<Difficulty, InMemoryBestScoreStore>
   const onExit = vi.fn()
   render(inFrame(<BucketScreen random={alwaysFirstItem} bestScores={bestScores} onExit={onExit} />))
-  return { bestScores, onExit }
+  fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${level}`, 'i') }))
+  return { bestScores: bestScores[level], allBestScores: bestScores, onExit }
 }
 
 const item = () => screen.getByRole('button', { name: /^Item:/ })
@@ -136,5 +137,51 @@ describe('BucketScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: /main menu/i }))
 
     expect(onExit).toHaveBeenCalled()
+  })
+
+  it('asks which level to play before any item appears', () => {
+    const bestScores = Object.fromEntries(DIFFICULTIES.map((difficulty) => [difficulty, new InMemoryBestScoreStore()])) as Record<Difficulty, InMemoryBestScoreStore>
+    render(inFrame(<BucketScreen random={alwaysFirstItem} bestScores={bestScores} onExit={vi.fn()} />))
+
+    const levels = within(screen.getByRole('group', { name: 'Levels' })).getAllByRole('button')
+
+    expect(levels.map((level) => level.textContent)).toEqual([
+      expect.stringMatching(/Easy.*🐶.*🍓.*🚚/),
+      expect.stringMatching(/Medium.*🐶.*🐟.*🐦/),
+      expect.stringMatching(/Hard.*🐶.*🐦.*🐟.*🦋/),
+    ])
+    expect(screen.queryByRole('button', { name: /^Item:/ })).not.toBeInTheDocument()
+  })
+
+  it('plays medium with mammals, fish and birds to sort into', () => {
+    renderBuckets(0, 'medium')
+
+    expect(item()).toHaveAccessibleName('Item: cow')
+    expect(within(screen.getByRole('group', { name: 'Buckets' })).getAllByRole('button').map((button) => button.getAttribute('aria-label'))).toEqual(['Mammals', 'Fish', 'Birds'])
+
+    tapItemThenBucket('Mammals')
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Yes! A cow is a mammal.')
+  })
+
+  it('teaches that a whale is a mammal on hard, not a fish', () => {
+    renderBuckets(0, 'hard')
+
+    expect(item()).toHaveAccessibleName('Item: whale')
+    tapItemThenBucket('Fish')
+    expect(screen.getByRole('alert')).toHaveTextContent('Nuh-uh')
+
+    tapItemThenBucket('Mammals')
+    expect(screen.getByRole('alert')).toHaveTextContent('Yes! A whale is a mammal.')
+  })
+
+  it('keeps a best score for each level', () => {
+    const { allBestScores } = renderBuckets(0, 'medium')
+
+    tapItemThenBucket('Mammals')
+
+    expect(allBestScores.medium.load()).toBe(1)
+    expect(allBestScores.easy.load()).toBe(0)
+    expect(allBestScores.hard.load()).toBe(0)
   })
 })

@@ -9,6 +9,7 @@ import { MatchScreen } from './match-up/ui/MatchScreen'
 import type { CollectionStore } from './dino-dig/application/CollectionStore'
 import { DigScreen } from './dino-dig/ui/DigScreen'
 import type { GalleryStore } from './colouring/application/GalleryStore'
+import type { Difficulty } from './put-it-in-the-bucket/domain/items'
 import { BucketScreen } from './put-it-in-the-bucket/ui/BucketScreen'
 import type { SketchStore } from './colouring/application/SketchStore'
 import { BuilderScreen } from './brick-builder/ui/BuilderScreen'
@@ -27,7 +28,9 @@ type Random = () => number
 interface AppProps {
   random: Random
   /** Colouring is not scored, so it has no best score. */
-  bestScores: Record<Exclude<GameId, 'colouring' | 'brick-builder'>, BestScoreStore>
+  bestScores: Record<Exclude<GameId, 'colouring' | 'brick-builder' | 'put-it-in-the-bucket'>, BestScoreStore>
+  /** The bucket game keeps a best score for each level. */
+  bucketBestScores: Record<Difficulty, BestScoreStore>
   sound: SoundPlayer
   dinoDigCollection: CollectionStore
   colouringGallery: GalleryStore
@@ -36,7 +39,7 @@ interface AppProps {
   basePath: string
 }
 
-export function App({ random, bestScores, sound, dinoDigCollection, colouringGallery, colouringSketches, basePath }: AppProps) {
+export function App({ random, bestScores, bucketBestScores, sound, dinoDigCollection, colouringGallery, colouringSketches, basePath }: AppProps) {
   const [playing, navigate] = useRoute(basePath)
   const backToGames = () => navigate(null)
   const openGame = (game: GameId) => {
@@ -75,7 +78,7 @@ export function App({ random, bestScores, sound, dinoDigCollection, colouringGal
       case 'colouring':
         return <ColouringScreen gallery={colouringGallery} sketches={colouringSketches} />
       case 'put-it-in-the-bucket':
-        return <BucketScreen random={random} bestScores={bestScores['put-it-in-the-bucket']} onExit={backToGames} />
+        return <BucketScreen random={random} bestScores={bucketBestScores} onExit={backToGames} />
       case 'brick-builder':
         return <BuilderScreen sound={sound} />
     }

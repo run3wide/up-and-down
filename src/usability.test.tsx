@@ -34,7 +34,7 @@ const GAMES: Record<GameId, Usability> = {
   'spelling-bee': { card: /^Play Spelling Bee/, onScreen: () => screen.getByRole('group', { name: 'Alphabet' }), stylesheet: 'spelling-bee/ui/spelling.css', layout: 'scrolls' },
   'dino-dig': { card: /^Play Dino Dig/, onScreen: () => screen.getByRole('group', { name: 'Dig site' }), stylesheet: 'dino-dig/ui/dig.css', layout: 'scrolls' },
   'brick-builder': { card: /^Play Brick Builder/, onScreen: () => screen.getByRole('group', { name: 'Baseplate' }), stylesheet: 'brick-builder/ui/builder.css', layout: 'scrolls' },
-  'put-it-in-the-bucket': { card: /^Play Put It In The Bucket/, onScreen: () => screen.getByRole('group', { name: 'Buckets' }), stylesheet: 'put-it-in-the-bucket/ui/bucket.css', layout: 'scrolls' },
+  'put-it-in-the-bucket': { card: /^Play Put It In The Bucket/, onScreen: () => screen.getByRole('group', { name: 'Levels' }), stylesheet: 'put-it-in-the-bucket/ui/bucket.css', layout: 'scrolls' },
   colouring: { card: /^Play Colouring/, onScreen: () => screen.getByRole('group', { name: 'Pictures' }), stylesheet: 'colouring/ui/colouring.css', layout: 'scrolls' },
 }
 
@@ -47,7 +47,7 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame', 'performance', 'setTimeout', 'clearTimeout'] })
   window.history.replaceState(null, '', '/')
   sound = { unlock: vi.fn<SoundPlayer['unlock']>(), play: vi.fn<SoundPlayer['play']>() }
-  render(<App random={() => 0.5} bestScores={bestScores()} sound={sound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} colouringSketches={new InMemorySketchStore()} basePath="/" />)
+  render(<App random={() => 0.5} bestScores={bestScores()} bucketBestScores={{ easy: new InMemoryBestScoreStore(), medium: new InMemoryBestScoreStore(), hard: new InMemoryBestScoreStore() }} sound={sound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} colouringSketches={new InMemorySketchStore()} basePath="/" />)
 })
 
 afterEach(() => {
