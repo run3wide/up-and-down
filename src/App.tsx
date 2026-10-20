@@ -15,6 +15,7 @@ import type { SketchStore } from './colouring/application/SketchStore'
 import { buildHunt } from './treasure-map/domain/hunt'
 import { cluesForHunt } from './treasure-map/domain/treasureGame'
 import { TreasureScreen } from './treasure-map/ui/TreasureScreen'
+import { DinoCluesScreen } from './dino-clues/ui/DinoCluesScreen'
 import { BuilderScreen } from './brick-builder/ui/BuilderScreen'
 import { ColouringScreen } from './colouring/ui/ColouringScreen'
 import type { Difficulty as SpellingDifficulty } from './spelling-bee/domain/words'
@@ -87,6 +88,8 @@ export function App({ random, bestScores, bucketBestScores, spellingBestScores, 
         return <BucketScreen random={random} bestScores={bucketBestScores} onExit={backToGames} />
       case 'treasure-map':
         return <TreasureScreen newHunt={(huntsFound) => buildHunt(cluesForHunt(huntsFound), random)} bestScores={bestScores['treasure-map']} sound={sound} onExit={backToGames} />
+      case 'dino-clues':
+        return <DinoCluesScreen random={random} bestScores={bestScores['dino-clues']} sound={sound} onExit={backToGames} />
       case 'brick-builder':
         return <BuilderScreen sound={sound} />
     }

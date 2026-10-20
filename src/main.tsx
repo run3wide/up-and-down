@@ -18,6 +18,7 @@ const bestScores = {
   'tic-tac-toe': new LocalStorageBestScoreStore('tic-tac-toe:best-score'),
   'dino-dig': new LocalStorageBestScoreStore('dino-dig:best-score'),
   'treasure-map': new LocalStorageBestScoreStore('treasure-map:best-score'),
+  'dino-clues': new LocalStorageBestScoreStore('dino-clues:best-score'),
 }
 
 // Easy keeps the key each game always used, so existing best scores survive.

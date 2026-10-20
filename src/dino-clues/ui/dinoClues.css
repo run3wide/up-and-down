@@ -1,0 +1,173 @@
+.dino-clues {
+  position: relative;
+  height: 100%;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 0.8rem;
+  padding: 4.5rem 1rem 1rem;
+  overflow-y: auto;
+  background: linear-gradient(#cfeeff 0 40%, #bfe8a8 40%);
+}
+
+.dino-clues .hud {
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+}
+
+.dino-clues .hud__score {
+  white-space: nowrap;
+}
+
+.dino-clues__question {
+  margin: 0;
+  max-width: 34rem;
+  padding: 0.5rem 1.2rem;
+  font-size: clamp(1.3rem, 5vw, 1.9rem);
+  text-align: center;
+  background: #fff;
+  border: 0.25rem solid #4c9be8;
+  border-radius: 1.5rem;
+  box-shadow: 0 0.3rem 0 #0002;
+}
+
+.dino-clues__scene {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(0.4rem, 2vw, 0.9rem);
+  width: min(100%, 34rem);
+}
+
+.dino-clues__place {
+  position: relative;
+  aspect-ratio: 1;
+  padding: 0;
+  font: inherit;
+  font-size: clamp(2.2rem, 10vw, 3.6rem);
+  background: #ffffffcc;
+  border: 0.25rem solid #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 0.25rem 0 #0002;
+  cursor: pointer;
+}
+
+.dino-clues__place:disabled {
+  cursor: default;
+}
+
+.dino-clues__place--empty {
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+.dino-clues__place--clue {
+  background: #ffe27a;
+  border-color: #ff9f1c;
+}
+
+.dino-clues__found {
+  position: absolute;
+  right: 0.1rem;
+  bottom: 0;
+  font-size: 1.5rem;
+  animation: pop-in 0.3s ease-out;
+}
+
+.dino-clues__message {
+  min-height: 2.6rem;
+  margin: 0;
+  font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+  text-align: center;
+}
+
+.dino-clues__notebook {
+  width: min(100%, 34rem);
+  padding: 0.6rem 0.8rem;
+  background: #fff7dc;
+  border: 0.25rem solid #b5651d;
+  border-radius: 0.8rem;
+  box-shadow: 0 0.3rem 0 #0002;
+}
+
+.dino-clues__clues {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dino-clues__clue {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.6rem;
+  font-size: clamp(1.05rem, 3.8vw, 1.35rem);
+  color: #8a5a2b;
+}
+
+.dino-clues__clue--found {
+  color: var(--ink);
+  animation: pop-in 0.3s ease-out;
+}
+
+.dino-clues__clue-emoji {
+  font-size: 1.8rem;
+}
+
+.dino-clues__choices {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(0.6rem, 3vw, 1.2rem);
+  width: min(100%, 34rem);
+}
+
+.dino-clues__choice {
+  display: grid;
+  justify-items: center;
+  gap: 0.1rem;
+  width: clamp(6.5rem, 28vw, 9rem);
+  padding: 0.6rem 0.4rem;
+  font: inherit;
+  font-size: clamp(1rem, 3.5vw, 1.3rem);
+  color: var(--ink);
+  background: #fff;
+  border: 0.3rem solid #4c9be8;
+  border-radius: 1.5rem;
+  box-shadow: 0 0.3rem 0 #0002;
+  cursor: pointer;
+  animation: pop-in 0.3s ease-out;
+}
+
+.dino-clues__choice:disabled {
+  cursor: default;
+}
+
+.dino-clues__choice-picture {
+  font-size: clamp(2.6rem, 11vw, 4rem);
+  line-height: 1.1;
+}
+
+.dino-clues__choice--nuh-uh {
+  animation: dino-clues-nuh-uh 0.5s ease-in-out;
+}
+
+@keyframes dino-clues-nuh-uh {
+  15% { translate: -0.5rem 0; }
+  45% { translate: 0.5rem 0; }
+  75% { translate: -0.3rem 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dino-clues__choice--nuh-uh {
+    animation: none;
+    background: #ffe0e0;
+  }
+
+  .dino-clues__found,
+  .dino-clues__clue--found,
+  .dino-clues__choice {
+    animation: none;
+  }
+}
