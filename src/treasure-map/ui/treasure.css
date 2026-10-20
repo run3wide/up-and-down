@@ -1,0 +1,164 @@
+.treasure-map {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto auto;
+  align-content: start;
+  justify-items: center;
+  gap: 0.8rem;
+  padding: 4.5rem 1rem 1rem;
+  overflow-y: auto;
+  background: linear-gradient(#bfe9ff, #ffeab8);
+}
+
+.treasure-map .hud {
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+}
+
+.treasure-map .hud__score {
+  white-space: nowrap;
+}
+
+.treasure-map__map-area {
+  width: min(100%, 38rem, 42vh * 1.27);
+}
+
+.treasure-map__drawing {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 1rem;
+  box-shadow: 0 0.4rem 0 #0003;
+}
+
+.treasure-map__sea {
+  fill: #6ec6e8;
+}
+
+.treasure-map__sand--light {
+  fill: #f6e2b0;
+}
+
+.treasure-map__sand--dark {
+  fill: #f0d79b;
+}
+
+.treasure-map__compass text {
+  font-size: 0.5px;
+  font-weight: bold;
+  fill: #1d4f73;
+}
+
+.treasure-map__start {
+  fill: none;
+  stroke: #1d4f73;
+  stroke-width: 0.06;
+  stroke-dasharray: 0.15 0.12;
+}
+
+.treasure-map__trail {
+  fill: #b5651d;
+  opacity: 0.6;
+}
+
+.treasure-map__reached {
+  fill: #5fcf6b;
+  opacity: 0.55;
+}
+
+.treasure-map__parrot {
+  transition: transform 0.18s ease-out;
+}
+
+.treasure-map__treasure {
+  animation: treasure-glow 1.6s ease-in-out infinite;
+}
+
+.treasure-map__clue {
+  display: grid;
+  gap: 0.2rem;
+  width: min(100%, 38rem);
+  padding: 0.8rem 1rem;
+  text-align: center;
+  background: #fff7dc;
+  border: 0.25rem solid #b5651d;
+  border-radius: 0.8rem;
+  box-shadow: 0 0.3rem 0 #0002;
+}
+
+.treasure-map__clue p {
+  margin: 0;
+}
+
+.treasure-map__clue-number {
+  font-size: 1rem;
+  color: #8a5a2b;
+}
+
+.treasure-map__clue-steps {
+  font-size: clamp(1.5rem, 6vw, 2.2rem);
+}
+
+.treasure-map__message {
+  min-height: 2.6rem;
+  font-size: clamp(1rem, 3.5vw, 1.3rem);
+}
+
+.treasure-map__arrows {
+  display: grid;
+  grid-template-areas: '. north .' 'west . east' '. south .' 'back back back';
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.treasure-map__arrow {
+  display: grid;
+  place-items: center;
+  width: clamp(5rem, 24vw, 7rem);
+  height: clamp(3rem, 10vw, 4rem);
+  font: inherit;
+  font-size: 1.5rem;
+  line-height: 1;
+  touch-action: manipulation;
+}
+
+.treasure-map__arrow-name {
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+.treasure-map__arrow--north {
+  grid-area: north;
+}
+
+.treasure-map__arrow--west {
+  grid-area: west;
+}
+
+.treasure-map__arrow--east {
+  grid-area: east;
+}
+
+.treasure-map__arrow--south {
+  grid-area: south;
+}
+
+.treasure-map__back {
+  grid-area: back;
+  margin-top: 0.4rem;
+}
+
+@keyframes treasure-glow {
+  50% { transform: scale(1.12); transform-origin: center; transform-box: fill-box; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .treasure-map__parrot {
+    transition: none;
+  }
+
+  .treasure-map__treasure {
+    animation: none;
+  }
+}

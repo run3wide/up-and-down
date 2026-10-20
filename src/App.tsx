@@ -12,6 +12,9 @@ import type { GalleryStore } from './colouring/application/GalleryStore'
 import type { Difficulty } from './put-it-in-the-bucket/domain/items'
 import { BucketScreen } from './put-it-in-the-bucket/ui/BucketScreen'
 import type { SketchStore } from './colouring/application/SketchStore'
+import { buildHunt } from './treasure-map/domain/hunt'
+import { cluesForHunt } from './treasure-map/domain/treasureGame'
+import { TreasureScreen } from './treasure-map/ui/TreasureScreen'
 import { BuilderScreen } from './brick-builder/ui/BuilderScreen'
 import { ColouringScreen } from './colouring/ui/ColouringScreen'
 import { SpellingScreen } from './spelling-bee/ui/SpellingScreen'
@@ -79,6 +82,8 @@ export function App({ random, bestScores, bucketBestScores, sound, dinoDigCollec
         return <ColouringScreen gallery={colouringGallery} sketches={colouringSketches} />
       case 'put-it-in-the-bucket':
         return <BucketScreen random={random} bestScores={bucketBestScores} onExit={backToGames} />
+      case 'treasure-map':
+        return <TreasureScreen newHunt={(huntsFound) => buildHunt(cluesForHunt(huntsFound), random)} bestScores={bestScores['treasure-map']} sound={sound} onExit={backToGames} />
       case 'brick-builder':
         return <BuilderScreen sound={sound} />
     }

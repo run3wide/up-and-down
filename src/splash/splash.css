@@ -154,6 +154,10 @@
   background: linear-gradient(#ffffff, #d9f0ff);
 }
 
+.game-card--treasure-map {
+  background: linear-gradient(#ffffff, #ffe9b0);
+}
+
 .game-card--dino-dig {
   background: linear-gradient(#ffffff, #f0dcc0);
 }
@@ -222,6 +226,10 @@
 
 .game-card__title--brick-builder {
   color: #d9480f;
+}
+
+.game-card__title--treasure-map {
+  color: #b5651d;
 }
 
 .game-card__title--bucket {
