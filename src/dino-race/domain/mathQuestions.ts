@@ -28,7 +28,7 @@ export function mathQuiz(random: Random): Quiz {
 }
 
 /** "2x + 6x =": the answer keeps its thing (8x); the traps are a bare 8 and 8 of something else. */
-function sameThing(random: Random, symbols: readonly string[], biggestCount: number): MathQuestion {
+export function sameThing(random: Random, symbols: readonly string[], biggestCount: number): MathQuestion {
   const [thing, otherThing] = pickTwo(random, symbols)
   const first = between(random, 1, biggestCount)
   const second = between(random, 1, biggestCount)
@@ -42,13 +42,12 @@ function sameThing(random: Random, symbols: readonly string[], biggestCount: num
 }
 
 /** "2x + 1x + 3y =": like things are grouped (3x + 3y); lumping everything under one thing is the trap. */
-function mixedThings(random: Random, symbols: readonly string[]): MathQuestion {
+export function mixedThings(random: Random, symbols: readonly string[], termCount = 3): MathQuestion {
   const [thing, otherThing] = pickTwo(random, symbols)
-  const terms = shuffle(random, [
-    { count: between(random, 1, 4), symbol: thing },
-    { count: between(random, 1, 4), symbol: thing },
-    { count: between(random, 1, 4), symbol: otherThing },
-  ])
+  const otherCount = Math.floor(termCount / 2)
+  const termsOf = (symbol: string, howMany: number): Term[] =>
+    Array.from({ length: howMany }, () => ({ count: between(random, 1, 4), symbol }))
+  const terms = shuffle(random, [...termsOf(thing, termCount - otherCount), ...termsOf(otherThing, otherCount)])
   const groups = groupLikeThings(terms)
   const everything = terms.reduce((total, term) => total + term.count, 0)
   return withShuffledOptions(random, {
