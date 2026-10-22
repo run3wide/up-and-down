@@ -20,45 +20,21 @@
 }
 
 .bakery__cake {
-  display: grid;
-  justify-items: center;
-  gap: 0;
-  width: min(100%, 14rem);
+  width: min(100%, 17rem);
 }
 
-.bakery__toppings {
-  display: flex;
-  justify-content: center;
-  gap: 0.1rem;
-  min-height: 1.8rem;
-  font-size: 1.5rem;
-}
-
-.bakery__frosting {
-  width: 85%;
-  height: 1rem;
-  border-radius: 1rem 1rem 0.3rem 0.3rem;
-  box-shadow: 0 0.15rem 0 #0002;
-}
-
-.bakery__frosting[data-empty] {
-  background: #ffffff80;
-  border: 0.15rem dashed #c9a27a;
-}
-
-.bakery__mould {
-  display: grid;
-  place-items: center;
+.cake-art {
+  display: block;
   width: 100%;
-  aspect-ratio: 2;
-  font-size: clamp(3rem, 14vw, 4.6rem);
-  border-radius: 0.5rem 0.5rem 50% 50% / 0.5rem 0.5rem 100% 100%;
-  box-shadow: 0 0.3rem 0 #0002;
+  height: auto;
+  overflow: visible;
 }
 
-.bakery__mould[data-empty] {
-  background: #f3e5d0;
-  border: 0.2rem dashed #c9a27a;
+.cake-art__empty {
+  margin: 0;
+  font-size: clamp(3.5rem, 16vw, 5.5rem);
+  line-height: 1.2;
+  text-align: center;
 }
 
 .bakery__step {
