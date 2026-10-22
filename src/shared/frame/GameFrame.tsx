@@ -2,6 +2,7 @@ import './frame.css'
 
 import { useState } from 'react'
 import { Overlay } from '../Overlays'
+import { ThemeToggle } from '../theme/ThemeToggle'
 import { FrameContext } from './FrameContext'
 
 interface GameFrameProps {
@@ -23,7 +24,10 @@ export function GameFrame({ title, onHome, children }: GameFrameProps) {
             <span aria-hidden="true">🏠</span>
           </button>
           <p className="game-frame__title">{title}</p>
-          <div className="game-frame__controls" ref={setControlsSlot} />
+          <div className="game-frame__tools">
+            <ThemeToggle />
+            <div className="game-frame__controls" ref={setControlsSlot} />
+          </div>
         </header>
         <div className="game-frame__content">{children}</div>
         {leaving && (

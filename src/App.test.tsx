@@ -4,6 +4,7 @@ import { App } from './App'
 import { InMemoryCollectionStore } from './dino-dig/infrastructure/InMemoryCollectionStore'
 import { InMemoryGalleryStore } from './colouring/infrastructure/InMemoryGalleryStore'
 import { InMemorySketchStore } from './colouring/infrastructure/InMemorySketchStore'
+import { InMemoryThemeStore } from './shared/theme/InMemoryThemeStore'
 import { InMemoryBestScoreStore } from './shared/InMemoryBestScoreStore'
 
 const bestScores = () => ({
@@ -27,7 +28,7 @@ const silentSound = { unlock: () => {}, play: () => {} }
 
 function renderApp(path = '/', basePath = '/') {
   window.history.replaceState(null, '', path)
-  render(<App random={() => 0.5} bestScores={bestScores()} bucketBestScores={bucketBestScores()} spellingBestScores={spellingBestScores()} sound={silentSound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} colouringSketches={new InMemorySketchStore()} basePath={basePath} />)
+  render(<App random={() => 0.5} bestScores={bestScores()} bucketBestScores={bucketBestScores()} spellingBestScores={spellingBestScores()} sound={silentSound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} colouringSketches={new InMemorySketchStore()} themeStore={new InMemoryThemeStore()} basePath={basePath} />)
 }
 
 function keyDown(key: string) {
@@ -47,6 +48,17 @@ afterEach(() => {
 const pickerHeading = () => screen.getByRole('heading', { name: 'Pick a game' })
 
 describe('App', () => {
+  it('has a dark mode switch on the picker and in a game, and the choice carries between them', () => {
+    renderApp('/')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Switch to dark mode' }))
+    expect(document.documentElement.dataset.theme).toBe('dark')
+    fireEvent.click(screen.getByRole('button', { name: /^Play Lemon Volcano/ }))
+
+    expect(screen.getByRole('button', { name: 'Switch to light mode' })).toBeInTheDocument()
+    expect(document.documentElement.dataset.theme).toBe('dark')
+  })
+
   it('opens on the game picker', () => {
     renderApp('/')
 

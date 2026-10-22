@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest'
+import { InMemoryThemeStore } from './shared/theme/InMemoryThemeStore'
 import { App } from './App'
 import { InMemoryGalleryStore } from './colouring/infrastructure/InMemoryGalleryStore'
 import { InMemorySketchStore } from './colouring/infrastructure/InMemorySketchStore'
@@ -50,7 +51,7 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame', 'performance', 'setTimeout', 'clearTimeout'] })
   window.history.replaceState(null, '', '/')
   sound = { unlock: vi.fn<SoundPlayer['unlock']>(), play: vi.fn<SoundPlayer['play']>() }
-  render(<App random={() => 0.5} bestScores={bestScores()} bucketBestScores={{ easy: new InMemoryBestScoreStore(), medium: new InMemoryBestScoreStore(), hard: new InMemoryBestScoreStore() }} spellingBestScores={{ easy: new InMemoryBestScoreStore(), medium: new InMemoryBestScoreStore(), hard: new InMemoryBestScoreStore() }} sound={sound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} colouringSketches={new InMemorySketchStore()} basePath="/" />)
+  render(<App random={() => 0.5} bestScores={bestScores()} bucketBestScores={{ easy: new InMemoryBestScoreStore(), medium: new InMemoryBestScoreStore(), hard: new InMemoryBestScoreStore() }} spellingBestScores={{ easy: new InMemoryBestScoreStore(), medium: new InMemoryBestScoreStore(), hard: new InMemoryBestScoreStore() }} sound={sound} dinoDigCollection={new InMemoryCollectionStore()} colouringGallery={new InMemoryGalleryStore()} colouringSketches={new InMemorySketchStore()} themeStore={new InMemoryThemeStore()} basePath="/" />)
 })
 
 afterEach(() => {

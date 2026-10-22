@@ -14,7 +14,7 @@
   display: grid;
   justify-items: center;
   padding: 0.5rem 2.5rem 0.75rem;
-  background: #fff;
+  background: var(--surface);
   border: 0.25rem solid #ff9f1c;
   border-radius: 1.5rem;
   box-shadow: 0 0.3rem 0 #0002;
@@ -90,7 +90,7 @@
   font: inherit;
   font-size: 1rem;
   color: var(--ink);
-  background: #fff;
+  background: var(--surface);
   border: 0.2rem solid #fff;
   border-radius: 1.2rem;
   box-shadow: 0 0.25rem 0 #0002;

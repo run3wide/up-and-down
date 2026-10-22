@@ -28,9 +28,9 @@ describe('child safety and privacy', () => {
     expect(calls).toEqual([])
   })
 
-  it('stores nothing but best scores, the Dino Dig museum and coloured-in pictures and a free drawing, on the device', () => {
+  it('stores nothing but best scores, the Dino Dig museum and coloured-in pictures and a free drawing and the light or dark mode pick, on the device', () => {
     const storage = shippedFiles(['.ts', '.tsx'])
-      .filter(({ path }) => !path.endsWith('LocalStorageBestScoreStore.ts') && !path.endsWith('LocalStorageCollectionStore.ts') && !path.endsWith('LocalStorageGalleryStore.ts') && !path.endsWith('LocalStorageSketchStore.ts'))
+      .filter(({ path }) => !path.endsWith('LocalStorageBestScoreStore.ts') && !path.endsWith('LocalStorageCollectionStore.ts') && !path.endsWith('LocalStorageGalleryStore.ts') && !path.endsWith('LocalStorageSketchStore.ts') && !path.endsWith('LocalStorageThemeStore.ts'))
       .flatMap(({ path, text }) => (text.match(/localStorage|sessionStorage|indexedDB|document\.cookie/g) ?? []).map((use) => `${path}: ${use}`))
 
     expect(storage).toEqual([])

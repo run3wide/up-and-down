@@ -79,7 +79,7 @@
 }
 
 .burst--poof span {
-  background: #ffffffcc;
+  background: var(--surface-glass);
   animation-name: fly-short;
 }
 
