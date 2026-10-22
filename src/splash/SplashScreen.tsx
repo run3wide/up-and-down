@@ -4,6 +4,7 @@ import { StrawberryIcon } from '../art/StrawberryIcon'
 import type { GameId } from './games'
 import { Logo } from './Logo'
 import { SplashScene } from './SplashScene'
+import { ThemeToggle } from '../shared/theme/ThemeToggle'
 import './splash.css'
 
 export function SplashScreen({ onPick }: { onPick: (game: GameId) => void }) {
@@ -13,6 +14,9 @@ export function SplashScreen({ onPick }: { onPick: (game: GameId) => void }) {
   return (
     <main className="splash">
       <SplashScene />
+      <div className="splash__theme">
+        <ThemeToggle />
+      </div>
       <div className="splash__content">
         <h1 className="splash__title">Pick a game</h1>
         <div className="game-cards">

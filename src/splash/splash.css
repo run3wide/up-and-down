@@ -109,7 +109,7 @@
   min-height: clamp(13rem, 34vh, 17rem);
   padding: 1rem 1rem 1.25rem;
   color: var(--ink);
-  background: #fff;
+  background: var(--surface);
   border: 0.3rem solid #fff;
   border-radius: 2rem;
   box-shadow: 0 0.4rem 0 #0002, 0 1rem 1.5rem #0003;
@@ -292,7 +292,7 @@
   position: absolute;
   width: 14rem;
   height: 4rem;
-  background: #fff;
+  background: var(--surface);
   border-radius: 999px;
   box-shadow: 3rem -1.6rem 0 -0.6rem #fff, -2.5rem -1rem 0 -1rem #fff;
   opacity: 0.9;
@@ -363,4 +363,11 @@
     animation: none !important;
     transition: none !important;
   }
+}
+
+.splash__theme {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 1;
 }

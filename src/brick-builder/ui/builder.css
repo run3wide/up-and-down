@@ -20,7 +20,7 @@
   padding: 0.2em 1.1em;
   font-size: 1.15rem;
   color: var(--ink);
-  background: #fff;
+  background: var(--surface);
   border: 0.12rem solid var(--ink);
   border-radius: 999px;
   box-shadow: 0 0.1rem 0 var(--ink);
@@ -142,7 +142,7 @@
 
 .brick-builder__choice--chosen {
   border-color: var(--ink);
-  background: #fff;
+  background: var(--surface);
 }
 
 .brick-builder__ghost {

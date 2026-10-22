@@ -15,7 +15,7 @@
   min-width: min(20rem, 100%);
   padding: 1.5rem 2rem 2rem;
   text-align: center;
-  background: #fff;
+  background: var(--surface);
   border-radius: 2rem;
   box-shadow: 0 1rem 2rem #0004;
   animation: pop-in 0.25s ease-out;
@@ -74,7 +74,7 @@
   min-height: 3rem;
   font-size: 1.3rem;
   color: var(--ink);
-  background: #fff;
+  background: var(--surface);
   border-color: var(--ink);
   box-shadow: 0 0.1em 0 var(--ink);
 }

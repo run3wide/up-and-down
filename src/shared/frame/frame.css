@@ -12,7 +12,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.4rem 0.75rem;
-  background: #fff;
+  background: var(--surface);
   box-shadow: 0 0.1rem 0.4rem #0002;
   /* Keeps its shadow above the game. */
   position: relative;
@@ -28,6 +28,12 @@
   white-space: nowrap;
 }
 
+.game-frame__tools {
+  display: flex;
+  gap: 0.5rem;
+  justify-self: end;
+}
+
 .game-frame__controls {
   display: flex;
   gap: 0.5rem;
@@ -39,7 +45,7 @@
   height: 3rem;
   font-size: 1.1rem;
   color: var(--ink);
-  background: #eef3ff;
+  background: var(--control-surface);
   border: 0;
   border-radius: 50%;
   cursor: pointer;

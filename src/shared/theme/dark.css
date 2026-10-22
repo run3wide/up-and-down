@@ -1,0 +1,58 @@
+/* Night mode: the same pictures under a night sky. The variables carry the shared surfaces; the rest paints each game's own backdrop and light panels. */
+:root[data-theme='dark'] {
+  --ink: #e8ecff;
+  --surface: #272c4d;
+  --surface-glass: #272c4dd9;
+  --control-surface: #363c68;
+  --sky-top: #0b1033;
+  --sky-bottom: #2b2f6e;
+  --grass: #2f7d4b;
+  --grass-dark: #245f3a;
+  color-scheme: dark;
+}
+
+/* Backdrops */
+:root[data-theme='dark'] .splash { background: linear-gradient(var(--sky-top), var(--sky-bottom) 70%, #3b3a73); }
+:root[data-theme='dark'] .lemon-volcano { background: linear-gradient(#2b1330, #5b2a3d 55%, #7a3d3a); }
+:root[data-theme='dark'] .kitchen { background: repeating-conic-gradient(#2c2a44 0 25%, #353252 0 50%) 0 0 / 5rem 5rem; }
+:root[data-theme='dark'] .match { background: linear-gradient(#141a3d, #163a3a); }
+:root[data-theme='dark'] .tic-tac-toe { background: linear-gradient(#141a3d, #3a1d3f); }
+:root[data-theme='dark'] .speller { background: repeating-conic-gradient(#1a2347 0 25%, #202b55 0 50%) 0 0 / 5rem 5rem; }
+:root[data-theme='dark'] .dig { background: linear-gradient(#141a3d 0 18%, #5a4328 18%); }
+:root[data-theme='dark'] .colouring { background: linear-gradient(#2a2347, #3f2442); }
+:root[data-theme='dark'] .brick-builder { background: linear-gradient(#141a3d, #232a5c); }
+:root[data-theme='dark'] .bucket-game { background: linear-gradient(#141a3d, #3a3350); }
+:root[data-theme='dark'] .treasure-map { background: linear-gradient(#141a3d, #3b3350); }
+:root[data-theme='dark'] .dino-clues { background: linear-gradient(#141a3d 0 40%, #1f4a35 40%); }
+:root[data-theme='dark'] .bakery { background: linear-gradient(#2d1a3f 0 45%, #3a2a3f 45%); }
+:root[data-theme='dark'] .race,
+:root[data-theme='dark'] .maze { background: #1f5a33; }
+
+/* Light panels that keep dark text in the day */
+:root[data-theme='dark'] .game-card { color: #1d2b53; }
+:root[data-theme='dark'] .treasure-map__clue,
+:root[data-theme='dark'] .dino-clues__notebook,
+:root[data-theme='dark'] .race__praise { background: #3a3358; color: var(--ink); }
+:root[data-theme='dark'] .treasure-map__clue-number,
+:root[data-theme='dark'] .dino-clues__clue { color: #f0c987; }
+:root[data-theme='dark'] .dino-clues__place { background: #272c4dcc; border-color: #4a5090; }
+:root[data-theme='dark'] .dino-clues__place--clue,
+:root[data-theme='dark'] .speller__letter--selected,
+:root[data-theme='dark'] .bucket-game__item--picked,
+:root[data-theme='dark'] .dig__bone--selected { background: #7a6420; color: #fff; }
+:root[data-theme='dark'] .match-card--matched,
+:root[data-theme='dark'] .ingredient--added,
+:root[data-theme='dark'] .speller__blank--filled { background: #1f5a3a; }
+:root[data-theme='dark'] .speller__blank { background: #272c4daa; }
+:root[data-theme='dark'] .tic-tac-toe-square--line { background: #6a5a20; }
+:root[data-theme='dark'] .bakery__answer { background: #2e3a6e; }
+:root[data-theme='dark'] .quiz__option--wrong { background: #3a3f55; color: #aab0c8; }
+:root[data-theme='dark'] .kitchen__plate { background: radial-gradient(#3a3f66 60%, #2a2f50 62%); }
+:root[data-theme='dark'] .dig__stage { background: #ffffff14; }
+:root[data-theme='dark'] .dig__spot { background: #ffffff10; }
+:root[data-theme='dark'] .brick-builder__plate { background: #ffffff1c; }
+:root[data-theme='dark'] .brick-builder__landing { background: #ffffff22; }
+:root[data-theme='dark'] .brick-builder__column { background: #ffffff10; }
+:root[data-theme='dark'] .brick-builder__choice { background: #272c4daa; }
+:root[data-theme='dark'] .brick-builder__pictures .brick-builder__tool[aria-pressed='true'] { background: #e8ecff; color: #1d2b53; }
+:root[data-theme='dark'] .overlay { background: #05071a99; }

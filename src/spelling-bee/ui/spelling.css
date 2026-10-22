@@ -15,7 +15,7 @@
   padding: 0.3rem 1.6rem;
   font-size: clamp(4rem, 16vw, 7rem);
   line-height: 1.15;
-  background: #fff;
+  background: var(--surface);
   border: 0.25rem solid #4c9be8;
   border-radius: 2rem;
   box-shadow: 0 0.3rem 0 #0002;
@@ -87,7 +87,7 @@
   font: inherit;
   font-size: 1.7rem;
   color: var(--ink);
-  background: #fff;
+  background: var(--surface);
   border: 0.2rem solid #fff;
   border-radius: 0.9rem;
   box-shadow: 0 0.25rem 0 #0002;
@@ -150,7 +150,7 @@
   padding: 0.8rem 1rem;
   font: inherit;
   color: var(--ink);
-  background: #fff;
+  background: var(--surface);
   border: 0.3rem solid #4c9be8;
   border-radius: 1.5rem;
   box-shadow: 0 0.3rem 0 #0002;

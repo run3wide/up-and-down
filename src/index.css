@@ -4,9 +4,15 @@
   --grass: #5fcf6b;
   --grass-dark: #3fae5a;
   --ink: #1d2b53;
+  --surface: #fff;
+  --surface-glass: #ffffffcc;
+  --control-surface: #eef3ff;
+  /* Line art and anything drawn on white paper keeps dark lines, day or night. */
+  --paper-ink: #1d2b53;
   --font-display: 'Arial Rounded MT Bold', 'Nunito', ui-rounded, 'Avenir Next Rounded', system-ui, sans-serif;
   font-family: var(--font-display);
   color: var(--ink);
+  color-scheme: light;
 }
 
 * {
@@ -29,7 +35,7 @@ button {
 }
 
 :focus-visible {
-  outline: 4px solid #1d2b53;
+  outline: 4px solid var(--ink);
   outline-offset: 3px;
 }
 

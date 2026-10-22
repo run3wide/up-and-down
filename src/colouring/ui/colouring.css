@@ -20,7 +20,7 @@
   padding: 0.2em 1.1em;
   font-size: 1.15rem;
   color: var(--ink);
-  background: #fff;
+  background: var(--surface);
   border: 0.12rem solid var(--ink);
   border-radius: 999px;
   box-shadow: 0 0.1rem 0 var(--ink);
@@ -44,14 +44,14 @@
   flex: none;
   width: min(100%, 36rem, 62vh);
   aspect-ratio: 1;
-  background: #fff;
+  background: var(--surface);
   border-radius: 1rem;
   box-shadow: 0 0.3rem 0.8rem #0003;
   touch-action: manipulation;
 }
 
 .colouring__part {
-  stroke: var(--ink);
+  stroke: var(--paper-ink);
   stroke-width: 0.7;
   stroke-linejoin: round;
 }
@@ -73,7 +73,7 @@
 
 .colouring__line {
   fill: none;
-  stroke: var(--ink);
+  stroke: var(--paper-ink);
   stroke-width: 0.8;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -116,7 +116,7 @@
   padding: 0.5rem;
   font-size: 1.2rem;
   color: var(--ink);
-  background: #fff;
+  background: var(--surface);
   border: 0.12rem solid var(--ink);
   border-radius: 1rem;
   box-shadow: 0 0.2rem 0 var(--ink);
@@ -150,7 +150,7 @@
   min-height: 3.25rem;
   padding: 0.3rem;
   color: var(--ink);
-  background: #fff;
+  background: var(--surface);
   border: 0.15rem solid var(--ink);
   border-radius: 1rem;
   box-shadow: 0 0.1rem 0 var(--ink);

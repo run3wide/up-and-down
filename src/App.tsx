@@ -23,6 +23,8 @@ import { ColouringScreen } from './colouring/ui/ColouringScreen'
 import type { Difficulty as SpellingDifficulty } from './spelling-bee/domain/words'
 import { SpellingScreen } from './spelling-bee/ui/SpellingScreen'
 import { TicTacToeScreen } from './tic-tac-toe/ui/TicTacToeScreen'
+import { ThemeContext, useThemeController } from './shared/theme/ThemeContext'
+import type { ThemeStore } from './shared/theme/theme'
 import { useRoute } from './routing/useRoute'
 import type { BestScoreStore } from './shared/bestScore'
 import { SplashScreen } from './splash/SplashScreen'
@@ -44,11 +46,15 @@ interface AppProps {
   dinoDigCollection: CollectionStore
   colouringGallery: GalleryStore
   colouringSketches: SketchStore
+  themeStore: ThemeStore
   /** Where the app is served from, so each game has its own address under it. */
   basePath: string
 }
 
-export function App({ random, bestScores, bucketBestScores, spellingBestScores, sound, dinoDigCollection, colouringGallery, colouringSketches, basePath }: AppProps) {
+const deviceIsDark = () => window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false
+
+export function App({ random, bestScores, bucketBestScores, spellingBestScores, sound, dinoDigCollection, colouringGallery, colouringSketches, themeStore, basePath }: AppProps) {
+  const theme = useThemeController(themeStore, deviceIsDark())
   const [playing, navigate] = useRoute(basePath)
   const backToGames = () => navigate(null)
   const openGame = (game: GameId) => {
@@ -56,12 +62,16 @@ export function App({ random, bestScores, bucketBestScores, spellingBestScores, 
     navigate(game)
   }
 
-  if (playing === null) return <SplashScreen onPick={openGame} />
-
   return (
-    <GameFrame key={playing} title={GAME_TITLES[playing]} onHome={backToGames}>
-      {screenFor(playing)}
-    </GameFrame>
+    <ThemeContext value={theme}>
+      {playing === null ? (
+        <SplashScreen onPick={openGame} />
+      ) : (
+        <GameFrame key={playing} title={GAME_TITLES[playing]} onHome={backToGames}>
+          {screenFor(playing)}
+        </GameFrame>
+      )}
+    </ThemeContext>
   )
 
   function screenFor(playing: GameId) {

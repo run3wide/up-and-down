@@ -18,7 +18,7 @@
   margin: 0;
   padding: 0.15em 0.9em;
   font-size: clamp(1.4rem, 4vw, 2.4rem);
-  background: #ffffffcc;
+  background: var(--surface-glass);
   border-radius: 999px;
   box-shadow: 0 0.15rem 0.4rem #0002;
 }
@@ -35,7 +35,7 @@
   height: 3.25rem;
   font-size: 1.1rem;
   color: var(--ink);
-  background: #ffffffcc;
+  background: var(--surface-glass);
   border: 0;
   border-radius: 50%;
   box-shadow: 0 0.15rem 0.4rem #0002;
