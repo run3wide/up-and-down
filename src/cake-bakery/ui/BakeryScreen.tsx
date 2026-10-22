@@ -5,6 +5,7 @@ import { Overlay, PausedOverlay } from '../../shared/Overlays'
 import type { Quiz } from '../../dino-race/domain/quiz'
 import { BakeGame, type BakeEvent, type Cake } from '../domain/bakeGame'
 import type { Step } from '../domain/ingredients'
+import { CakeArt } from './CakeArt'
 import '../../shared/hud.css'
 import './bakery.css'
 
@@ -125,16 +126,9 @@ export function BakeryScreen({ createQuiz, bestScores, onExit }: BakeryScreenPro
 }
 
 function CakePreview({ cake }: { cake: Cake }) {
-  const { shape, flavour, frosting, topping } = cake
   return (
     <div className="bakery__cake" role="img" aria-label={describe(cake)}>
-      <div className="bakery__toppings" aria-hidden="true">
-        {topping ? Array.from({ length: 5 }, (_, i) => <span key={i}>{topping.emoji}</span>) : null}
-      </div>
-      <div className="bakery__frosting" aria-hidden="true" style={{ background: frosting?.colour }} data-empty={frosting ? undefined : ''} />
-      <div className="bakery__mould" aria-hidden="true" style={{ background: flavour?.colour }} data-empty={flavour ? undefined : ''}>
-        {shape?.emoji ?? '🎂'}
-      </div>
+      <CakeArt cake={cake} />
     </div>
   )
 }
