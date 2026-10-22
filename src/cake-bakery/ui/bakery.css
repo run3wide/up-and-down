@@ -61,30 +61,86 @@
   text-align: center;
 }
 
-.bakery__answers {
+.bakery__blanks {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
-  gap: 0.6rem;
+  gap: 0.4rem;
 }
 
-.bakery__answer {
-  min-width: 6rem;
-  min-height: 3.4rem;
-  padding: 0.4rem 1rem;
+.bakery__plus {
+  margin: 0 0.3rem;
+  font-size: clamp(1.6rem, 6vw, 2.2rem);
+}
+
+.bakery__blank {
+  width: clamp(3.4rem, 14vw, 4.4rem);
+  height: clamp(3.8rem, 15vw, 4.8rem);
+  padding: 0;
   font: inherit;
-  font-size: clamp(1.2rem, 5vw, 1.6rem);
+  font-size: clamp(1.7rem, 7vw, 2.4rem);
   color: var(--ink);
   background: #e7f1ff;
-  border: 0.25rem solid #4c9be8;
+  border: 0.25rem dashed #4c9be8;
   border-radius: 1rem;
-  box-shadow: 0 0.25rem 0 #0002;
   cursor: pointer;
 }
 
-.bakery__answer:disabled {
+.bakery__blank--filled {
+  background: #fff7dc;
+  border-style: solid;
+}
+
+.bakery__blank:disabled {
   cursor: default;
-  opacity: 0.5;
+}
+
+.bakery__tiles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  max-width: 24rem;
+}
+
+.bakery__tile {
+  min-width: 3.4rem;
+  height: 3.8rem;
+  padding: 0 0.7rem;
+  font: inherit;
+  font-size: clamp(1.7rem, 7vw, 2.4rem);
+  color: var(--ink);
+  background: #d3f9d8;
+  border: 0.25rem solid #40c057;
+  border-radius: 1rem;
+  box-shadow: 0 0.25rem 0 #0002;
+  cursor: grab;
+  touch-action: none;
+}
+
+.bakery__tile--symbol {
+  background: #ffe8cc;
+  border-color: #ff922b;
+}
+
+.bakery__tile--selected {
+  outline: 0.3rem solid var(--ink);
+  outline-offset: 0.15rem;
+}
+
+.bakery__tile:disabled {
+  cursor: default;
+}
+
+.bakery__ghost {
+  position: fixed;
+  z-index: 10;
+  translate: -50% -50%;
+  font-size: 3rem;
+  color: var(--ink);
+  pointer-events: none;
+  text-shadow: 0 0.1em 0.2em #0004;
 }
 
 .bakery__answer--nuh-uh {
@@ -141,7 +197,7 @@
 @media (prefers-reduced-motion: reduce) {
   .bakery__answer--nuh-uh {
     animation: none;
-    background: #ffe0e0;
+    outline: 0.25rem solid #e5484d;
   }
 
   .bakery__choice {
