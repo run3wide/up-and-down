@@ -37,6 +37,7 @@ const GAMES: Record<GameId, Usability> = {
   'put-it-in-the-bucket': { card: /^Play Put It In The Bucket/, onScreen: () => screen.getByRole('group', { name: 'Levels' }), stylesheet: 'put-it-in-the-bucket/ui/bucket.css', layout: 'scrolls' },
   'treasure-map': { card: /^Play Treasure Map/, onScreen: () => screen.getByRole('region', { name: 'Clue' }), stylesheet: 'treasure-map/ui/treasure.css', layout: 'scrolls' },
   'dino-clues': { card: /^Play Dino Clues/, onScreen: () => screen.getByRole('group', { name: 'Hiding places' }), stylesheet: 'dino-clues/ui/dinoClues.css', layout: 'scrolls' },
+  'cake-bakery': { card: /^Play Cake Bakery/, onScreen: () => screen.getByRole('group', { name: 'Answers' }), stylesheet: 'cake-bakery/ui/bakery.css', layout: 'scrolls' },
   colouring: { card: /^Play Colouring/, onScreen: () => screen.getByRole('group', { name: 'Pictures' }), stylesheet: 'colouring/ui/colouring.css', layout: 'scrolls' },
 }
 

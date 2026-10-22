@@ -15,6 +15,8 @@ import type { SketchStore } from './colouring/application/SketchStore'
 import { buildHunt } from './treasure-map/domain/hunt'
 import { cluesForHunt } from './treasure-map/domain/treasureGame'
 import { TreasureScreen } from './treasure-map/ui/TreasureScreen'
+import { cakeQuiz } from './cake-bakery/domain/cakeQuestions'
+import { BakeryScreen } from './cake-bakery/ui/BakeryScreen'
 import { DinoCluesScreen } from './dino-clues/ui/DinoCluesScreen'
 import { BuilderScreen } from './brick-builder/ui/BuilderScreen'
 import { ColouringScreen } from './colouring/ui/ColouringScreen'
@@ -90,6 +92,8 @@ export function App({ random, bestScores, bucketBestScores, spellingBestScores, 
         return <TreasureScreen newHunt={(huntsFound) => buildHunt(cluesForHunt(huntsFound), random)} bestScores={bestScores['treasure-map']} sound={sound} onExit={backToGames} />
       case 'dino-clues':
         return <DinoCluesScreen random={random} bestScores={bestScores['dino-clues']} sound={sound} onExit={backToGames} />
+      case 'cake-bakery':
+        return <BakeryScreen createQuiz={() => cakeQuiz(random)} bestScores={bestScores['cake-bakery']} onExit={backToGames} />
       case 'brick-builder':
         return <BuilderScreen sound={sound} />
     }

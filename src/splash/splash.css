@@ -162,6 +162,10 @@
   background: linear-gradient(#ffffff, #d6f0c2);
 }
 
+.game-card--cake-bakery {
+  background: linear-gradient(#ffffff, #ffd6e7);
+}
+
 .game-card--dino-dig {
   background: linear-gradient(#ffffff, #f0dcc0);
 }
@@ -238,6 +242,10 @@
 
 .game-card__title--dino-clues {
   color: #2f9e44;
+}
+
+.game-card__title--cake-bakery {
+  color: #d6336c;
 }
 
 .game-card__title--bucket {
