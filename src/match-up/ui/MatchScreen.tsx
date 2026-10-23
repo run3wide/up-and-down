@@ -29,6 +29,7 @@ export function MatchScreen({ random, bestScores, onExit }: MatchScreenProps) {
         if (event.type === 'cardFlipped') setMessage('')
         if (event.type === 'pairFound') setMessage(`A match! ${event.face}${event.face} ⭐`)
         if (event.type === 'pairMissed') setMessage(`${event.first} and ${event.second} are not the same. Try again!`)
+        if (event.type === 'matchUndone') setMessage('Put them back! Find them again.')
         if (event.type === 'boardCleared') {
           setMessage('Great job! You found them all! 🎉')
           setBest(recordFinalScore(bestScores, game.snapshot().boardsCleared).best)
@@ -51,6 +52,11 @@ export function MatchScreen({ random, bestScores, onExit }: MatchScreenProps) {
 
   const flip = (id: number) => {
     react(game.flip(id))
+    setSnapshot(game.snapshot())
+  }
+
+  const undoMatch = () => {
+    react(game.undoMatch())
     setSnapshot(game.snapshot())
   }
 
@@ -97,6 +103,11 @@ export function MatchScreen({ random, bestScores, onExit }: MatchScreenProps) {
           ),
         )}
       </div>
+      {snapshot.phase === 'playing' && (
+        <button className="match__back" aria-label="Undo last match" disabled={paused || !snapshot.canUndo} onClick={undoMatch}>
+          <span aria-hidden="true">↩ Back</span>
+        </button>
+      )}
       {snapshot.phase === 'cleared' && (
         <button className="big-button" autoFocus onClick={nextBoard}>
           Next board
