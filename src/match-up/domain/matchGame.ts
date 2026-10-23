@@ -1,6 +1,6 @@
-import type { Item, Kind } from './kinds'
+import type { Item } from './pictures'
 
-/** Every board is a 5x5 square: 12 pairs and one lucky star in the middle, which is already face up and never needs a partner. */
+/** Every board is a 5x5 square: 12 pairs of identical pictures and one lucky star in the middle, which is already face up and never needs a partner. */
 const PAIRS_PER_BOARD = 12
 const STAR_POSITION = 12
 const LUCKY_STAR: Item = { name: 'Lucky star', face: '⭐' }
@@ -10,7 +10,7 @@ export type CardState = 'down' | 'up' | 'matched'
 
 export type MatchEvent =
   | { type: 'cardFlipped'; card: number }
-  | { type: 'pairFound'; kind: string }
+  | { type: 'pairFound'; name: string; face: string }
   | { type: 'pairMissed'; first: string; second: string }
   | { type: 'boardCleared' }
 
@@ -27,23 +27,18 @@ export interface MatchSnapshot {
   readonly cards: readonly CardSnapshot[]
 }
 
-interface Card extends Item {
-  /** The lucky star has no kind. */
-  readonly kind: Kind | null
-}
-
 export class MatchGame {
-  private readonly kinds: readonly Kind[]
+  private readonly pictures: readonly Item[]
   private readonly random: () => number
   private boardsCleared = 0
   private cleared = false
-  private board: readonly Card[]
+  private board: readonly Item[]
   private up: number[] = []
   private matched = new Set<number>()
 
-  constructor(kinds: readonly Kind[], random: () => number) {
-    if (kinds.length < PAIRS_PER_BOARD) throw new Error(`A board needs ${PAIRS_PER_BOARD} kinds, got ${kinds.length}`)
-    this.kinds = kinds
+  constructor(pictures: readonly Item[], random: () => number) {
+    if (pictures.length < PAIRS_PER_BOARD) throw new Error(`A board needs ${PAIRS_PER_BOARD} pictures, got ${pictures.length}`)
+    this.pictures = pictures
     this.random = random
     this.board = this.deal()
   }
@@ -79,15 +74,15 @@ export class MatchGame {
 
   private judgePair(): MatchEvent[] {
     const [first, second] = this.up.map((id) => this.board[id])
-    if (first.kind !== second.kind) return this.missPair(first, second)
+    if (first.name !== second.name) return this.missPair(first, second)
     this.up.forEach((id) => this.matched.add(id))
     this.up = []
-    const events: MatchEvent[] = [{ type: 'pairFound', kind: first.kind!.plural }]
+    const events: MatchEvent[] = [{ type: 'pairFound', name: first.name, face: first.face }]
     if (this.matched.size === this.board.length) events.push(this.clearBoard())
     return events
   }
 
-  private missPair(first: Card, second: Card): MatchEvent[] {
+  private missPair(first: Item, second: Item): MatchEvent[] {
     return [{ type: 'pairMissed', first: first.name, second: second.name }]
   }
 
@@ -97,16 +92,12 @@ export class MatchGame {
     return { type: 'boardCleared' }
   }
 
-  private deal(): Card[] {
+  private deal(): Item[] {
     this.cleared = false
     this.up = []
     this.matched = new Set([STAR_POSITION])
-    const cards: Card[] = this.shuffled(
-      this.shuffled(this.kinds)
-        .slice(0, PAIRS_PER_BOARD)
-        .flatMap((kind) => this.shuffled(kind.items).slice(0, 2).map((item) => ({ ...item, kind }))),
-    )
-    return cards.toSpliced(STAR_POSITION, 0, { ...LUCKY_STAR, kind: null })
+    const cards = this.shuffled(this.shuffled(this.pictures).slice(0, PAIRS_PER_BOARD).flatMap((picture) => [picture, picture]))
+    return cards.toSpliced(STAR_POSITION, 0, LUCKY_STAR)
   }
 
   private phase(): Phase {
