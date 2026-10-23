@@ -33,7 +33,7 @@ afterEach(() => {
 })
 
 describe('BucketScreen', () => {
-  it('shows an item at the top with a dog, a strawberry and a truck bucket below', () => {
+  it('shows an item at the top with a dog, a strawberry, a truck and a teddy bucket below', () => {
     renderBuckets()
 
     expect(item()).toHaveAccessibleName('Item: cow')
@@ -42,6 +42,7 @@ describe('BucketScreen', () => {
       expect.stringContaining('🐶'),
       expect.stringContaining('🍓'),
       expect.stringContaining('🚚'),
+      expect.stringContaining('🧸'),
     ])
     expect(screen.getByRole('status')).toHaveTextContent('Score: 0')
   })
@@ -123,7 +124,7 @@ describe('BucketScreen', () => {
 
     for (let turn = 0; turn < ITEMS.length; turn++) {
       const wanted = ITEMS.find((candidate) => `Item: ${candidate.name}` === item().getAttribute('aria-label'))!.bucket
-      tapItemThenBucket({ animals: 'Animals', fruit: 'Fruit', vehicles: 'Vehicles' }[wanted]!)
+      tapItemThenBucket({ animals: 'Animals', fruit: 'Fruit', vehicles: 'Vehicles', toys: 'Toys' }[wanted]!)
     }
 
     expect(screen.getByRole('status')).toHaveTextContent(`Score: ${ITEMS.length}`)
@@ -153,11 +154,11 @@ describe('BucketScreen', () => {
     expect(screen.queryByRole('button', { name: /^Item:/ })).not.toBeInTheDocument()
   })
 
-  it('plays medium with mammals, fish and birds to sort into', () => {
+  it('plays medium with mammals, fish, birds and reptiles to sort into', () => {
     renderBuckets(0, 'medium')
 
     expect(item()).toHaveAccessibleName('Item: cow')
-    expect(within(screen.getByRole('group', { name: 'Buckets' })).getAllByRole('button').map((button) => button.getAttribute('aria-label'))).toEqual(['Mammals', 'Fish', 'Birds'])
+    expect(within(screen.getByRole('group', { name: 'Buckets' })).getAllByRole('button').map((button) => button.getAttribute('aria-label'))).toEqual(['Mammals', 'Fish', 'Birds', 'Reptiles'])
 
     tapItemThenBucket('Mammals')
 

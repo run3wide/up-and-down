@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { BUCKETS, DIFFICULTIES, ITEMS, LEVELS } from './items'
 
 describe('the things to sort', () => {
-  it('has a dog, a strawberry and a truck to sort into', () => {
-    expect(BUCKETS.map((bucket) => bucket.emoji)).toEqual(['🐶', '🍓', '🚚'])
+  it('has a dog, a strawberry, a truck and a teddy to sort into', () => {
+    expect(BUCKETS.map((bucket) => bucket.emoji)).toEqual(['🐶', '🍓', '🚚', '🧸'])
   })
 
   it('belongs every item in a bucket that is on the table', () => {
@@ -25,21 +25,22 @@ describe('the levels', () => {
     expect(DIFFICULTIES).toEqual(['easy', 'medium', 'hard'])
   })
 
-  it('keeps the original animals, fruit and vehicles as the easy level', () => {
+  it('keeps the original animals, fruit, vehicles and toys as the easy level', () => {
     expect(LEVELS.easy.buckets).toBe(BUCKETS)
     expect(LEVELS.easy.items).toBe(ITEMS)
   })
 
-  it('sorts mammals from fish from birds on medium', () => {
-    expect(LEVELS.medium.buckets.map((bucket) => bucket.label)).toEqual(['Mammals', 'Fish', 'Birds'])
+  it('sorts mammals from fish from birds from reptiles on medium', () => {
+    expect(LEVELS.medium.buckets.map((bucket) => bucket.label)).toEqual(['Mammals', 'Fish', 'Birds', 'Reptiles'])
   })
 
-  it('adds insects, and animals that look like another kind, on hard', () => {
+  it('adds insects and reptiles, and animals that look like another kind, on hard', () => {
     const { buckets, items } = LEVELS.hard
     const mammals = items.filter((item) => item.bucket === 'mammals').map((item) => item.name)
 
-    expect(buckets.map((bucket) => bucket.label)).toEqual(['Mammals', 'Birds', 'Fish', 'Insects'])
+    expect(buckets.map((bucket) => bucket.label)).toEqual(['Mammals', 'Birds', 'Fish', 'Insects', 'Reptiles'])
     expect(mammals).toEqual(expect.arrayContaining(['whale', 'dolphin', 'bat']))
+    expect(items.find((item) => item.name === 'turtle')?.bucket).toBe('reptiles')
   })
 
   it.each(DIFFICULTIES)('has every %s item belong in a bucket on the table, with enough of each and no name twice', (difficulty) => {
@@ -48,6 +49,7 @@ describe('the levels', () => {
 
     expect(items.filter((item) => !ids.includes(item.bucket))).toEqual([])
     for (const id of ids) expect(items.filter((item) => item.bucket === id).length).toBeGreaterThanOrEqual(3)
+    expect(new Set(buckets.map((bucket) => bucket.emoji)).size).toBe(buckets.length)
     expect(new Set(items.map((item) => item.name)).size).toBe(items.length)
     expect(new Set(items.map((item) => item.emoji)).size).toBe(items.length)
   })
