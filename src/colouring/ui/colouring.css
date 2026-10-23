@@ -71,6 +71,19 @@
   cursor: pointer;
 }
 
+/* Big, white with a dark edge, so a number reads on any colour and across the room on a TV. */
+.colouring__number {
+  fill: #fff;
+  stroke: #1d2b53;
+  stroke-width: 0.9;
+  paint-order: stroke;
+  font-weight: bold;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+  user-select: none;
+}
+
 .colouring__line {
   fill: none;
   stroke: var(--paper-ink);
