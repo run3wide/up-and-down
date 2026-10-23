@@ -26,10 +26,10 @@
 
 .match__cards {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   align-content: start;
-  gap: 0.7rem;
-  width: min(100%, 30rem);
+  gap: clamp(0.3rem, 1.6vw, 0.6rem);
+  width: min(100%, 34rem);
 }
 
 .match-card {
@@ -41,16 +41,17 @@
   min-width: 0;
   padding: 0.25rem;
   font: inherit;
-  font-size: 1rem;
+  font-size: clamp(0.6rem, 2.6vw, 0.9rem);
+  overflow-wrap: anywhere;
   color: var(--ink);
   background: var(--surface);
   border: 0.2rem solid #fff;
-  border-radius: 1.2rem;
+  border-radius: 0.9rem;
   box-shadow: 0 0.25rem 0 #0002;
 }
 
 .match-card--down {
-  font-size: 2.6rem;
+  font-size: clamp(1.4rem, 7vw, 2.2rem);
   color: #fff;
   background: #6c5ce7;
   cursor: pointer;
@@ -76,7 +77,7 @@
 }
 
 .match-card__face {
-  font-size: 2.6rem;
+  font-size: clamp(1.5rem, 8vw, 2.4rem);
   line-height: 1.1;
 }
 

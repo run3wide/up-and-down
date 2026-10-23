@@ -9,6 +9,7 @@ import { inFrame } from '../../test-support/inFrame'
 /** The screen deals the same board as a game built with the same random source, so we can read where things are. */
 const anyOrder = () => 0
 const dealt = () => new MatchGame(KINDS, anyOrder).snapshot().cards
+const PAIRS = 12
 
 function renderMatch() {
   const bestScores = new InMemoryBestScoreStore()
@@ -18,7 +19,7 @@ function renderMatch() {
 }
 
 const cards = () => within(screen.getByRole('group', { name: 'Cards' }))
-const kindOf = (name: string) => KINDS.find((kind) => kind.items.some((item) => item.name === name))!
+const kindOf = (name: string) => KINDS.find((kind) => kind.items.some((item) => item.name === name))
 
 /** Cards are told apart by their place on the board, which stays the same while they turn over. */
 const cardAt = (position: number) => cards().getAllByRole('button')[position]
@@ -31,7 +32,7 @@ function positionsOfAPair(skip = 0): [number, number] {
 
 function positionsOfAMiss(): [number, number] {
   const [first, ...rest] = dealt()
-  return [first.id, rest.find((card) => kindOf(card.name) !== kindOf(first.name))!.id]
+  return [first.id, rest.find((card) => kindOf(card.name) && kindOf(card.name) !== kindOf(first.name))!.id]
 }
 
 function findPair(skip = 0) {
@@ -39,7 +40,7 @@ function findPair(skip = 0) {
 }
 
 function findEveryPair() {
-  for (let i = 0; i < dealt().length / 2; i++) findPair(i)
+  for (let i = 0; i < PAIRS; i++) findPair(i)
 }
 
 function miss() {
@@ -49,7 +50,7 @@ function miss() {
 /** A game that mirrors the screen's, so the test can ask it where things are on the second board. */
 function gameOnSecondBoard() {
   const game = new MatchGame(KINDS, anyOrder)
-  for (let i = 0; i < dealt().length / 2; i++) positionsOfAPair(i).forEach((id) => game.flip(id))
+  for (let i = 0; i < PAIRS; i++) positionsOfAPair(i).forEach((id) => game.flip(id))
   game.nextBoard()
   return game
 }
@@ -69,10 +70,22 @@ describe('MatchScreen', () => {
     renderMatch()
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/alike/i)
-    expect(cards().getAllByRole('button')).toHaveLength(8)
-    expect(cards().getAllByRole('button', { name: /^Hidden card/ })).toHaveLength(8)
+    expect(cards().getAllByRole('button')).toHaveLength(25)
+    expect(cards().getAllByRole('button', { name: /^Hidden card/ })).toHaveLength(24)
     expect(screen.getByRole('status')).toHaveTextContent('Score: 0')
     expect(screen.getByRole('img', { name: '5 lives left' })).toBeInTheDocument()
+  })
+
+  it('numbers the back of each card so a helper can say which to turn over, with a lucky star in the middle', () => {
+    renderMatch()
+
+    expect(cardAt(0)).toHaveTextContent('1')
+    expect(cardAt(24)).toHaveTextContent('25')
+    expect(cardAt(11)).toHaveTextContent('12')
+    expect(cardAt(13)).toHaveTextContent('14')
+    expect(cardAt(12)).toHaveAccessibleName('Lucky star')
+    expect(cardAt(12)).toBeDisabled()
+    expect(cards().getAllByRole('button')).toHaveLength(25)
   })
 
   it('shows what a card is when it is turned over', () => {
@@ -92,7 +105,7 @@ describe('MatchScreen', () => {
     const [first, second] = positionsOfAPair()
     expect(cardAt(first)).toBeDisabled()
     expect(cardAt(second)).toBeDisabled()
-    expect(screen.getByRole('alert')).toHaveTextContent(new RegExp(`both are ${kindOf(dealt()[first].name).plural}`, 'i'))
+    expect(screen.getByRole('alert')).toHaveTextContent(new RegExp(`both are ${kindOf(dealt()[first].name)!.plural}`, 'i'))
     expect(screen.getByRole('img', { name: '5 lives left' })).toBeInTheDocument()
   })
 
@@ -108,7 +121,7 @@ describe('MatchScreen', () => {
     expect(cardAt(second)).toHaveAccessibleName(dealt()[second].name)
   })
 
-  it('offers the next board once every pair is found, with a bigger board after it', () => {
+  it('offers the next board once every pair is found, and another 5x5 board after it', () => {
     renderMatch()
 
     findEveryPair()
@@ -116,7 +129,7 @@ describe('MatchScreen', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(/great/i)
     expect(screen.getByRole('status')).toHaveTextContent('Score: 1')
     fireEvent.click(screen.getByRole('button', { name: 'Next board' }))
-    expect(cards().getAllByRole('button', { name: /^Hidden card/ })).toHaveLength(12)
+    expect(cards().getAllByRole('button', { name: /^Hidden card/ })).toHaveLength(24)
     expect(screen.queryByRole('button', { name: 'Next board' })).not.toBeInTheDocument()
   })
 
