@@ -8,8 +8,8 @@ import { MAX_LIVES, MatchGame, type MatchEvent } from '../domain/matchGame'
 import '../../shared/hud.css'
 import './match.css'
 
-/** Long enough to look at both cards and remember them. */
-const MISS_SHOWN_MS = 2000
+/** Long enough to see both cards, short enough not to wait. */
+const MISS_SHOWN_MS = 1000
 
 interface MatchScreenProps {
   random: () => number
