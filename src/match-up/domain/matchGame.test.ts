@@ -142,6 +142,32 @@ describe('MatchGame', () => {
     expect(cards[next.id].state).toBe('up')
   })
 
+  it('turns a missed pair back over when asked, without another heart', () => {
+    const game = new MatchGame(small, anyOrder)
+    const [a, b] = aMismatch(game)
+    flipBoth(game, [a, b])
+
+    game.turnBackMissed()
+
+    const snapshot = game.snapshot()
+    expect(snapshot.cards[a].state).toBe('down')
+    expect(snapshot.cards[b].state).toBe('down')
+    expect(snapshot.lives).toBe(MAX_LIVES - 1)
+  })
+
+  it('leaves a lone flipped card and a found pair alone when asked to turn a missed pair back', () => {
+    const game = new MatchGame(small, anyOrder)
+    const [a, b] = aPair(game)
+    flipBoth(game, [a, b])
+    const lone = game.snapshot().cards.find((card) => card.state === 'down')!
+    game.flip(lone.id)
+
+    game.turnBackMissed()
+
+    expect(game.snapshot().cards[lone.id].state).toBe('up')
+    expect(game.snapshot().cards[a].state).toBe('matched')
+  })
+
   it('does not take a heart twice for the same missed pair', () => {
     const game = new MatchGame(small, anyOrder)
     const [a, b] = aMismatch(game)

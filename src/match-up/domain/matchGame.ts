@@ -62,6 +62,11 @@ export class MatchGame {
     return events
   }
 
+  /** Turns a pair that did not match back over; a lone flipped card stays. */
+  turnBackMissed() {
+    if (this.up.length === 2) this.up = []
+  }
+
   nextBoard() {
     if (!this.cleared) return
     this.lives = Math.min(this.lives + 1, MAX_LIVES)
