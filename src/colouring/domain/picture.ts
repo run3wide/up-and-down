@@ -58,3 +58,13 @@ export class Picture {
     this.history.push(this.fills)
   }
 }
+
+/** The next blank part after the one at `from`, wrapping round to the start; null when there is no other blank part. */
+export function nextToColour(template: Template, fills: Fills, from: number): number | null {
+  const { regions } = template
+  for (let step = 1; step <= regions.length; step++) {
+    const index = (from + step + regions.length) % regions.length
+    if (index !== from && !(regions[index].id in fills)) return index
+  }
+  return null
+}
