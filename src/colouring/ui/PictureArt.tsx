@@ -83,7 +83,7 @@ export function PictureArt({ template, fills, onPick, current }: PictureArtProps
       ))}
       {onPick &&
         spots.map((spot, index) =>
-          spot ? (
+          spot && !(template.regions[index].id in fills) ? (
             <text
               key={template.regions[index].id}
               className="colouring__number"

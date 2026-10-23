@@ -136,6 +136,23 @@ describe('ColouringScreen', () => {
       expect(numbers.map((number) => number.textContent)).toEqual([String(trex.regions.length)])
     })
 
+    it('takes the number off a part once it is coloured, and brings it back if the colour is undone', () => {
+      Object.assign(SVGElement.prototype, { isPointInFill: () => true })
+      renderScreen()
+      openPicture('T-Rex')
+      const topPart = trex.regions.length
+      const numbers = () => [...document.querySelectorAll('.colouring__number')].map((number) => number.textContent)
+      expect(numbers()).toEqual([String(topPart)])
+
+      fireEvent.click(screen.getByRole('button', { name: /colour by number/i }))
+      chooseColour('Green')
+      tapPart(trex.regions[topPart - 1].name)
+
+      expect(numbers()).toEqual([])
+      fireEvent.click(screen.getByRole('button', { name: 'Undo' }))
+      expect(numbers()).toEqual([String(topPart)])
+    })
+
     it('does not number the little pictures on the shelf', () => {
       Object.assign(SVGElement.prototype, { isPointInFill: () => true })
       renderScreen()
