@@ -39,6 +39,7 @@ const GAMES: Record<GameId, Usability> = {
   'treasure-map': { card: /^Play Treasure Map/, onScreen: () => screen.getByRole('region', { name: 'Clue' }), stylesheet: 'treasure-map/ui/treasure.css', layout: 'scrolls' },
   'dino-clues': { card: /^Play Dino Clues/, onScreen: () => screen.getByRole('group', { name: 'Hiding places' }), stylesheet: 'dino-clues/ui/dinoClues.css', layout: 'scrolls' },
   'cake-bakery': { card: /^Play Cake Bakery/, onScreen: () => screen.getByRole('group', { name: 'Answer' }), stylesheet: 'cake-bakery/ui/bakery.css', layout: 'scrolls' },
+  'group-up': { card: /^Play Group Up/, onScreen: () => screen.getByRole('group', { name: 'Pile' }), stylesheet: 'group-up/ui/group.css', layout: 'scrolls' },
   colouring: { card: /^Play Colouring/, onScreen: () => screen.getByRole('group', { name: 'Pictures' }), stylesheet: 'colouring/ui/colouring.css', layout: 'scrolls' },
 }
 

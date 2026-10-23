@@ -1,8 +1,6 @@
-/** "3x": a count of one kind of thing. */
-export interface Term {
-  readonly count: number
-  readonly symbol: string
-}
+import type { Term } from '../../shared/likeThings'
+
+export type { Term }
 
 /** A like-things sum whose answer the player builds from tiles. */
 export interface Sum {
