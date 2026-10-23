@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { COLOURS } from './colours'
-import { Picture } from './picture'
+import { Picture, nextToColour } from './picture'
 import type { Template } from './templates'
 
 const TWO_PART_TEMPLATE: Template = {
@@ -14,6 +14,30 @@ const TWO_PART_TEMPLATE: Template = {
 }
 
 const [red, blue] = COLOURS
+
+describe('nextToColour', () => {
+  const regions = ['a', 'b', 'c', 'd'].map((id) => ({ id, name: id, path: '' }))
+  const template = { id: 't', name: 'T', regions, lines: [] }
+
+  it('finds the next blank part after the one given', () => {
+    expect(nextToColour(template, { a: 'red' }, 0)).toBe(1)
+    expect(nextToColour(template, { a: 'red', b: 'red' }, 0)).toBe(2)
+  })
+
+  it('starts from the first part when given -1', () => {
+    expect(nextToColour(template, {}, -1)).toBe(0)
+    expect(nextToColour(template, { a: 'red' }, -1)).toBe(1)
+  })
+
+  it('wraps round to blanks at the start', () => {
+    expect(nextToColour(template, { c: 'red', d: 'red' }, 2)).toBe(0)
+  })
+
+  it('has nowhere to go when everything is coloured, or the only blank is the one given', () => {
+    expect(nextToColour(template, { a: 'red', b: 'red', c: 'red', d: 'red' }, 1)).toBeNull()
+    expect(nextToColour(template, { a: 'red', b: 'red', c: 'red' }, 3)).toBeNull()
+  })
+})
 
 describe('Picture', () => {
   it('starts with every part uncoloured', () => {

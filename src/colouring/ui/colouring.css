@@ -57,6 +57,12 @@
 }
 
 /* The browser's own focus ring is a box round the part's bounding box, blown up by the SVG's scale; outline the shape instead. */
+.colouring__part--current {
+  stroke: #e5484d;
+  stroke-width: 1.8;
+  paint-order: stroke;
+}
+
 .colouring__part:focus {
   outline: none;
 }
@@ -178,4 +184,90 @@
 .colouring__brush[aria-pressed='true'] {
   outline: 0.3rem solid var(--ink);
   outline-offset: 0.15rem;
+}
+
+.colouring__workspace {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: min(100%, 36rem);
+}
+
+.colouring__number-box {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    'number name steps'
+    'mode mode mode';
+  align-items: center;
+  gap: 0.2rem 0.8rem;
+  width: 100%;
+  padding: 0.4rem 0.8rem;
+  background: var(--surface);
+  border: 0.25rem solid #e5484d;
+  border-radius: 1.2rem;
+  box-shadow: 0 0.3rem 0 #0002;
+}
+
+.colouring__number-label {
+  display: none;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.colouring__number-big {
+  grid-area: number;
+  margin: 0;
+  font-size: clamp(2.6rem, 11vw, 4rem);
+  line-height: 1;
+}
+
+.colouring__number-name {
+  grid-area: name;
+  margin: 0;
+  font-size: clamp(1.2rem, 4vw, 1.6rem);
+}
+
+.colouring__number-steps {
+  grid-area: steps;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.colouring__mode {
+  grid-area: mode;
+  justify-self: center;
+  font-size: 1rem;
+}
+
+/* On a wide screen, such as a TV, the box sits beside the picture. */
+@media (min-width: 760px) {
+  .colouring__workspace {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: min(100%, 56rem);
+    gap: 1.5rem;
+  }
+
+  .colouring__number-box {
+    flex: none;
+    width: auto;
+    min-width: 12rem;
+    grid-template-columns: 1fr;
+    grid-template-areas: 'label' 'number' 'name' 'steps' 'mode';
+    justify-items: center;
+    text-align: center;
+    padding: 0.6rem 1rem;
+  }
+
+  .colouring__number-label {
+    display: block;
+    grid-area: label;
+  }
+
+  .colouring__number-big {
+    font-size: clamp(3rem, 8vw, 5rem);
+  }
 }

@@ -18,8 +18,108 @@ const openPicture = (name: string) => fireEvent.click(screen.getByRole('button',
 const chooseColour = (name: string) => fireEvent.click(screen.getByRole('button', { name }))
 const part = (name: string) => screen.getByRole('button', { name: new RegExp(`^${name},`) })
 const tapPart = (name: string) => fireEvent.click(part(name))
+const numberBox = () => within(screen.getByRole('complementary', { name: 'Current part' }))
+const currentNumber = () => numberBox().getByTestId('current-number').textContent
+/** The picture's old way: choose a colour, then tap parts to fill them. */
+const switchToTapping = () => fireEvent.click(screen.getByRole('button', { name: /colour by number/i }))
+const openPictureForTapping = (name: string) => {
+  openPicture(name)
+  switchToTapping()
+}
 
 describe('ColouringScreen', () => {
+  describe('colouring by number', () => {
+    const regionNumbered = (n: number) => trex.regions[n - 1]
+
+    it('shows the number to colour next in a box at the side, starting at 1', () => {
+      renderScreen()
+
+      openPicture('T-Rex')
+
+      expect(currentNumber()).toBe('1')
+      expect(numberBox().getByText(regionNumbered(1).name)).toBeInTheDocument()
+    })
+
+    it('fills the current part with the next colour picked, and moves on to the next blank number', () => {
+      renderScreen()
+      openPicture('T-Rex')
+
+      chooseColour('Green')
+
+      expect(part(regionNumbered(1).name)).toHaveAccessibleName(`${regionNumbered(1).name}, number 1, Green`)
+      expect(currentNumber()).toBe('2')
+      chooseColour('Blue')
+      expect(part(regionNumbered(2).name)).toHaveAccessibleName(`${regionNumbered(2).name}, number 2, Blue`)
+      expect(currentNumber()).toBe('3')
+    })
+
+    it('makes a tapped part the current one without colouring it, then colours it with the next colour', () => {
+      renderScreen()
+      openPicture('T-Rex')
+
+      tapPart('Head')
+
+      expect(part('Head')).toHaveAccessibleName(/not coloured$/)
+      expect(currentNumber()).toBe(String(trex.regions.findIndex((region) => region.name === 'Head') + 1))
+      chooseColour('Pink')
+      expect(part('Head')).toHaveAccessibleName(/Pink$/)
+    })
+
+    it('jumps to a number typed on the keyboard', () => {
+      renderScreen()
+      openPicture('T-Rex')
+
+      fireEvent.keyDown(window, { key: '1' })
+      fireEvent.keyDown(window, { key: '2' })
+
+      expect(currentNumber()).toBe('12')
+      expect(numberBox().getByText(regionNumbered(12).name)).toBeInTheDocument()
+    })
+
+    it('starts a new number when the digits typed would be more than the picture has', () => {
+      renderScreen()
+      openPicture('T-Rex')
+
+      fireEvent.keyDown(window, { key: '9' })
+      fireEvent.keyDown(window, { key: '9' })
+
+      expect(currentNumber()).toBe('9')
+    })
+
+    it('steps through the numbers with arrow buttons, wrapping round', () => {
+      renderScreen()
+      openPicture('T-Rex')
+
+      fireEvent.click(numberBox().getByRole('button', { name: 'Previous number' }))
+      expect(currentNumber()).toBe(String(trex.regions.length))
+      fireEvent.click(numberBox().getByRole('button', { name: 'Next number' }))
+      expect(currentNumber()).toBe('1')
+    })
+
+    it('stays on the same number when every part is coloured', () => {
+      renderScreen()
+      openPicture('T-Rex')
+
+      for (let i = 0; i < trex.regions.length; i++) chooseColour('Teal')
+
+      expect(screen.getByRole('status')).toHaveTextContent(/all coloured in/i)
+      const before = currentNumber()
+      chooseColour('Red')
+      expect(currentNumber()).toBe(before)
+    })
+
+    it('can be switched off to colour by choosing a colour and tapping parts', () => {
+      renderScreen()
+      openPicture('T-Rex')
+
+      switchToTapping()
+      chooseColour('Green')
+
+      expect(part(regionNumbered(1).name)).toHaveAccessibleName(/not coloured$/)
+      expect(screen.getByRole('button', { name: /colour by number/i })).toHaveAttribute('aria-pressed', 'false')
+    })
+  })
+
   describe('part numbers', () => {
     afterEach(() => {
       delete (SVGElement.prototype as { isPointInFill?: unknown }).isPointInFill
@@ -64,7 +164,7 @@ describe('ColouringScreen', () => {
 
   it('colours a part with the chosen colour', () => {
     renderScreen()
-    openPicture('T-Rex')
+    openPictureForTapping('T-Rex')
 
     chooseColour('Green')
     tapPart('Body')
@@ -85,7 +185,7 @@ describe('ColouringScreen', () => {
 
   it('colours a part from the keyboard', () => {
     renderScreen()
-    openPicture('T-Rex')
+    openPictureForTapping('T-Rex')
 
     fireEvent.keyDown(part('Tail'), { key: 'Enter' })
     fireEvent.keyDown(part('Head'), { key: ' ' })
@@ -96,7 +196,7 @@ describe('ColouringScreen', () => {
 
   it('undoes a colour and clears them all', () => {
     renderScreen()
-    openPicture('T-Rex')
+    openPictureForTapping('T-Rex')
     tapPart('Body')
     chooseColour('Pink')
     tapPart('Head')
@@ -111,7 +211,7 @@ describe('ColouringScreen', () => {
 
   it('cheers when every part is coloured, and keeps the picture open for more', () => {
     renderScreen()
-    openPicture('T-Rex')
+    openPictureForTapping('T-Rex')
     expect(screen.queryByText(/all coloured in/i)).not.toBeInTheDocument()
 
     for (const region of trex.regions) tapPart(region.name)
@@ -124,7 +224,7 @@ describe('ColouringScreen', () => {
 
   it('keeps a picture as it was left, and picks it up again next time', () => {
     const gallery = renderScreen()
-    openPicture('T-Rex')
+    openPictureForTapping('T-Rex')
     chooseColour('Orange')
     tapPart('Body')
 
@@ -141,7 +241,7 @@ describe('ColouringScreen', () => {
 
   it('goes back to the shelf with the latest colours', () => {
     renderScreen()
-    openPicture('T-Rex')
+    openPictureForTapping('T-Rex')
     tapPart('Body')
 
     fireEvent.click(screen.getByRole('button', { name: 'My pictures' }))

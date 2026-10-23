@@ -11,6 +11,8 @@ interface PictureArtProps {
   fills: Fills
   /** Without it the picture is just a thumbnail. */
   onPick?: (region: string) => void
+  /** The part to colour next, outlined so it can be found on the picture. */
+  current?: string
 }
 
 const colourOf = (id: string | undefined) => COLOURS.find((colour) => colour.id === id)
@@ -50,7 +52,7 @@ function useNumberSpots(template: Template, wanted: boolean) {
   return { svg, spots }
 }
 
-export function PictureArt({ template, fills, onPick }: PictureArtProps) {
+export function PictureArt({ template, fills, onPick, current }: PictureArtProps) {
   const { svg, spots } = useNumberSpots(template, onPick !== undefined)
   return (
     <svg ref={svg} className="colouring__art" viewBox="0 0 100 100" role={onPick ? 'group' : undefined} aria-label={onPick ? template.name : undefined} aria-hidden={onPick ? undefined : true}>
@@ -60,7 +62,7 @@ export function PictureArt({ template, fills, onPick }: PictureArtProps) {
           <path
             key={region.id}
             d={region.path}
-            className="colouring__part"
+            className={`colouring__part${region.id === current ? ' colouring__part--current' : ''}`}
             fill={colour?.hex ?? BLANK}
             {...(onPick && {
               role: 'button',
