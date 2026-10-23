@@ -24,6 +24,11 @@
 :root[data-theme='dark'] .bucket-game { background: linear-gradient(#141a3d, #3a3350); }
 :root[data-theme='dark'] .treasure-map { background: linear-gradient(#141a3d, #3b3350); }
 :root[data-theme='dark'] .dino-clues { background: linear-gradient(#141a3d 0 40%, #1f4a35 40%); }
+:root[data-theme='dark'] .group-up { background: linear-gradient(#141a3d 0 35%, #2d2a44 35%); }
+:root[data-theme='dark'] .group-up__chip,
+:root[data-theme='dark'] .group-up__box-chip { background: #4a4030; }
+:root[data-theme='dark'] .group-up__box { background: #2e3a6e; }
+:root[data-theme='dark'] .group-up__answer { background: #1f5a3a; }
 :root[data-theme='dark'] .bakery { background: linear-gradient(#2d1a3f 0 45%, #3a2a3f 45%); }
 :root[data-theme='dark'] .race,
 :root[data-theme='dark'] .maze { background: #1f5a33; }

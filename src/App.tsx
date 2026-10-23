@@ -16,6 +16,8 @@ import { buildHunt } from './treasure-map/domain/hunt'
 import { cluesForHunt } from './treasure-map/domain/treasureGame'
 import { TreasureScreen } from './treasure-map/ui/TreasureScreen'
 import { cakeQuiz } from './cake-bakery/domain/cakeQuestions'
+import { groupQuiz } from './group-up/domain/groupQuestions'
+import { GroupScreen } from './group-up/ui/GroupScreen'
 import { BakeryScreen } from './cake-bakery/ui/BakeryScreen'
 import { DinoCluesScreen } from './dino-clues/ui/DinoCluesScreen'
 import { BuilderScreen } from './brick-builder/ui/BuilderScreen'
@@ -104,6 +106,8 @@ export function App({ random, bestScores, bucketBestScores, spellingBestScores, 
         return <DinoCluesScreen random={random} bestScores={bestScores['dino-clues']} sound={sound} onExit={backToGames} />
       case 'cake-bakery':
         return <BakeryScreen createQuiz={() => cakeQuiz(random)} bestScores={bestScores['cake-bakery']} onExit={backToGames} />
+      case 'group-up':
+        return <GroupScreen createQuiz={() => groupQuiz(random)} bestScores={bestScores['group-up']} onExit={backToGames} />
       case 'brick-builder':
         return <BuilderScreen sound={sound} />
     }

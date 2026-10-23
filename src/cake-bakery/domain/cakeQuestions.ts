@@ -1,10 +1,8 @@
+import { FRUIT, LETTERS, SHAPES, likeThingsTerms, show, shuffle } from '../../shared/likeThings'
 import type { Sum, SumQuiz, Term } from './sum'
 
 type Random = () => number
 
-const FRUIT = ['🍍', '🍌', '🍇', '🍓', '🍎']
-const SHAPES = ['⭐', '🔺', '🟦', '🟢']
-const LETTERS = ['x', 'y', 'p', 'z']
 const FIRST_MIXED_QUESTION = 3
 const FIRST_LETTER_QUESTION = 5
 const FIRST_LONG_SUM = 7
@@ -24,10 +22,10 @@ function buildSum(random: Random, questionNumber: number): Sum {
   return sumOf(random, random() < 0.5 ? pictures : LETTERS, 2, 4)
 }
 
-/** `kinds` different things spread over `termCount` terms, shuffled so like things are not side by side. */
+/** `kinds` different things spread over `termCount` terms. */
 function sumOf(random: Random, symbols: readonly string[], kinds: number, termCount: number): Sum {
-  const things = shuffle(random, symbols).slice(0, kinds)
-  const terms = shuffle(random, things.flatMap((symbol, index) => termsFor(random, symbol, index, kinds, termCount)))
+  const terms = likeThingsTerms(random, symbols, kinds, termCount, BIGGEST_COUNT)
+  const things = [...new Set(terms.map((term) => term.symbol))]
   const answer = things.map((symbol) => ({ symbol, count: terms.filter((term) => term.symbol === symbol).reduce((total, term) => total + term.count, 0) }))
   const everything = terms.reduce((total, term) => total + term.count, 0)
   const spareSymbol = shuffle(random, symbols.filter((symbol) => !things.includes(symbol)))[0]
@@ -38,12 +36,6 @@ function sumOf(random: Random, symbols: readonly string[], kinds: number, termCo
     symbols: shuffle(random, [...things, spareSymbol]),
     explanation: `Keep ${things.join(' with ')} with its own kind: only like things go together!`,
   }
-}
-
-/** The first thing gets the extra term when the terms do not split evenly, e.g. 2x + 1x + 3y. */
-function termsFor(random: Random, symbol: string, index: number, kinds: number, termCount: number): Term[] {
-  const howMany = Math.floor(termCount / kinds) + (index < termCount % kinds ? 1 : 0)
-  return Array.from({ length: howMany }, () => ({ symbol, count: 1 + Math.floor(random() * BIGGEST_COUNT) }))
 }
 
 /** Tempting wrong numbers: lumping everything together, or a total that is out by one. */
@@ -58,15 +50,4 @@ function spareCounts(random: Random, answer: readonly Term[], everything: number
     if (!needed.has(filler) && !spares.includes(filler)) spares.push(filler)
   }
   return spares
-}
-
-const show = ({ count, symbol }: Term): string => `${count}${symbol}`
-
-function shuffle<T>(random: Random, items: readonly T[]): T[] {
-  const result = [...items]
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1))
-    ;[result[i], result[j]] = [result[j], result[i]]
-  }
-  return result
 }

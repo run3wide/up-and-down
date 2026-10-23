@@ -19,6 +19,7 @@ const bestScores = () => ({
   'treasure-map': new InMemoryBestScoreStore(),
   'dino-clues': new InMemoryBestScoreStore(),
   'cake-bakery': new InMemoryBestScoreStore(),
+  'group-up': new InMemoryBestScoreStore(),
 })
 
 const spellingBestScores = () => ({ easy: new InMemoryBestScoreStore(), medium: new InMemoryBestScoreStore(), hard: new InMemoryBestScoreStore() })

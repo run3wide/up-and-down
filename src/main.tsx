@@ -22,6 +22,7 @@ const bestScores = {
   'treasure-map': new LocalStorageBestScoreStore('treasure-map:best-score'),
   'dino-clues': new LocalStorageBestScoreStore('dino-clues:best-score'),
   'cake-bakery': new LocalStorageBestScoreStore('cake-bakery:best-score'),
+  'group-up': new LocalStorageBestScoreStore('group-up:best-score'),
 }
 
 // Easy keeps the key each game always used, so existing best scores survive.
