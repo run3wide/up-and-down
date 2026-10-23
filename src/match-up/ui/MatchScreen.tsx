@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { FrameControls } from '../../shared/frame/FrameControls'
-import { recordFinalScore, type BestScoreResult, type BestScoreStore } from '../../shared/bestScore'
-import { Hearts } from '../../shared/Hearts'
-import { GameOverOverlay, PausedOverlay } from '../../shared/Overlays'
+import { recordFinalScore, type BestScoreStore } from '../../shared/bestScore'
+import { PausedOverlay } from '../../shared/Overlays'
 import { KINDS } from '../domain/kinds'
-import { MAX_LIVES, MatchGame, type MatchEvent } from '../domain/matchGame'
+import { MatchGame, type MatchEvent } from '../domain/matchGame'
 import '../../shared/hud.css'
 import './match.css'
 
@@ -21,7 +20,7 @@ export function MatchScreen({ random, bestScores, onExit }: MatchScreenProps) {
   const [game] = useState(() => new MatchGame(KINDS, random))
   const [snapshot, setSnapshot] = useState(() => game.snapshot())
   const [message, setMessage] = useState('')
-  const [result, setResult] = useState<BestScoreResult | null>(null)
+  const [best, setBest] = useState(() => bestScores.load())
   const [paused, setPaused] = useState(false)
 
   const react = useCallback(
@@ -30,8 +29,10 @@ export function MatchScreen({ random, bestScores, onExit }: MatchScreenProps) {
         if (event.type === 'cardFlipped') setMessage('')
         if (event.type === 'pairFound') setMessage(`Both are ${event.kind}! ⭐`)
         if (event.type === 'pairMissed') setMessage(`${event.first} and ${event.second} are not alike. Try again!`)
-        if (event.type === 'boardCleared') setMessage('Great job! You found them all! 🎉')
-        if (event.type === 'gameOver') setResult(recordFinalScore(bestScores, game.snapshot().boardsCleared))
+        if (event.type === 'boardCleared') {
+          setMessage('Great job! You found them all! 🎉')
+          setBest(recordFinalScore(bestScores, game.snapshot().boardsCleared).best)
+        }
       }
     },
     [bestScores, game],
@@ -62,7 +63,9 @@ export function MatchScreen({ random, bestScores, onExit }: MatchScreenProps) {
   return (
     <main className="match">
       <header className="hud">
-        <Hearts lives={snapshot.lives} max={MAX_LIVES} />
+        <p className="hud__score" role="note">
+          Best: {best}
+        </p>
         <p className="hud__score" role="status">
           Score: {snapshot.boardsCleared}
         </p>
@@ -100,9 +103,6 @@ export function MatchScreen({ random, bestScores, onExit }: MatchScreenProps) {
         </button>
       )}
       {paused && <PausedOverlay onResume={() => setPaused(false)} onMainMenu={onExit} />}
-      {snapshot.phase === 'over' && result && (
-        <GameOverOverlay title="Good try!" score={snapshot.boardsCleared} result={result} onBackToGames={onExit} />
-      )}
     </main>
   )
 }

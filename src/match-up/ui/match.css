@@ -89,3 +89,12 @@
     transition: none !important;
   }
 }
+
+.match .hud {
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+}
+
+.match .hud__score {
+  white-space: nowrap;
+}
