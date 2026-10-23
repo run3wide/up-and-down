@@ -136,6 +136,25 @@ describe('MatchScreen', () => {
     expect(cardAt(first)).toHaveAccessibleName(dealt()[first].name)
   })
 
+  it('has a back button that undoes the last match, and is off when there is none', () => {
+    renderMatch()
+    const back = () => screen.getByRole('button', { name: 'Undo last match' })
+    expect(back()).toBeDisabled()
+    findPair(0)
+    findPair(1)
+
+    fireEvent.click(back())
+
+    const [first, second] = positionsOfAPair(1)
+    expect(cardAt(first)).toHaveAccessibleName(`Hidden card ${first + 1}`)
+    expect(cardAt(second)).toHaveAccessibleName(`Hidden card ${second + 1}`)
+    expect(cardAt(positionsOfAPair(0)[0])).toBeDisabled()
+    expect(screen.getByRole('alert')).toHaveTextContent('Put them back')
+    expect(back()).toBeEnabled()
+    fireEvent.click(back())
+    expect(back()).toBeDisabled()
+  })
+
   it('offers the next board once every pair is found, and another 5x5 board after it', () => {
     renderMatch()
 

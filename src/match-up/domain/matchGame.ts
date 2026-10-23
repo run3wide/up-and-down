@@ -12,6 +12,7 @@ export type MatchEvent =
   | { type: 'cardFlipped'; card: number }
   | { type: 'pairFound'; name: string; face: string }
   | { type: 'pairMissed'; first: string; second: string }
+  | { type: 'matchUndone'; name: string }
   | { type: 'boardCleared' }
 
 export interface CardSnapshot extends Item {
@@ -24,6 +25,8 @@ export interface MatchSnapshot {
   readonly boardsCleared: number
   readonly pairsFound: number
   readonly pairsTotal: number
+  /** True while there is a found pair to take back. */
+  readonly canUndo: boolean
   readonly cards: readonly CardSnapshot[]
 }
 
@@ -35,6 +38,8 @@ export class MatchGame {
   private board: readonly Item[]
   private up: number[] = []
   private matched = new Set<number>()
+  /** The pairs found on this board, oldest first, so the last can be taken back. */
+  private found: (readonly [number, number])[] = []
 
   constructor(pictures: readonly Item[], random: () => number) {
     if (pictures.length < PAIRS_PER_BOARD) throw new Error(`A board needs ${PAIRS_PER_BOARD} pictures, got ${pictures.length}`)
@@ -57,6 +62,18 @@ export class MatchGame {
     if (this.up.length === 2) this.up = []
   }
 
+  /** Takes the last pair found off the board, face down again, together with any missed pair still showing. */
+  undoMatch(): MatchEvent[] {
+    const last = this.found.pop()
+    if (!last || this.cleared) {
+      if (last) this.found.push(last)
+      return []
+    }
+    last.forEach((id) => this.matched.delete(id))
+    this.up = []
+    return [{ type: 'matchUndone', name: this.board[last[0]].name }]
+  }
+
   nextBoard() {
     if (!this.cleared) return
     this.board = this.deal()
@@ -68,6 +85,7 @@ export class MatchGame {
       boardsCleared: this.boardsCleared,
       pairsFound: (this.matched.size - 1) / 2,
       pairsTotal: PAIRS_PER_BOARD,
+      canUndo: this.found.length > 0 && !this.cleared,
       cards: this.board.map(({ name, face }, id) => ({ id, name, face, state: this.stateOf(id) })),
     }
   }
@@ -76,6 +94,7 @@ export class MatchGame {
     const [first, second] = this.up.map((id) => this.board[id])
     if (first.name !== second.name) return this.missPair(first, second)
     this.up.forEach((id) => this.matched.add(id))
+    this.found.push([this.up[0], this.up[1]])
     this.up = []
     const events: MatchEvent[] = [{ type: 'pairFound', name: first.name, face: first.face }]
     if (this.matched.size === this.board.length) events.push(this.clearBoard())
@@ -96,6 +115,7 @@ export class MatchGame {
     this.cleared = false
     this.up = []
     this.matched = new Set([STAR_POSITION])
+    this.found = []
     const cards = this.shuffled(this.shuffled(this.pictures).slice(0, PAIRS_PER_BOARD).flatMap((picture) => [picture, picture]))
     return cards.toSpliced(STAR_POSITION, 0, LUCKY_STAR)
   }

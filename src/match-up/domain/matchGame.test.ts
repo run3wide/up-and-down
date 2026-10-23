@@ -162,6 +162,85 @@ describe('MatchGame', () => {
     expect(game.snapshot().cards[b].state).toBe('up')
   })
 
+  it('takes the last pair found back off the board, face down again, when asked', () => {
+    const game = new MatchGame(small, anyOrder)
+    const first = aPair(game)
+    flipBoth(game, first)
+    const second = aPair(game)
+    flipBoth(game, second)
+
+    const events = game.undoMatch()
+
+    expect(events).toEqual([{ type: 'matchUndone', name: game.snapshot().cards[second[0]].name }])
+    const snapshot = game.snapshot()
+    expect(snapshot.cards[second[0]].state).toBe('down')
+    expect(snapshot.cards[second[1]].state).toBe('down')
+    expect(snapshot.cards[first[0]].state).toBe('matched')
+    expect(snapshot.pairsFound).toBe(1)
+  })
+
+  it('goes back one pair at a time, as far as the first, and then has nothing to undo', () => {
+    const game = new MatchGame(small, anyOrder)
+    flipBoth(game, aPair(game))
+    flipBoth(game, aPair(game))
+
+    game.undoMatch()
+    game.undoMatch()
+
+    expect(game.snapshot().pairsFound).toBe(0)
+    expect(game.undoMatch()).toEqual([])
+    expect(game.snapshot().cards.filter((card) => card.name !== STAR).every((card) => card.state === 'down')).toBe(true)
+  })
+
+  it('lets a pair that was undone be found again', () => {
+    const game = new MatchGame(small, anyOrder)
+    const pair = aPair(game)
+    flipBoth(game, pair)
+    game.undoMatch()
+
+    flipBoth(game, pair)
+
+    expect(game.snapshot().cards[pair[0]].state).toBe('matched')
+    expect(game.snapshot().pairsFound).toBe(1)
+  })
+
+  it('also turns back a missed pair that is showing, so the board is tidy', () => {
+    const game = new MatchGame(small, anyOrder)
+    flipBoth(game, aPair(game))
+    const [a, b] = aMismatch(game)
+    flipBoth(game, [a, b])
+
+    game.undoMatch()
+
+    expect(game.snapshot().cards[a].state).toBe('down')
+    expect(game.snapshot().cards[b].state).toBe('down')
+  })
+
+  it('does not undo once the board is cleared, so the score cannot be taken back', () => {
+    const game = new MatchGame(small, anyOrder)
+    clearBoard(game)
+
+    expect(game.undoMatch()).toEqual([])
+    expect(game.snapshot()).toMatchObject({ phase: 'cleared', boardsCleared: 1, pairsFound: 12 })
+  })
+
+  it('starts the next board with nothing to undo', () => {
+    const game = new MatchGame(small, anyOrder)
+    clearBoard(game)
+    game.nextBoard()
+
+    expect(game.undoMatch()).toEqual([])
+  })
+
+  it('says whether there is a match to undo', () => {
+    const game = new MatchGame(small, anyOrder)
+    expect(game.snapshot().canUndo).toBe(false)
+
+    flipBoth(game, aPair(game))
+
+    expect(game.snapshot().canUndo).toBe(true)
+  })
+
   it('ends the board when every pair is found, without scoring until the player moves on', () => {
     const game = new MatchGame(small, anyOrder)
     clearBoard(game)
