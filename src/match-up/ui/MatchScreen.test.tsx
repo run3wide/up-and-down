@@ -1,5 +1,5 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
 import { KINDS } from '../domain/kinds'
 import { MatchGame } from '../domain/matchGame'
@@ -65,6 +65,14 @@ function missOnSecondBoard(game: MatchGame) {
   flip(second.id)
 }
 
+beforeEach(() => {
+  vi.useFakeTimers()
+})
+
+afterEach(() => {
+  vi.useRealTimers()
+})
+
 describe('MatchScreen', () => {
   it('deals a board of face-down cards with full hearts', () => {
     renderMatch()
@@ -119,6 +127,32 @@ describe('MatchScreen', () => {
     expect(screen.getByRole('img', { name: '4 lives left' })).toBeInTheDocument()
     expect(cardAt(first)).toHaveAccessibleName(dealt()[first].name)
     expect(cardAt(second)).toHaveAccessibleName(dealt()[second].name)
+  })
+
+  it('turns a missed pair back over by itself after a moment, so the player can try again', () => {
+    renderMatch()
+    miss()
+    const [first, second] = positionsOfAMiss()
+
+    act(() => void vi.advanceTimersByTime(1000))
+    expect(cardAt(first)).toHaveAccessibleName(dealt()[first].name)
+    act(() => void vi.advanceTimersByTime(1500))
+
+    expect(cardAt(first)).toHaveAccessibleName(`Hidden card ${first + 1}`)
+    expect(cardAt(second)).toHaveAccessibleName(`Hidden card ${second + 1}`)
+    expect(cardAt(first)).toBeEnabled()
+    expect(screen.getByRole('img', { name: '4 lives left' })).toBeInTheDocument()
+  })
+
+  it('keeps a found pair showing when the timer passes', () => {
+    renderMatch()
+    findPair()
+    const [first] = positionsOfAPair()
+
+    act(() => void vi.advanceTimersByTime(5000))
+
+    expect(cardAt(first)).toBeDisabled()
+    expect(cardAt(first)).toHaveAccessibleName(dealt()[first].name)
   })
 
   it('offers the next board once every pair is found, and another 5x5 board after it', () => {

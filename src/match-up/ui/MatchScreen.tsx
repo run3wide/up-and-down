@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { FrameControls } from '../../shared/frame/FrameControls'
 import { recordFinalScore, type BestScoreResult, type BestScoreStore } from '../../shared/bestScore'
 import { Hearts } from '../../shared/Hearts'
@@ -7,6 +7,9 @@ import { KINDS } from '../domain/kinds'
 import { MAX_LIVES, MatchGame, type MatchEvent } from '../domain/matchGame'
 import '../../shared/hud.css'
 import './match.css'
+
+/** Long enough to look at both cards and remember them. */
+const MISS_SHOWN_MS = 2000
 
 interface MatchScreenProps {
   random: () => number
@@ -33,6 +36,17 @@ export function MatchScreen({ random, bestScores, onExit }: MatchScreenProps) {
     },
     [bestScores, game],
   )
+
+  const missShowing = snapshot.phase === 'playing' && snapshot.cards.filter((card) => card.state === 'up').length === 2
+
+  useEffect(() => {
+    if (!missShowing) return
+    const timer = setTimeout(() => {
+      game.turnBackMissed()
+      setSnapshot(game.snapshot())
+    }, MISS_SHOWN_MS)
+    return () => clearTimeout(timer)
+  }, [missShowing, game])
 
   const flip = (id: number) => {
     react(game.flip(id))
