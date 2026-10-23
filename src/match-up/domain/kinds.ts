@@ -20,5 +20,9 @@ export const KINDS: readonly Kind[] = [
   { id: 'shape', plural: 'shapes', items: [item('Circle', '⚪'), item('Square', '🟦'), item('Triangle', '🔺'), item('Diamond', '🔶'), item('Star', '⭐')] },
   { id: 'weather', plural: 'weather', items: [item('Sun', '☀️'), item('Rain', '🌧️'), item('Snow', '❄️'), item('Rainbow', '🌈'), item('Cloud', '☁️')] },
   { id: 'toy', plural: 'toys', items: [item('Ball', '⚽'), item('Teddy', '🧸'), item('Kite', '🪁'), item('Balloon', '🎈'), item('Drum', '🥁')] },
+  { id: 'instrument', plural: 'instruments', items: [item('Guitar', '🎸'), item('Piano', '🎹'), item('Trumpet', '🎺'), item('Violin', '🎻'), item('Saxophone', '🎷')] },
+  { id: 'vegetable', plural: 'vegetables', items: [item('Carrot', '🥕'), item('Corn', '🌽'), item('Broccoli', '🥦'), item('Potato', '🥔'), item('Cucumber', '🥒')] },
+  { id: 'colour', plural: 'colours', items: [item('Red', '🔴'), item('Blue', '🔵'), item('Green', '🟢'), item('Yellow', '🟡'), item('Purple', '🟣')] },
+  { id: 'treat', plural: 'treats', items: [item('Cake', '🎂'), item('Ice cream', '🍦'), item('Cookie', '🍪'), item('Doughnut', '🍩'), item('Lollipop', '🍭')] },
   { id: 'clothes', plural: 'clothes', items: [item('Shirt', '👕'), item('Trousers', '👖'), item('Socks', '🧦'), item('Hat', '🧢'), item('Dress', '👗')] },
 ]

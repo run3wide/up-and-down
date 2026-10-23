@@ -5,19 +5,17 @@ import type { Kind } from './kinds'
 
 const item = (name: string) => ({ name, face: '·' })
 
-const fruits: Kind = { id: 'fruit', plural: 'fruits', items: [item('Apple'), item('Banana'), item('Grape')] }
-const animals: Kind = { id: 'animal', plural: 'animals', items: [item('Cat'), item('Dog'), item('Cow')] }
-const numbers: Kind = { id: 'number', plural: 'numbers', items: [item('One'), item('Two'), item('Three')] }
-const colours: Kind = { id: 'colour', plural: 'colours', items: [item('Red'), item('Blue'), item('Green')] }
-const small = [fruits, animals, numbers, colours]
-
 const manyKinds = (count: number): Kind[] =>
   Array.from({ length: count }, (_, k) => ({ id: `kind${k}`, plural: `kind${k}s`, items: ['a', 'b', 'c'].map((letter) => item(`${letter}${k}`)) }))
+
+/** A full board is 12 pairs, so the fixtures need 12 kinds. */
+const small = manyKinds(12)
+const STAR = 'Lucky star'
 
 const anyOrder = () => 0
 
 function kindOf(kinds: readonly Kind[], name: string) {
-  return kinds.find((kind) => kind.items.some((it) => it.name === name))!.id
+  return kinds.find((kind) => kind.items.some((it) => it.name === name))?.id
 }
 
 /** The ids of the two cards on the board that are the same kind. */
@@ -60,9 +58,9 @@ describe('MatchGame', () => {
     const game = new MatchGame(small, anyOrder)
 
     const snapshot = game.snapshot()
-    expect(snapshot).toMatchObject({ phase: 'playing', lives: MAX_LIVES, boardsCleared: 0, pairsTotal: 4, pairsFound: 0 })
-    expect(snapshot.cards).toHaveLength(8)
-    expect(snapshot.cards.every((card) => card.state === 'down')).toBe(true)
+    expect(snapshot).toMatchObject({ phase: 'playing', lives: MAX_LIVES, boardsCleared: 0, pairsTotal: 12, pairsFound: 0 })
+    expect(snapshot.cards).toHaveLength(25)
+    expect(snapshot.cards.filter((card) => card.name !== STAR).every((card) => card.state === 'down')).toBe(true)
   })
 
   it('deals exactly two cards of each kind, and they are different things', () => {
@@ -108,7 +106,7 @@ describe('MatchGame', () => {
     expect(events).toEqual([
       { type: 'cardFlipped', card: a },
       { type: 'cardFlipped', card: b },
-      expect.objectContaining({ type: 'pairFound', kind: expect.stringMatching(/^(fruits|animals|numbers|colours)$/) }),
+      expect.objectContaining({ type: 'pairFound', kind: expect.stringMatching(/^kind\d+s$/) }),
     ])
     const snapshot = game.snapshot()
     expect(snapshot.cards[a].state).toBe('matched')
@@ -158,7 +156,7 @@ describe('MatchGame', () => {
     const game = new MatchGame(small, anyOrder)
     clearBoard(game)
 
-    expect(game.snapshot()).toMatchObject({ phase: 'cleared', boardsCleared: 1, pairsFound: 4 })
+    expect(game.snapshot()).toMatchObject({ phase: 'cleared', boardsCleared: 1, pairsFound: 12 })
   })
 
   it('announces a cleared board right after the last pair', () => {
@@ -183,18 +181,36 @@ describe('MatchGame', () => {
     expect(game.snapshot().lives).toBe(MAX_LIVES)
   })
 
-  it('deals boards that are always full rows of four cards, growing to a 4x4 square', () => {
-    const kinds = manyKinds(8)
-    const game = new MatchGame(kinds, anyOrder)
+  it('always deals a 5x5 board, with a lucky star face up in the middle that is not a pair', () => {
+    const game = new MatchGame(small, anyOrder)
     const sizes: number[] = []
 
-    for (let board = 0; board < 5; board++) {
-      sizes.push(game.snapshot().cards.length)
-      clearBoard(game, kinds)
+    for (let board = 0; board < 3; board++) {
+      const { cards, pairsTotal } = game.snapshot()
+      sizes.push(cards.length)
+      expect(cards[12]).toMatchObject({ name: STAR, face: '⭐', state: 'matched' })
+      expect(cards.filter((card) => card.name === STAR)).toHaveLength(1)
+      expect(pairsTotal).toBe(12)
+      clearBoard(game)
       game.nextBoard()
     }
 
-    expect(sizes).toEqual([8, 12, 16, 16, 16])
+    expect(sizes).toEqual([25, 25, 25])
+  })
+
+  it('leaves the lucky star alone: flipping it does nothing and costs nothing', () => {
+    const game = new MatchGame(small, anyOrder)
+
+    expect(game.flip(12)).toEqual([])
+    expect(game.snapshot().lives).toBe(MAX_LIVES)
+  })
+
+  it('clears the board when the 12 pairs are found, without counting the star as a pair', () => {
+    const game = new MatchGame(small, anyOrder)
+
+    clearBoard(game)
+
+    expect(game.snapshot()).toMatchObject({ phase: 'cleared', pairsFound: 12, pairsTotal: 12 })
   })
 
   it('deals a fresh face-down board after a cleared one', () => {
@@ -204,15 +220,11 @@ describe('MatchGame', () => {
 
     const snapshot = game.snapshot()
     expect(snapshot).toMatchObject({ phase: 'playing', pairsFound: 0, boardsCleared: 1 })
-    expect(snapshot.cards.every((card) => card.state === 'down')).toBe(true)
+    expect(snapshot.cards.filter((card) => card.name !== STAR).every((card) => card.state === 'down')).toBe(true)
   })
 
-  it('never deals more pairs than there are kinds', () => {
-    const game = new MatchGame(small, anyOrder)
-    clearBoard(game)
-    game.nextBoard()
-
-    expect(game.snapshot().pairsTotal).toBe(4)
+  it('needs enough kinds to fill a board', () => {
+    expect(() => new MatchGame(manyKinds(11), anyOrder)).toThrow()
   })
 
   it('ignores nextBoard while a board is still being played', () => {
@@ -235,7 +247,7 @@ describe('MatchGame', () => {
   })
 
   it('plays with the real kinds: each has enough different things to fill a board', () => {
-    expect(KINDS.length).toBeGreaterThanOrEqual(8)
+    expect(KINDS.length).toBeGreaterThanOrEqual(12)
     for (const kind of KINDS) expect(kind.items.length).toBeGreaterThanOrEqual(4)
     const names = KINDS.flatMap((kind) => kind.items.map((it) => it.name))
     expect(new Set(names).size).toBe(names.length)

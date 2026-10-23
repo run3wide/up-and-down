@@ -68,7 +68,7 @@ export function MatchScreen({ random, bestScores, onExit }: MatchScreenProps) {
               disabled={paused || snapshot.phase !== 'playing'}
               onClick={() => flip(card.id)}
             >
-              <span aria-hidden="true">?</span>
+              <span aria-hidden="true">{card.id + 1}</span>
             </button>
           ) : (
             <button key={card.id} className={`match-card match-card--${card.state}`} aria-label={card.name} disabled>
