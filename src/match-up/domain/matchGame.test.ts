@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { KINDS } from './kinds'
-import { MAX_LIVES, MatchGame, type MatchEvent } from './matchGame'
+import { MatchGame, type MatchEvent } from './matchGame'
 import type { Kind } from './kinds'
 
 const item = (name: string) => ({ name, face: '·' })
@@ -54,11 +54,11 @@ function clearBoard(game: MatchGame, kinds: readonly Kind[] = small) {
 }
 
 describe('MatchGame', () => {
-  it('starts with a board of face-down cards, full lives and nothing cleared', () => {
+  it('starts with a board of face-down cards and nothing cleared', () => {
     const game = new MatchGame(small, anyOrder)
 
     const snapshot = game.snapshot()
-    expect(snapshot).toMatchObject({ phase: 'playing', lives: MAX_LIVES, boardsCleared: 0, pairsTotal: 12, pairsFound: 0 })
+    expect(snapshot).toMatchObject({ phase: 'playing', boardsCleared: 0, pairsTotal: 12, pairsFound: 0 })
     expect(snapshot.cards).toHaveLength(25)
     expect(snapshot.cards.filter((card) => card.name !== STAR).every((card) => card.state === 'down')).toBe(true)
   })
@@ -111,10 +111,10 @@ describe('MatchGame', () => {
     const snapshot = game.snapshot()
     expect(snapshot.cards[a].state).toBe('matched')
     expect(snapshot.cards[b].state).toBe('matched')
-    expect(snapshot).toMatchObject({ pairsFound: 1, lives: MAX_LIVES })
+    expect(snapshot).toMatchObject({ pairsFound: 1 })
   })
 
-  it('takes a heart for two cards that are not alike, and keeps them showing so they can be remembered', () => {
+  it('keeps two cards that are not alike showing so they can be remembered, and says so', () => {
     const game = new MatchGame(small, anyOrder)
     const [a, b] = aMismatch(game)
     const names = [game.snapshot().cards[a].name, game.snapshot().cards[b].name]
@@ -125,7 +125,6 @@ describe('MatchGame', () => {
     const snapshot = game.snapshot()
     expect(snapshot.cards[a].state).toBe('up')
     expect(snapshot.cards[b].state).toBe('up')
-    expect(snapshot.lives).toBe(MAX_LIVES - 1)
   })
 
   it('turns a missed pair back over on the next flip', () => {
@@ -142,7 +141,7 @@ describe('MatchGame', () => {
     expect(cards[next.id].state).toBe('up')
   })
 
-  it('turns a missed pair back over when asked, without another heart', () => {
+  it('turns a missed pair back over when asked', () => {
     const game = new MatchGame(small, anyOrder)
     const [a, b] = aMismatch(game)
     flipBoth(game, [a, b])
@@ -152,7 +151,6 @@ describe('MatchGame', () => {
     const snapshot = game.snapshot()
     expect(snapshot.cards[a].state).toBe('down')
     expect(snapshot.cards[b].state).toBe('down')
-    expect(snapshot.lives).toBe(MAX_LIVES - 1)
   })
 
   it('leaves a lone flipped card and a found pair alone when asked to turn a missed pair back', () => {
@@ -168,14 +166,14 @@ describe('MatchGame', () => {
     expect(game.snapshot().cards[a].state).toBe('matched')
   })
 
-  it('does not take a heart twice for the same missed pair', () => {
+  it('keeps a missed pair showing when one of its cards is flipped again', () => {
     const game = new MatchGame(small, anyOrder)
     const [a, b] = aMismatch(game)
     flipBoth(game, [a, b])
 
-    game.flip(a)
+    expect(game.flip(a)).toEqual([])
 
-    expect(game.snapshot().lives).toBe(MAX_LIVES - 1)
+    expect(game.snapshot().cards[b].state).toBe('up')
   })
 
   it('ends the board when every pair is found, without scoring until the player moves on', () => {
@@ -192,19 +190,6 @@ describe('MatchGame', () => {
     const events = flipBoth(game, aPair(game))
 
     expect(events.map((event) => event.type)).toEqual(['cardFlipped', 'cardFlipped', 'pairFound', 'boardCleared'])
-  })
-
-  it('gives a heart back for a cleared board, up to the most hearts', () => {
-    const game = new MatchGame(small, anyOrder)
-    flipBoth(game, aMismatch(game))
-    clearBoard(game)
-
-    game.nextBoard()
-
-    expect(game.snapshot().lives).toBe(MAX_LIVES)
-    clearBoard(game)
-    game.nextBoard()
-    expect(game.snapshot().lives).toBe(MAX_LIVES)
   })
 
   it('always deals a 5x5 board, with a lucky star face up in the middle that is not a pair', () => {
@@ -224,11 +209,10 @@ describe('MatchGame', () => {
     expect(sizes).toEqual([25, 25, 25])
   })
 
-  it('leaves the lucky star alone: flipping it does nothing and costs nothing', () => {
+  it('leaves the lucky star alone: flipping it does nothing', () => {
     const game = new MatchGame(small, anyOrder)
 
     expect(game.flip(12)).toEqual([])
-    expect(game.snapshot().lives).toBe(MAX_LIVES)
   })
 
   it('clears the board when the 12 pairs are found, without counting the star as a pair', () => {
@@ -262,14 +246,13 @@ describe('MatchGame', () => {
     expect(game.snapshot().cards[0].state).toBe('up')
   })
 
-  it('ends the game when the hearts run out, and then stops listening', () => {
+  it('never ends the game, however many pairs are missed: there is always another go', () => {
     const game = new MatchGame(small, anyOrder)
-    let events: MatchEvent[] = []
-    for (let i = 0; i < MAX_LIVES; i++) events = missOnce(game)
 
-    expect(events.at(-1)).toEqual({ type: 'gameOver' })
-    expect(game.snapshot()).toMatchObject({ phase: 'over', lives: 0 })
-    expect(game.flip(game.snapshot().cards.find((card) => card.state === 'down')!.id)).toEqual([])
+    for (let i = 0; i < 40; i++) missOnce(game)
+
+    expect(game.snapshot().phase).toBe('playing')
+    expect(game.flip(game.snapshot().cards.find((card) => card.state === 'down')!.id)).toHaveLength(1)
   })
 
   it('plays with the real kinds: each has enough different things to fill a board', () => {

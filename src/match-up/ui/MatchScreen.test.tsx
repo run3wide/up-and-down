@@ -47,24 +47,6 @@ function miss() {
   for (const position of positionsOfAMiss()) flip(position)
 }
 
-/** A game that mirrors the screen's, so the test can ask it where things are on the second board. */
-function gameOnSecondBoard() {
-  const game = new MatchGame(KINDS, anyOrder)
-  for (let i = 0; i < PAIRS; i++) positionsOfAPair(i).forEach((id) => game.flip(id))
-  game.nextBoard()
-  return game
-}
-
-function missOnSecondBoard(game: MatchGame) {
-  const faceDown = () => game.snapshot().cards.filter((card) => card.state === 'down')
-  const first = faceDown()[0]
-  game.flip(first.id)
-  const second = faceDown().find((card) => kindOf(card.name) !== kindOf(first.name))!
-  game.flip(second.id)
-  flip(first.id)
-  flip(second.id)
-}
-
 beforeEach(() => {
   vi.useFakeTimers()
 })
@@ -74,14 +56,14 @@ afterEach(() => {
 })
 
 describe('MatchScreen', () => {
-  it('deals a board of face-down cards with full hearts', () => {
+  it('deals a board of face-down cards, with no hearts to lose', () => {
     renderMatch()
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/alike/i)
     expect(cards().getAllByRole('button')).toHaveLength(25)
     expect(cards().getAllByRole('button', { name: /^Hidden card/ })).toHaveLength(24)
     expect(screen.getByRole('status')).toHaveTextContent('Score: 0')
-    expect(screen.getByRole('img', { name: '5 lives left' })).toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: /lives left/ })).not.toBeInTheDocument()
   })
 
   it('numbers the back of each card so a helper can say which to turn over, with a lucky star in the middle', () => {
@@ -114,17 +96,16 @@ describe('MatchScreen', () => {
     expect(cardAt(first)).toBeDisabled()
     expect(cardAt(second)).toBeDisabled()
     expect(screen.getByRole('alert')).toHaveTextContent(new RegExp(`both are ${kindOf(dealt()[first].name)!.plural}`, 'i'))
-    expect(screen.getByRole('img', { name: '5 lives left' })).toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: /lives left/ })).not.toBeInTheDocument()
   })
 
-  it('gently says two things are not alike, takes a heart, and lets the player look at them', () => {
+  it('gently says two things are not alike, and lets the player look at them', () => {
     renderMatch()
 
     miss()
 
     const [first, second] = positionsOfAMiss()
     expect(screen.getByRole('alert')).toHaveTextContent(`${dealt()[first].name} and ${dealt()[second].name} are not alike`)
-    expect(screen.getByRole('img', { name: '4 lives left' })).toBeInTheDocument()
     expect(cardAt(first)).toHaveAccessibleName(dealt()[first].name)
     expect(cardAt(second)).toHaveAccessibleName(dealt()[second].name)
   })
@@ -141,7 +122,6 @@ describe('MatchScreen', () => {
     expect(cardAt(first)).toHaveAccessibleName(`Hidden card ${first + 1}`)
     expect(cardAt(second)).toHaveAccessibleName(`Hidden card ${second + 1}`)
     expect(cardAt(first)).toBeEnabled()
-    expect(screen.getByRole('img', { name: '4 lives left' })).toBeInTheDocument()
   })
 
   it('keeps a found pair showing when the timer passes', () => {
@@ -167,17 +147,22 @@ describe('MatchScreen', () => {
     expect(screen.queryByRole('button', { name: 'Next board' })).not.toBeInTheDocument()
   })
 
-  it('ends when the hearts run out, kindly, and remembers the best score', () => {
+  it('never ends, however many pairs are missed', () => {
+    renderMatch()
+
+    for (let i = 0; i < 12; i++) miss()
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(cards().getAllByRole('button', { name: /^Hidden card/ }).length).toBeGreaterThan(20)
+  })
+
+  it('remembers the best score when a board is cleared', () => {
     const { bestScores } = renderMatch()
+
     findEveryPair()
-    fireEvent.click(screen.getByRole('button', { name: 'Next board' }))
-    const secondBoard = gameOnSecondBoard()
 
-    for (let i = 0; i < 5; i++) missOnSecondBoard(secondBoard)
-
-    const gameOver = screen.getByRole('dialog', { name: 'Good try!' })
-    expect(gameOver).toHaveTextContent('Score: 1')
     expect(bestScores.load()).toBe(1)
+    expect(screen.getByRole('note')).toHaveTextContent('Best: 1')
   })
 
   it('can be paused, and goes back to the games from there', () => {

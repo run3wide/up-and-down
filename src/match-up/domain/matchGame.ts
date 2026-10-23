@@ -1,13 +1,11 @@
 import type { Item, Kind } from './kinds'
 
-export const MAX_LIVES = 5
-
 /** Every board is a 5x5 square: 12 pairs and one lucky star in the middle, which is already face up and never needs a partner. */
 const PAIRS_PER_BOARD = 12
 const STAR_POSITION = 12
 const LUCKY_STAR: Item = { name: 'Lucky star', face: '⭐' }
 
-export type Phase = 'playing' | 'cleared' | 'over'
+export type Phase = 'playing' | 'cleared'
 export type CardState = 'down' | 'up' | 'matched'
 
 export type MatchEvent =
@@ -15,7 +13,6 @@ export type MatchEvent =
   | { type: 'pairFound'; kind: string }
   | { type: 'pairMissed'; first: string; second: string }
   | { type: 'boardCleared' }
-  | { type: 'gameOver' }
 
 export interface CardSnapshot extends Item {
   readonly id: number
@@ -24,7 +21,6 @@ export interface CardSnapshot extends Item {
 
 export interface MatchSnapshot {
   readonly phase: Phase
-  readonly lives: number
   readonly boardsCleared: number
   readonly pairsFound: number
   readonly pairsTotal: number
@@ -39,7 +35,6 @@ interface Card extends Item {
 export class MatchGame {
   private readonly kinds: readonly Kind[]
   private readonly random: () => number
-  private lives = MAX_LIVES
   private boardsCleared = 0
   private cleared = false
   private board: readonly Card[]
@@ -54,7 +49,7 @@ export class MatchGame {
   }
 
   flip(id: number): MatchEvent[] {
-    if (this.lives === 0 || this.cleared || !this.isFaceDown(id)) return []
+    if (this.cleared || !this.isFaceDown(id)) return []
     if (this.up.length === 2) this.up = []
     this.up.push(id)
     const events: MatchEvent[] = [{ type: 'cardFlipped', card: id }]
@@ -69,14 +64,12 @@ export class MatchGame {
 
   nextBoard() {
     if (!this.cleared) return
-    this.lives = Math.min(this.lives + 1, MAX_LIVES)
     this.board = this.deal()
   }
 
   snapshot(): MatchSnapshot {
     return {
       phase: this.phase(),
-      lives: this.lives,
       boardsCleared: this.boardsCleared,
       pairsFound: (this.matched.size - 1) / 2,
       pairsTotal: PAIRS_PER_BOARD,
@@ -95,10 +88,7 @@ export class MatchGame {
   }
 
   private missPair(first: Card, second: Card): MatchEvent[] {
-    this.lives -= 1
-    const events: MatchEvent[] = [{ type: 'pairMissed', first: first.name, second: second.name }]
-    if (this.lives === 0) events.push({ type: 'gameOver' })
-    return events
+    return [{ type: 'pairMissed', first: first.name, second: second.name }]
   }
 
   private clearBoard(): MatchEvent {
@@ -120,7 +110,6 @@ export class MatchGame {
   }
 
   private phase(): Phase {
-    if (this.lives === 0) return 'over'
     return this.cleared ? 'cleared' : 'playing'
   }
 
