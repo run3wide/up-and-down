@@ -134,9 +134,9 @@ describe('MatchScreen', () => {
     miss()
     const [first, second] = positionsOfAMiss()
 
-    act(() => void vi.advanceTimersByTime(1000))
+    act(() => void vi.advanceTimersByTime(500))
     expect(cardAt(first)).toHaveAccessibleName(dealt()[first].name)
-    act(() => void vi.advanceTimersByTime(1500))
+    act(() => void vi.advanceTimersByTime(700))
 
     expect(cardAt(first)).toHaveAccessibleName(`Hidden card ${first + 1}`)
     expect(cardAt(second)).toHaveAccessibleName(`Hidden card ${second + 1}`)
