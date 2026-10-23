@@ -1,56 +1,44 @@
 import { describe, expect, it } from 'vitest'
-import { KINDS } from './kinds'
 import { MatchGame, type MatchEvent } from './matchGame'
-import type { Kind } from './kinds'
+import { PICTURES, type Item } from './pictures'
 
-const item = (name: string) => ({ name, face: '·' })
+const manyPictures = (count: number): Item[] => Array.from({ length: count }, (_, k) => ({ name: `picture${k}`, face: '·' }))
 
-const manyKinds = (count: number): Kind[] =>
-  Array.from({ length: count }, (_, k) => ({ id: `kind${k}`, plural: `kind${k}s`, items: ['a', 'b', 'c'].map((letter) => item(`${letter}${k}`)) }))
-
-/** A full board is 12 pairs, so the fixtures need 12 kinds. */
-const small = manyKinds(12)
+/** A full board is 12 pairs, so the fixtures need 12 pictures. */
+const small = manyPictures(12)
 const STAR = 'Lucky star'
-
 const anyOrder = () => 0
-
-function kindOf(kinds: readonly Kind[], name: string) {
-  return kinds.find((kind) => kind.items.some((it) => it.name === name))?.id
-}
-
-/** The ids of the two cards on the board that are the same kind. */
-function aPair(game: MatchGame, kinds: readonly Kind[] = small, skip = 0): [number, number] {
-  const open = game.snapshot().cards.filter((card) => card.state === 'down')
-  const pairs = kinds
-    .map((kind) => open.filter((card) => kindOf(kinds, card.name) === kind.id))
-    .filter((cards) => cards.length === 2)
-  const [a, b] = pairs[skip]
-  return [a.id, b.id]
-}
-
-/** Two cards of different kinds. */
-function aMismatch(game: MatchGame, kinds: readonly Kind[] = small): [number, number] {
-  const open = game.snapshot().cards.filter((card) => card.state === 'down')
-  const first = open[0]
-  const other = open.find((card) => kindOf(kinds, card.name) !== kindOf(kinds, first.name))!
-  return [first.id, other.id]
-}
 
 function flipBoth(game: MatchGame, [a, b]: [number, number]): MatchEvent[] {
   return [...game.flip(a), ...game.flip(b)]
 }
 
-/** Flips a card, then one of a different kind. Works while an earlier miss is still showing. */
-function missOnce(game: MatchGame, kinds: readonly Kind[] = small): MatchEvent[] {
-  const down = () => game.snapshot().cards.filter((card) => card.state === 'down')
-  const first = down()[0]
-  const events = game.flip(first.id)
-  const other = down().find((card) => kindOf(kinds, card.name) !== kindOf(kinds, first.name))!
-  return [...events, ...game.flip(other.id)]
+const faceDown = (game: MatchGame) => game.snapshot().cards.filter((card) => card.state === 'down')
+
+/** The ids of two face-down cards showing the same picture. */
+function aPair(game: MatchGame, skip = 0): [number, number] {
+  const open = faceDown(game)
+  const pairs = [...new Set(open.map((card) => card.name))].map((name) => open.filter((card) => card.name === name)).filter((cards) => cards.length === 2)
+  const [a, b] = pairs[skip]
+  return [a.id, b.id]
 }
 
-function clearBoard(game: MatchGame, kinds: readonly Kind[] = small) {
-  while (game.snapshot().cards.some((card) => card.state === 'down')) flipBoth(game, aPair(game, kinds))
+/** Two face-down cards showing different pictures. */
+function aMismatch(game: MatchGame): [number, number] {
+  const open = faceDown(game)
+  return [open[0].id, open.find((card) => card.name !== open[0].name)!.id]
+}
+
+function missOnce(game: MatchGame): MatchEvent[] {
+  return flipBoth(game, aMismatch(game))
+}
+
+function clearBoard(game: MatchGame) {
+  while (faceDown(game).length > 0) flipBoth(game, aPair(game))
+}
+
+function clearBoardExceptLastPair(game: MatchGame) {
+  while (faceDown(game).length > 2) flipBoth(game, aPair(game))
 }
 
 describe('MatchGame', () => {
@@ -63,17 +51,14 @@ describe('MatchGame', () => {
     expect(snapshot.cards.filter((card) => card.name !== STAR).every((card) => card.state === 'down')).toBe(true)
   })
 
-  it('deals exactly two cards of each kind, and they are different things', () => {
+  it('deals exactly two cards of each picture it uses, and twelve different pictures', () => {
     const game = new MatchGame(small, anyOrder)
 
-    for (const kind of small) {
-      const names = game
-        .snapshot()
-        .cards.filter((card) => kindOf(small, card.name) === kind.id)
-        .map((card) => card.name)
-      expect(names).toHaveLength(2)
-      expect(new Set(names).size).toBe(2)
-    }
+    const names = game.snapshot().cards.filter((card) => card.name !== STAR).map((card) => card.name)
+
+    expect(names).toHaveLength(24)
+    for (const name of new Set(names)) expect(names.filter((candidate) => candidate === name)).toHaveLength(2)
+    expect(new Set(names).size).toBe(12)
   })
 
   it('turns a card face up when it is flipped', () => {
@@ -97,16 +82,17 @@ describe('MatchGame', () => {
     expect(game.flip(99)).toEqual([])
   })
 
-  it('keeps two cards of the same kind face up and says what they have in common', () => {
+  it('keeps two identical pictures face up and says which picture they are', () => {
     const game = new MatchGame(small, anyOrder)
     const [a, b] = aPair(game)
+    const { name, face } = game.snapshot().cards[a]
 
     const events = flipBoth(game, [a, b])
 
     expect(events).toEqual([
       { type: 'cardFlipped', card: a },
       { type: 'cardFlipped', card: b },
-      expect.objectContaining({ type: 'pairFound', kind: expect.stringMatching(/^kind\d+s$/) }),
+      { type: 'pairFound', name, face },
     ])
     const snapshot = game.snapshot()
     expect(snapshot.cards[a].state).toBe('matched')
@@ -114,7 +100,7 @@ describe('MatchGame', () => {
     expect(snapshot).toMatchObject({ pairsFound: 1 })
   })
 
-  it('keeps two cards that are not alike showing so they can be remembered, and says so', () => {
+  it('keeps two different pictures showing so they can be remembered, and says so', () => {
     const game = new MatchGame(small, anyOrder)
     const [a, b] = aMismatch(game)
     const names = [game.snapshot().cards[a].name, game.snapshot().cards[b].name]
@@ -131,7 +117,7 @@ describe('MatchGame', () => {
     const game = new MatchGame(small, anyOrder)
     const [a, b] = aMismatch(game)
     flipBoth(game, [a, b])
-    const next = game.snapshot().cards.find((card) => card.state === 'down')!
+    const next = faceDown(game)[0]
 
     game.flip(next.id)
 
@@ -157,7 +143,7 @@ describe('MatchGame', () => {
     const game = new MatchGame(small, anyOrder)
     const [a, b] = aPair(game)
     flipBoth(game, [a, b])
-    const lone = game.snapshot().cards.find((card) => card.state === 'down')!
+    const lone = faceDown(game)[0]
     game.flip(lone.id)
 
     game.turnBackMissed()
@@ -233,8 +219,8 @@ describe('MatchGame', () => {
     expect(snapshot.cards.filter((card) => card.name !== STAR).every((card) => card.state === 'down')).toBe(true)
   })
 
-  it('needs enough kinds to fill a board', () => {
-    expect(() => new MatchGame(manyKinds(11), anyOrder)).toThrow()
+  it('needs enough pictures to fill a board', () => {
+    expect(() => new MatchGame(manyPictures(11), anyOrder)).toThrow()
   })
 
   it('ignores nextBoard while a board is still being played', () => {
@@ -252,17 +238,13 @@ describe('MatchGame', () => {
     for (let i = 0; i < 40; i++) missOnce(game)
 
     expect(game.snapshot().phase).toBe('playing')
-    expect(game.flip(game.snapshot().cards.find((card) => card.state === 'down')!.id)).toHaveLength(1)
+    expect(game.flip(faceDown(game)[0].id)).toHaveLength(1)
   })
 
-  it('plays with the real kinds: each has enough different things to fill a board', () => {
-    expect(KINDS.length).toBeGreaterThanOrEqual(12)
-    for (const kind of KINDS) expect(kind.items.length).toBeGreaterThanOrEqual(4)
-    const names = KINDS.flatMap((kind) => kind.items.map((it) => it.name))
-    expect(new Set(names).size).toBe(names.length)
+  it('plays with the real pictures: plenty, each different, and none that looks like a card number', () => {
+    expect(PICTURES.length).toBeGreaterThanOrEqual(12)
+    expect(new Set(PICTURES.map((picture) => picture.name)).size).toBe(PICTURES.length)
+    expect(new Set(PICTURES.map((picture) => picture.face)).size).toBe(PICTURES.length)
+    expect(PICTURES.filter((picture) => /^\d+$/.test(picture.face))).toEqual([])
   })
 })
-
-function clearBoardExceptLastPair(game: MatchGame) {
-  while (game.snapshot().cards.filter((card) => card.state === 'down').length > 2) flipBoth(game, aPair(game))
-}

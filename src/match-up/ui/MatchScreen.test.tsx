@@ -1,14 +1,15 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryBestScoreStore } from '../../shared/InMemoryBestScoreStore'
-import { KINDS } from '../domain/kinds'
 import { MatchGame } from '../domain/matchGame'
+import { PICTURES } from '../domain/pictures'
 import { MatchScreen } from './MatchScreen'
 import { inFrame } from '../../test-support/inFrame'
 
 /** The screen deals the same board as a game built with the same random source, so we can read where things are. */
 const anyOrder = () => 0
-const dealt = () => new MatchGame(KINDS, anyOrder).snapshot().cards
+const STAR = 'Lucky star'
+const dealt = () => new MatchGame(PICTURES, anyOrder).snapshot().cards
 const PAIRS = 12
 
 function renderMatch() {
@@ -19,20 +20,20 @@ function renderMatch() {
 }
 
 const cards = () => within(screen.getByRole('group', { name: 'Cards' }))
-const kindOf = (name: string) => KINDS.find((kind) => kind.items.some((item) => item.name === name))
 
 /** Cards are told apart by their place on the board, which stays the same while they turn over. */
 const cardAt = (position: number) => cards().getAllByRole('button')[position]
 const flip = (position: number) => fireEvent.click(cardAt(position))
 
 function positionsOfAPair(skip = 0): [number, number] {
-  const pairs = KINDS.map((kind) => dealt().filter((card) => kindOf(card.name) === kind).map((card) => card.id)).filter((ids) => ids.length === 2)
+  const cardsOnBoard = dealt().filter((card) => card.name !== STAR)
+  const pairs = [...new Set(cardsOnBoard.map((card) => card.name))].map((name) => cardsOnBoard.filter((card) => card.name === name).map((card) => card.id))
   return pairs[skip] as [number, number]
 }
 
 function positionsOfAMiss(): [number, number] {
   const [first, ...rest] = dealt()
-  return [first.id, rest.find((card) => kindOf(card.name) && kindOf(card.name) !== kindOf(first.name))!.id]
+  return [first.id, rest.find((card) => card.name !== STAR && card.name !== first.name)!.id]
 }
 
 function findPair(skip = 0) {
@@ -59,7 +60,7 @@ describe('MatchScreen', () => {
   it('deals a board of face-down cards, with no hearts to lose', () => {
     renderMatch()
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/alike/i)
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/the same/i)
     expect(cards().getAllByRole('button')).toHaveLength(25)
     expect(cards().getAllByRole('button', { name: /^Hidden card/ })).toHaveLength(24)
     expect(screen.getByRole('status')).toHaveTextContent('Score: 0')
@@ -87,7 +88,7 @@ describe('MatchScreen', () => {
     expect(cardAt(id)).toHaveAccessibleName(name)
   })
 
-  it('keeps a pair of the same kind showing and says what they have in common', () => {
+  it('keeps a matching pair showing and says it is a match', () => {
     renderMatch()
 
     findPair()
@@ -95,17 +96,17 @@ describe('MatchScreen', () => {
     const [first, second] = positionsOfAPair()
     expect(cardAt(first)).toBeDisabled()
     expect(cardAt(second)).toBeDisabled()
-    expect(screen.getByRole('alert')).toHaveTextContent(new RegExp(`both are ${kindOf(dealt()[first].name)!.plural}`, 'i'))
+    expect(screen.getByRole('alert')).toHaveTextContent(`A match! ${dealt()[first].face}${dealt()[first].face}`)
     expect(screen.queryByRole('img', { name: /lives left/ })).not.toBeInTheDocument()
   })
 
-  it('gently says two things are not alike, and lets the player look at them', () => {
+  it('gently says two pictures are not the same, and lets the player look at them', () => {
     renderMatch()
 
     miss()
 
     const [first, second] = positionsOfAMiss()
-    expect(screen.getByRole('alert')).toHaveTextContent(`${dealt()[first].name} and ${dealt()[second].name} are not alike`)
+    expect(screen.getByRole('alert')).toHaveTextContent(`${dealt()[first].name} and ${dealt()[second].name} are not the same`)
     expect(cardAt(first)).toHaveAccessibleName(dealt()[first].name)
     expect(cardAt(second)).toHaveAccessibleName(dealt()[second].name)
   })

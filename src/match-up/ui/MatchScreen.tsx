@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { FrameControls } from '../../shared/frame/FrameControls'
 import { recordFinalScore, type BestScoreStore } from '../../shared/bestScore'
 import { PausedOverlay } from '../../shared/Overlays'
-import { KINDS } from '../domain/kinds'
+import { PICTURES } from '../domain/pictures'
 import { MatchGame, type MatchEvent } from '../domain/matchGame'
 import '../../shared/hud.css'
 import './match.css'
@@ -17,7 +17,7 @@ interface MatchScreenProps {
 }
 
 export function MatchScreen({ random, bestScores, onExit }: MatchScreenProps) {
-  const [game] = useState(() => new MatchGame(KINDS, random))
+  const [game] = useState(() => new MatchGame(PICTURES, random))
   const [snapshot, setSnapshot] = useState(() => game.snapshot())
   const [message, setMessage] = useState('')
   const [best, setBest] = useState(() => bestScores.load())
@@ -27,8 +27,8 @@ export function MatchScreen({ random, bestScores, onExit }: MatchScreenProps) {
     (events: MatchEvent[]) => {
       for (const event of events) {
         if (event.type === 'cardFlipped') setMessage('')
-        if (event.type === 'pairFound') setMessage(`Both are ${event.kind}! ⭐`)
-        if (event.type === 'pairMissed') setMessage(`${event.first} and ${event.second} are not alike. Try again!`)
+        if (event.type === 'pairFound') setMessage(`A match! ${event.face}${event.face} ⭐`)
+        if (event.type === 'pairMissed') setMessage(`${event.first} and ${event.second} are not the same. Try again!`)
         if (event.type === 'boardCleared') {
           setMessage('Great job! You found them all! 🎉')
           setBest(recordFinalScore(bestScores, game.snapshot().boardsCleared).best)
@@ -71,7 +71,7 @@ export function MatchScreen({ random, bestScores, onExit }: MatchScreenProps) {
         </p>
       </header>
       <FrameControls pause={{ paused, onPause: () => setPaused(true) }} />
-      <h1 className="match__title">Find two that are alike</h1>
+      <h1 className="match__title">Find two that are the same</h1>
       <p className="match__message" role="alert">
         {message}
       </p>
