@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import { InMemoryGalleryStore } from '../infrastructure/InMemoryGalleryStore'
 import { InMemorySketchStore } from '../infrastructure/InMemorySketchStore'
 import { TEMPLATES } from '../domain/templates'
@@ -20,6 +20,30 @@ const part = (name: string) => screen.getByRole('button', { name: new RegExp(`^$
 const tapPart = (name: string) => fireEvent.click(part(name))
 
 describe('ColouringScreen', () => {
+  describe('part numbers', () => {
+    afterEach(() => {
+      delete (SVGElement.prototype as { isPointInFill?: unknown }).isPointInFill
+    })
+
+    it('writes a big number on each part that can be seen, so a helper can say which to colour', () => {
+      // A browser would measure the shapes; here whatever is drawn last covers everything.
+      Object.assign(SVGElement.prototype, { isPointInFill: () => true })
+      renderScreen()
+
+      openPicture('T-Rex')
+
+      const numbers = [...document.querySelectorAll('.colouring__number')]
+      expect(numbers.map((number) => number.textContent)).toEqual([String(trex.regions.length)])
+    })
+
+    it('does not number the little pictures on the shelf', () => {
+      Object.assign(SVGElement.prototype, { isPointInFill: () => true })
+      renderScreen()
+
+      expect(document.querySelector('.colouring__number')).toBeNull()
+    })
+  })
+
   it('offers every picture on a shelf, none of them coloured yet', () => {
     renderScreen()
 
@@ -35,7 +59,7 @@ describe('ColouringScreen', () => {
     openPicture('T-Rex')
 
     expect(screen.getByRole('heading', { name: 'Colour the T-Rex' })).toBeInTheDocument()
-    for (const region of trex.regions) expect(part(region.name)).toHaveAccessibleName(`${region.name}, not coloured`)
+    trex.regions.forEach((region, index) => expect(part(region.name)).toHaveAccessibleName(`${region.name}, number ${index + 1}, not coloured`))
   })
 
   it('colours a part with the chosen colour', () => {
@@ -45,8 +69,8 @@ describe('ColouringScreen', () => {
     chooseColour('Green')
     tapPart('Body')
 
-    expect(part('Body')).toHaveAccessibleName('Body, Green')
-    expect(part('Head')).toHaveAccessibleName('Head, not coloured')
+    expect(part('Body')).toHaveAccessibleName(/^Body, number \d+, Green$/)
+    expect(part('Head')).toHaveAccessibleName(/^Head, number \d+, not coloured$/)
   })
 
   it('shows which colour is chosen, starting with the first', () => {
@@ -66,8 +90,8 @@ describe('ColouringScreen', () => {
     fireEvent.keyDown(part('Tail'), { key: 'Enter' })
     fireEvent.keyDown(part('Head'), { key: ' ' })
 
-    expect(part('Tail')).toHaveAccessibleName('Tail, Red')
-    expect(part('Head')).toHaveAccessibleName('Head, Red')
+    expect(part('Tail')).toHaveAccessibleName(/^Tail, number \d+, Red$/)
+    expect(part('Head')).toHaveAccessibleName(/^Head, number \d+, Red$/)
   })
 
   it('undoes a colour and clears them all', () => {
@@ -78,11 +102,11 @@ describe('ColouringScreen', () => {
     tapPart('Head')
 
     fireEvent.click(screen.getByRole('button', { name: 'Undo' }))
-    expect(part('Head')).toHaveAccessibleName('Head, not coloured')
-    expect(part('Body')).toHaveAccessibleName('Body, Red')
+    expect(part('Head')).toHaveAccessibleName(/^Head, number \d+, not coloured$/)
+    expect(part('Body')).toHaveAccessibleName(/^Body, number \d+, Red$/)
 
     fireEvent.click(screen.getByRole('button', { name: 'Clear' }))
-    expect(part('Body')).toHaveAccessibleName('Body, not coloured')
+    expect(part('Body')).toHaveAccessibleName(/^Body, number \d+, not coloured$/)
   })
 
   it('cheers when every part is coloured, and keeps the picture open for more', () => {
@@ -95,7 +119,7 @@ describe('ColouringScreen', () => {
     expect(screen.getByRole('status')).toHaveTextContent(/all coloured in/i)
     chooseColour('Teal')
     tapPart('Sky')
-    expect(part('Sky')).toHaveAccessibleName('Sky, Teal')
+    expect(part('Sky')).toHaveAccessibleName(/^Sky, number \d+, Teal$/)
   })
 
   it('keeps a picture as it was left, and picks it up again next time', () => {
@@ -112,7 +136,7 @@ describe('ColouringScreen', () => {
 
     expect(screen.getByRole('button', { name: `T-Rex, 2 of ${trex.regions.length} parts coloured` })).toBeInTheDocument()
     openPicture('T-Rex')
-    expect(part('Body')).toHaveAccessibleName('Body, Green')
+    expect(part('Body')).toHaveAccessibleName(/^Body, number \d+, Green$/)
   })
 
   it('goes back to the shelf with the latest colours', () => {
